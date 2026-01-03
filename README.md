@@ -1,2 +1,2 @@
 # Loadcontrol
-Load cpntrol example
+Load control example
