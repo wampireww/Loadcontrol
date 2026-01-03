@@ -5,109 +5,109 @@
 <title>Harekat Load Control - Final</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-/* ---------- Temel stil ---------- */
 body{
-  font-family: Arial,sans-serif;
-  background: #eef2f7;
-  margin: 5px;
-  color:#222;
+    font-family: Arial, sans-serif;
+    background: #f2f4f7;
+    margin: 5px;
 }
 section{
-  background: #fff;
-  border: 1px solid #c3c3c3;
-  border-radius: 8px;
-  padding: 8px;
-  margin-bottom: 8px;
+    background:#fff;
+    border:1px solid #d0d0d0;
+    border-radius:6px;
+    padding:6px 8px;
+    margin-bottom:8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
 }
 h1{
-  text-align:center;
-  color:#004080;
-  font-weight:normal;
-  margin:5px;
-  font-size:1.4em;
+    text-align:center;
+    color:#003366;
+    font-weight:normal;
+    margin:5px;
+    font-size:1.4em;
 }
 h3{
-  cursor:pointer;
-  margin:4px 0;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  font-size:1em;
-  color:#004080;
+    cursor:pointer;
+    margin:4px 0;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
 }
 .flex{
-  display:flex;
-  flex-wrap:wrap;
-  align-items:center;
-  gap:5px;
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:5px;
 }
-input[type=number],input[type=text],select{
-  width:60px;
-  font-size:0.9em;
-  padding:2px 4px;
-  border:1px solid #ccc;
-  border-radius:4px;
+input[type=number],input[type=text]{
+    width:60px;
 }
 button{
-  background:#004080;
-  color:#fff;
-  border:none;
-  border-radius:4px;
-  padding:2px 6px;
-  cursor:pointer;
-  font-size:0.9em;
+    background:#003366;
+    color:#fff;
+    border:none;
+    border-radius:4px;
+    padding:2px 6px;
+    cursor:pointer;
+    font-size:0.85em;
 }
-button:hover{background:#0066cc;}
+button:hover{
+    background:#0055aa;
+}
 .compartment{
-  border-top:1px solid #aaa;
-  margin-top:5px;
-  padding-top:5px;
-  background:#f9f9f9;
-  border-radius:4px;
+    border-top:1px solid #bbb;
+    margin-top:5px;
+    padding-top:5px;
+    border-radius:4px;
 }
 .content{
-  display:none;
-  background:#fafafa;
-  padding:4px;
-  border-radius:4px;
+    display:none;
+    background:#fdfdfd;
+    padding:4px;
+    border-radius:4px;
 }
 .bagaj,.konteyner,.kargo,.ek{
-  border:1px dashed #aaa;
-  padding:4px;
-  margin:3px 0;
-  border-radius:4px;
-  display:flex;
-  flex-wrap:wrap;
-  align-items:center;
-  gap:5px;
-  background:#fff;
+    border:1px dashed #bbb;
+    padding:4px;
+    margin:3px 0;
+    border-radius:4px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:5px;
+    align-items:center;
 }
 .summary{
-  background:#e6f0ff;
-  padding:5px;
-  border-radius:6px;
+    background:#e6f0ff;
+    padding:5px;
+    border-radius:6px;
 }
 .item-wrapper{
-  display:inline-flex;
-  flex-wrap:wrap;
-  align-items:center;
-  margin:2px 5px 5px 0;
+    display:inline-flex;
+    flex-wrap:wrap;
+    align-items:center;
+    margin:2px 5px 5px 0;
 }
-.item-input{width:60px;margin-left:5px;}
-.weight-display{font-size:.9em;color:#004080;margin-left:10px;}
-.midBadge{font-size:.78em;color:#444;margin:0 10px;}
+.item-input{
+    width:60px;
+    margin-left:5px;
+}
+.weight-display{
+    font-size:.9em;
+    color:#003366;
+    margin-left:10px;
+}
+.midBadge{
+    font-size:.78em;
+    color:#444;
+    margin:0 10px;
+}
 textarea{
-  width:100%;
-  height:80px;
-  margin-top:5px;
-  border-radius:4px;
-  border:1px solid #ccc;
-  padding:4px;
+    width:100%;
+    height:80px;
+    margin-top:5px;
+    border-radius:4px;
+    border:1px solid #ccc;
+    padding:4px;
 }
-/* ---------- Minik ikonlar ---------- */
-.bagaj::before{content:"🎒";margin-right:4px;}
-.kargo::before{content:"📦";margin-right:4px;}
-.ek::before{content:"✉️";margin-right:4px;}
 </style>
 </head>
 <body>
@@ -115,13 +115,13 @@ textarea{
 
 <section class="flex">
 <div style="flex:1">Uçak
-<select id="aircraft" onchange="fullReset();checkLoadType()">
+<select id="aircraft" onchange="saveAircraft();fullReset(false);checkLoadType()">
 <option value="">Seç</option>
 <option>A319</option><option>A320</option><option>A321</option><option>B737</option>
 <option>A330</option><option>A350</option><option>B777</option><option>B787</option>
 </select></div>
 <div style="flex:1">Yükleme
-<select id="loadType" onchange="checkLoadType()">
+<select id="loadType" onchange="saveLoadType();checkLoadType()">
 <option value="">Seçiniz</option>
 <option value="YIGMA">Yığma</option>
 <option value="ULD">ULD</option>
@@ -159,19 +159,38 @@ Mix <input type="number" id="mxAvg" readonly>
 </section>
 
 <script>
+// === Prevent Pull-to-refresh ===
+document.addEventListener('touchmove', function(event) {
+  if(event.touches.length > 1){
+    event.preventDefault();
+  }
+}, {passive:false});
+
+// === Aircraft & LoadType ===
 const comps={A319:[1,4,5],A320:[1,3,4,5],A321:[1,2,3,4,5],B737:[1,2,3,4],
 A330:[1,2,3,4,5],A350:[1,2,3,4,5],B777:[1,2,3,4,5],B787:[1,2,3,4,5]};
 const wide=["A330","A350","B777","B787"];
 
-// ---------- FULL RESET ----------
-function fullReset(){
-  localStorage.setItem("hlc_aircraft",aircraft.value||"");
-  localStorage.setItem("hlc_loadType",loadType.value||"");
-  document.querySelectorAll('input,textarea').forEach(i=>i.value="");
+function saveAircraft(){
+    localStorage.setItem("hlc_aircraft", aircraft.value);
+}
+function saveLoadType(){
+    localStorage.setItem("hlc_loadType", loadType.value);
+}
+function fullReset(clearStorage=true){
+  if(clearStorage) localStorage.clear();
+  document.querySelectorAll('input,textarea').forEach(i=>{
+      if(i.id!=="waterInput" && i.id!=="pantryInput") i.value="";
+  });
   compartments.innerHTML="";
   summary.innerHTML="";
   finalWater.textContent="Nil";
   finalPantry.textContent="Nil";
+  // restore aircraft/loadType if clearStorage=false
+  if(!clearStorage){
+    if(localStorage.getItem("hlc_aircraft")) aircraft.value = localStorage.getItem("hlc_aircraft");
+    if(localStorage.getItem("hlc_loadType")) loadType.value = localStorage.getItem("hlc_loadType");
+  }
 }
 
 function updateMix(){
@@ -181,13 +200,12 @@ function updateMix(){
 
 function checkLoadType(){
  const ac=aircraft.value, lt=loadType.value;
- if(!lt){fullReset(); return;}
+ if(!lt){fullReset(false); return;}
  if((ac==="B737"&&lt==="ULD")||(wide.includes(ac)&&lt==="YIGMA")){
-  alert("Seçim geçersiz!"); loadType.value=""; fullReset(); return;}
+  alert("Seçim geçersiz!"); loadType.value=""; fullReset(false); return;}
  updateCompartments(true);
 }
 
-// ---------- COMPARTMENTS ----------
 function updateCompartments(r){
  if(r) compartments.innerHTML="";
  if(!aircraft.value || !loadType.value) return;
@@ -221,43 +239,21 @@ function updateCompartments(r){
  autoSave(); updateSummary();
 }
 
-// ---------- ITEMS ----------
+// === AddBagaj, addItem, renumber, updateCPTBadge, updateSummary, autoSave ===
 function renumber(container, kind){
   let i=1;
   container.querySelectorAll(`.item-wrapper[data-kind="${kind}"]`).forEach(e=>{
     const labelSpan = e.querySelector('span');
     if(labelSpan){labelSpan.textContent = kind+" "+(i++);}
-    else {
-      const input=e.querySelector('input');
-      const btn=e.querySelector('button');
-      e.innerHTML='';
-      const s=document.createElement('span');
-      s.textContent = kind+" "+(i++);
-      e.appendChild(s);
-      e.appendChild(input);
-      e.appendChild(btn);
-    }
   });
 }
-
 function renumberGlobalBag(type){
  let i=1;
  document.querySelectorAll('.konteyner-item[data-type="'+type+'"]').forEach(e=>{
    const labelSpan = e.querySelector('span');
    if(labelSpan){labelSpan.textContent = type+" "+(i++);}
-   else {
-     const input=e.querySelector('input');
-     const btn=e.querySelector('button');
-     e.innerHTML='';
-     const s=document.createElement('span');
-     s.textContent = type+" "+(i++);
-     e.appendChild(s);
-     e.appendChild(input);
-     e.appendChild(btn);
-   }
  });
 }
-
 function addBagaj(b){
  const t=b.previousElementSibling.value,p=b.parentElement;
  const d=document.createElement("div");
@@ -272,7 +268,6 @@ function addBagaj(b){
  p.appendChild(d);
  renumberGlobalBag(t); updateSummary(); autoSave();
 }
-
 function addItem(b,k){
  const p=b.parentElement;
  const d=document.createElement("div");
@@ -287,33 +282,28 @@ function addItem(b,k){
  p.appendChild(d);
  renumber(p.closest('.content'),k); updateSummary(); autoSave();
 }
-
-// ---------- BADGE UPDATE ----------
 function updateCPTBadge(){
  document.querySelectorAll('.compartment').forEach(c=>{
   const loadTypeVal=loadType.value;
   const isULD=loadTypeVal==='ULD';
   const isYIGMA=loadTypeVal==='YIGMA';
   let Btotal=0, Ctotal=0, Mtotal=0;
-
   const compNum = parseInt(c.querySelector('h3').childNodes[0].nodeValue.trim().split(" ")[1]);
-
   if(isYIGMA){
     c.querySelectorAll('.bagaj input').forEach(inp=>Btotal+=+inp.value||0);
-  } else if(isULD){
-    if(compNum===5){
-      c.querySelectorAll('.bagaj input').forEach(inp=>Btotal+=+inp.value||0);
-    } else {Btotal=c.querySelectorAll('.konteyner-item').length;}
-  }
-
-  if(isYIGMA){
     c.querySelectorAll('.item-wrapper[data-kind="Cargo"]').forEach(i=>Ctotal+=+i.querySelector('input').value||0);
     c.querySelectorAll('.item-wrapper[data-kind="Manuel"]').forEach(i=>Mtotal+=+i.querySelector('input').value||0);
   } else if(isULD){
-    Ctotal=c.querySelectorAll('.item-wrapper[data-kind="Cargo"]').length;
-    Mtotal=c.querySelectorAll('.item-wrapper[data-kind="Manuel"]').length;
+    if(compNum===5){
+      c.querySelectorAll('.bagaj input').forEach(inp=>Btotal+=+inp.value||0);
+      c.querySelectorAll('.item-wrapper[data-kind="Cargo"]').forEach(i=>Ctotal+=+i.querySelector('input').value||0);
+      c.querySelectorAll('.item-wrapper[data-kind="Manuel"]').forEach(i=>Mtotal+=+i.querySelector('input').value||0);
+    } else {
+      Btotal=c.querySelectorAll('.konteyner-item').length;
+      Ctotal=c.querySelectorAll('.item-wrapper[data-kind="Cargo"]').length;
+      Mtotal=c.querySelectorAll('.item-wrapper[data-kind="Manuel"]').length;
+    }
   }
-
   const h=c.querySelector('h3');
   let mid=h.querySelector('.midBadge');
   if(!mid){mid=document.createElement('span'); mid.className='midBadge'; h.insertBefore(mid,h.querySelector('.weight-display'));}
@@ -322,9 +312,8 @@ function updateCPTBadge(){
   if(Ctotal) out.push("C "+Ctotal);
   if(Mtotal) out.push("Mn "+Mtotal);
   mid.textContent=out.join(" / ");
+});
 }
-
-// ---------- SUMMARY ----------
 function updateSummary(){
  let out="";
  const byA=+byAvg.value||0, bcA=+bcAvg.value||0, mxA=+mxAvg.value||0;
@@ -349,33 +338,16 @@ function updateSummary(){
  finalPantry.textContent=pantryInput.value||"Nil";
  updateCPTBadge();
 }
-
-function autoSave(){
-  localStorage.setItem("hlc",document.body.innerHTML);
-  localStorage.setItem("hlc_aircraft",aircraft.value||"");
-  localStorage.setItem("hlc_loadType",loadType.value||"");
-}
+function autoSave(){localStorage.setItem("hlc",document.body.innerHTML);}
 function saveManual(){autoSave();}
 
-// ---------- LOCAL STORAGE LOAD ----------
+// Load saved state
 window.addEventListener('load', ()=>{
   if(localStorage.getItem("hlc")) document.body.innerHTML=localStorage.getItem("hlc");
-  const acLS = localStorage.getItem("hlc_aircraft");
-  const ltLS = localStorage.getItem("hlc_loadType");
-  if(acLS) aircraft.value=acLS;
-  if(ltLS) loadType.value=ltLS;
+  if(localStorage.getItem("hlc_aircraft")) aircraft.value = localStorage.getItem("hlc_aircraft");
+  if(localStorage.getItem("hlc_loadType")) loadType.value = localStorage.getItem("hlc_loadType");
+  updateSummary();
 });
-
-// ---------- ANDROID PULL-TO-REFRESH ENGELLE ----------
-let lastTouchY = 0;
-let touchStart = false;
-document.addEventListener('touchstart', function(e){ lastTouchY = e.touches[0].clientY; touchStart=true; });
-document.addEventListener('touchmove', function(e){
-  if(!touchStart) return;
-  let touchY = e.touches[0].clientY;
-  if(touchY - lastTouchY > 20 && window.scrollY===0){ e.preventDefault(); }
-}, {passive:false});
-document.addEventListener('touchend', ()=>{ touchStart=false; });
 </script>
 </body>
 </html>
