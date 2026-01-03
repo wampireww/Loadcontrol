@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<title>Harekat Load Control - Final</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+/* ---------------- Genel ---------------- */
+body {
+  font-family: Arial, sans-serif;
+  background: #f7f9fb;
+  margin: 5px;
+  color: #333;
+}
+
+/* ---------------- Bölümler ---------------- */
+section {
+  background: #ffffff;
+  border: 1px solid #d0d4d8;
+  border-radius: 8px;
+  padding: 8px;
+  margin-bottom: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+/* ---------------- Başlıklar ---------------- */
+h1 {
+  text-align: center;
+  color: #004080;
+  font-weight: normal;
+  margin: 5px;
+  font-size: 1.4em;
+}
+
+h3 {
+  cursor: pointer;
+  margin: 4px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* ---------------- Flex yapılar ---------------- */
+.flex {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
+}
+
+/* ---------------- Inputlar ---------------- */
+input[type=number],
+input[type=text] {
+  width: 60px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 2px 4px;
+  font-size: 0.9em;
+  color: #004080;
+  background: #fdfdfd;
+}
+
+/* ---------------- Butonlar ---------------- */
+button {
+  background: #004080;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 2px 6px;
+  cursor: pointer;
+  font-size: 0.85em;
+  transition: background 0.2s;
+}
+button:hover {
+  background: #0066cc;
+}
+
+/* ---------------- Kompartmanlar ---------------- */
+.compartment {
+  border-top: 1px solid #ccc;
+  margin-top: 5px;
+  padding-top: 5px;
+  background: #fafbfc;
+  border-radius: 6px;
+}
+
+/* ---------------- İçerik ---------------- */
+.content {
+  display: none;
+  background: #f9fafe;
+  padding: 4px;
+  border-radius: 4px;
+}
+
+/* ---------------- Bagaj, konteyner, kargo, manuel ---------------- */
+.bagaj, .konteyner, .kargo, .ek {
+  border: 1px dashed #bbb;
+  padding: 4px;
+  margin: 3px 0;
+  border-radius: 4px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
+  background: #f3f6fa;
+}
+
+/* ---------------- Özet ---------------- */
+.summary {
+  background: #e6f0ff;
+  padding: 5px;
+  border-radius: 6px;
+}
+
+/* ---------------- Öğe wrapper ---------------- */
+.item-wrapper {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: 2px 5px 5px 0;
+}
+
+/* ---------------- Input wrapper ---------------- */
+.item-input {
+  width: 60px;
+  margin-left: 5px;
+}
+
+/* ---------------- Kilogram göstergesi ---------------- */
+.weight-display {
+  font-size: 0.9em;
+  color: #004080;
+  margin-left: 10px;
+}
+
+/* ---------------- Orta badge ---------------- */
+.midBadge {
+  font-size: 0.78em;
+  color: #444;
+  margin: 0 10px;
+  font-weight: bold;
+}
+
+/* ---------------- Not alanı ---------------- */
+textarea {
+  width: 100%;
+  height: 80px;
+  margin-top: 5px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  padding: 4px;
+  background: #fff;
+}
+
+/* ---------------- Küçük ikonlar ---------------- */
+.icon {
+  font-size: 1em;
+  margin-right: 3px;
+}
+
+/* ---------------- Hover efektleri ---------------- */
+.compartment:hover {
+  background: #f0f3f7;
+}
+
+.bagaj:hover, .konteyner:hover, .kargo:hover, .ek:hover {
+  background: #e9eff8;
+}
+</style>
+</head>
+<body>
+<h1>Harekat Load Control</h1>
+
+<section class="flex">
+<div style="flex:1">Uçak
+<select id="aircraft" onchange="fullReset();checkLoadType()">
+<option value="">Seç</option>
+<option>A319</option><option>A320</option><option>A321</option><option>B737</option>
+<option>A330</option><option>A350</option><option>B777</option><option>B787</option>
+</select></div>
+<div style="flex:1">Yükleme
+<select id="loadType" onchange="checkLoadType()">
+<option value="">Seçiniz</option>
+<option value="YIGMA">Yığma</option>
+<option value="ULD">ULD</option>
+</select></div>
+</section>
+
+<section class="flex">
+Water <input type="text" id="waterInput" oninput="autoSave();updateSummary()">
+Pantry <input type="text" id="pantryInput" oninput="autoSave();updateSummary()">
+</section>
+
+<section>
+<h3>Bagaj Ortalamaları</h3>
+<div class="flex">
+By <input type="number" id="byAvg" oninput="updateMix()">
+Bc <input type="number" id="bcAvg" oninput="updateMix()">
+Mix <input type="number" id="mxAvg" readonly>
+</div>
+</section>
+
+<section><div id="compartments"></div></section>
+
+<section class="summary">
+<h3>Final Kontrol</h3>
+<div id="summary"></div>
+<div class="flex" style="margin-top:6px;font-weight:bold">
+<span>Water: <span id="finalWater">Nil</span></span>
+<span>Pantry: <span id="finalPantry">Nil</span></span>
+</div>
+<div class="flex" style="justify-content:flex-end;gap:10px;margin-top:5px">
+<button onclick="updateSummary()">Güncelle</button>
+<button onclick="saveManual()">Kaydet</button>
+</div>
+<textarea id="note" placeholder="Not ekle" oninput="autoSave()"></textarea>
+</section>
+
+<script>
+const comps={A319:[1,4,5],A320:[1,3,4,5],A321:[1,2,3,4,5],B737:[1,2,3,4],
+A330:[1,2,3,4,5],A350:[1,2,3,4,5],B777:[1,2,3,4,5],B787:[1,2,3,4,5]};
+const wide=["A330","A350","B777","B787"];
+
+function fullReset(){
+  localStorage.clear();
+  document.querySelectorAll('input,textarea').forEach(i=>i.value="");
+  compartments.innerHTML="";
+  summary.innerHTML="";
+  finalWater.textContent="Nil";
+  finalPantry.textContent="Nil";
+}
+
+function updateMix(){
+  mxAvg.value=((+byAvg.value||0)+(+bcAvg.value||0))/2;
+  autoSave();updateSummary();
+}
+
+function checkLoadType(){
+ const ac=aircraft.value, lt=loadType.value;
+ if(!lt){fullReset(); return;}
+ if((ac==="B737"&&lt==="ULD")||(wide.includes(ac)&&lt==="YIGMA")){
+  alert("Seçim geçersiz!"); loadType.value=""; fullReset(); return;}
+ updateCompartments(true);
+}
+
+function updateCompartments(r){
+ if(r) compartments.innerHTML="";
+ if(!aircraft.value || !loadType.value) return;
+ comps[aircraft.value].forEach(n=>{
+  const c=document.createElement("div");
+  c.className="compartment";
+  c.innerHTML=`<h3 onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display=='none'?'block':'none'">
+  CPT ${n}<span class="weight-display">0 kg</span></h3><div class="content"></div>`;
+  const ct=c.querySelector(".content");
+
+  if(loadType.value==="YIGMA"||n===5){
+    ct.innerHTML+=`<div class="bagaj flex">
+      By <input type="number" class="by" oninput="autoSave();updateSummary()">
+      Bc <input type="number" class="bc" oninput="autoSave();updateSummary()">
+      Mix <input type="number" class="mx" oninput="autoSave();updateSummary()">
+    </div>`;
+  }
+
+  if(loadType.value==="ULD" && n!==5){
+    const lbl=wide.includes(aircraft.value)?"AKE":"AKH";
+    ct.innerHTML+=`<div class="konteyner flex">${lbl} Bagaj
+      <select class="bagType"><option>By</option><option>Bc</option><option>Mix</option></select>
+      <button onclick="addBagaj(this)">+</button>
+    </div>`;
+  }
+
+  ct.innerHTML+=`<div class="kargo flex">Cargo <button onclick="addItem(this,'Cargo')">+</button></div>
+  <div class="ek flex">Manuel <button onclick="addItem(this,'Manuel')">+</button></div>`;
+  compartments.appendChild(c);
+ });
+ autoSave(); updateSummary();
+}
+
+function renumber(container, kind){
+  let i=1;
+  container.querySelectorAll(`.item-wrapper[data-kind="${kind}"]`).forEach(e=>{
+    const labelSpan = e.querySelector('span');
+    if(labelSpan){labelSpan.textContent = kind+" "+(i++);}
+    else {
+      const input=e.querySelector('input');
+      const btn=e.querySelector('button');
+      e.innerHTML='';
+      const s=document.createElement('span');
+      s.textContent = kind+" "+(i++);
+      e.appendChild(s);
+      e.appendChild(input);
+      e.appendChild(btn);
+    }
+  });
+}
+
+function renumberGlobalBag(type){
+ let i=1;
+ document.querySelectorAll('.konteyner-item[data-type="'+type+'"]').forEach(e=>{
+   const labelSpan = e.querySelector('span');
+   if(labelSpan){labelSpan.textContent = type+" "+(i++);}
+   else {
+     const input=e.querySelector('input');
+     const btn=e.querySelector('button');
+     e.innerHTML='';
+     const s=document.createElement('span');
+     s.textContent = type+" "+(i++);
+     e.appendChild(s);
+     e.appendChild(input);
+     e.appendChild(btn);
+   }
+ });
+}
+
+function addBagaj(b){
+ const t=b.previousElementSibling.value,p=b.parentElement;
+ const d=document.createElement("div");
+ d.className="konteyner-item item-wrapper"; d.dataset.type=t;
+ const s=document.createElement('span'); s.textContent=t; d.appendChild(s);
+ const input=document.createElement('input'); input.type="number"; input.className="item-input";
+ input.oninput=function(){autoSave();updateSummary()};
+ d.appendChild(input);
+ const btn=document.createElement('button'); btn.textContent="Sil";
+ btn.onclick=function(){d.remove(); renumberGlobalBag(t); updateSummary(); autoSave()};
+ d.appendChild(btn);
+ p.appendChild(d);
+ renumberGlobalBag(t); updateSummary(); autoSave();
+}
+
+function addItem(b,k){
+ const p=b.parentElement;
+ const d=document.createElement("div");
+ d.className="item-wrapper"; d.dataset.kind=k;
+ const s=document.createElement('span'); s.textContent=k; d.appendChild(s);
+ const input=document.createElement('input'); input.type="number"; input.className="item-input";
+ input.oninput=function(){updateSummary();autoSave()};
+ d.appendChild(input);
+ const btn=document.createElement('button'); btn.textContent="Sil";
+ btn.onclick=function(){d.remove(); renumber(p.closest('.content'),k); updateSummary(); autoSave()};
+ d.appendChild(btn);
+ p.appendChild(d);
+ renumber(p.closest('.content'),k); updateSummary(); autoSave();
+}
+
+function updateCPTBadge(){
+ document.querySelectorAll('.compartment').forEach(c=>{
+  const loadTypeVal=loadType.value;
+  const isULD=loadTypeVal==='ULD';
+  const isYIGMA=loadTypeVal==='YIGMA';
+  let Btotal=0, Ctotal=0, Mtotal=0;
+
+  const compNum = parseInt(c.querySelector('h3').childNodes[0].nodeValue.trim().split(" ")[1]);
+
+  // Bagaj
+  if(isYIGMA){
+    c.querySelectorAll('.bagaj input').forEach(inp=>Btotal+=+inp.value||0);
+  } else if(isULD){
+    // Kompartman 5 ve ULD uçaklarda B sayısını göster
+    if(compNum===5){
+      const bagajInputs = c.querySelectorAll('.bagaj input');
+      if(bagajInputs.length){
+        bagajInputs.forEach(inp=>Btotal += +inp.value || 0);
+      } else {
+        Btotal = c.querySelectorAll('.konteyner-item').length;
+      }
+    } else {
+      Btotal=c.querySelectorAll('.konteyner-item').length;
+    }
+  }
+
+  // Kargo
+  if(isYIGMA){
+    c.querySelectorAll('.item-wrapper[data-kind="Cargo"]').forEach(i=>Ctotal+=+i.querySelector('input').value||0);
+  } else if(isULD){
+    const comp5=isULD && compNum===5;
+    if(comp5){
+      c.querySelectorAll('.item-wrapper[data-kind="Cargo"]').forEach(i=>Ctotal+=+i.querySelector('input').value||0);
+    } else {
+      Ctotal=c.querySelectorAll('.item-wrapper[data-kind="Cargo"]').length;
+    }
+  }
+
+  // Manuel
+  if(isYIGMA){
+    c.querySelectorAll('.item-wrapper[data-kind="Manuel"]').forEach(i=>Mtotal+=+i.querySelector('input').value||0);
+  } else if(isULD){
+    const comp5=isULD && compNum===5;
+    if(comp5){
+      c.querySelectorAll('.item-wrapper[data-kind="Manuel"]').forEach(i=>Mtotal+=+i.querySelector('input').value||0);
+    } else {
+      Mtotal=c.querySelectorAll('.item-wrapper[data-kind="Manuel"]').length;
+    }
+  }
+
+  const h=c.querySelector('h3');
+  let mid=h.querySelector('.midBadge');
+  if(!mid){mid=document.createElement('span'); mid.className='midBadge'; h.insertBefore(mid,h.querySelector('.weight-display'));}
+  let out=[];
+  if(Btotal) out.push("B "+Btotal);
+  if(Ctotal) out.push("C "+Ctotal);
+  if(Mtotal) out.push("Mn "+Mtotal); // Büyük M, küçük n
+  mid.textContent=out.join(" / ");
+});
+}
+
+function updateSummary(){
+ let out="";
+ const byA=+byAvg.value||0, bcA=+bcAvg.value||0, mxA=+mxAvg.value||0;
+ document.querySelectorAll(".compartment").forEach(c=>{
+   let t=0;
+   c.querySelectorAll(".bagaj").forEach(b=>{
+     t+=(+b.querySelector(".by").value||0)*byA;
+     t+=(+b.querySelector(".bc").value||0)*bcA;
+     t+=(+b.querySelector(".mx").value||0)*mxA;
+   });
+   c.querySelectorAll(".konteyner-item").forEach(k=>{
+     const a=+k.querySelector("input").value||0;
+     const avg=k.dataset.type==="By"?byA:k.dataset.type==="Bc"?bcA:mxA;
+     t+=(a*avg+70)-a;
+   });
+   c.querySelectorAll('.item-wrapper').forEach(i=>t+=+i.querySelector("input").value||0);
+   c.querySelector(".weight-display").textContent=Math.round(t)+" kg";
+   out+=`<div>${c.querySelector("h3").childNodes[0].nodeValue.trim()}: ${Math.round(t)} kg</div>`;
+ });
+ summary.innerHTML=out;
+ finalWater.textContent=waterInput.value||"Nil";
+ finalPantry.textContent=pantryInput.value||"Nil";
+ updateCPTBadge();
+}
+
+function autoSave(){localStorage.setItem("hlc",document.body.innerHTML);}
+function saveManual(){autoSave();}
+
+// Load saved state
+window.addEventListener('load', ()=>{
+  if(localStorage.getItem("hlc")) document.body.innerHTML=localStorage.getItem("hlc");
+});
+</script>
+</body>
+</html>
