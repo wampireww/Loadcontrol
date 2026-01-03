@@ -5,8 +5,8 @@
 <title>Harekat Load Control - Final</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-body{font-family:Arial,sans-serif;background:#f0f2f5;margin:5px; overscroll-behavior: none; -webkit-overflow-scrolling: auto;}
-section{background:#fff;border:1px solid #ccc;border-radius:8px;padding:8px;margin-bottom:8px;}
+body{font-family:Arial,sans-serif;background:#f0f2f5;margin:5px;}
+section{background:#fff;border:1px solid #ccc;border-radius:8px;padding:8px;margin-bottom:8px;box-shadow:0 1px 3px rgba(0,0,0,0.1);}
 h1{text-align:center;color:#004080;font-weight:normal;margin:5px;font-size:1.4em;}
 h3{cursor:pointer;margin:4px 0;display:flex;justify-content:space-between;align-items:center;}
 .flex{display:flex;flex-wrap:wrap;align-items:center;gap:5px;}
@@ -16,16 +16,15 @@ button:hover{background:#0066cc;}
 .compartment{border-top:1px solid #aaa;margin-top:5px;padding-top:5px;}
 .content{display:none;background:#fafafa;padding:4px;border-radius:4px;}
 .bagaj,.konteyner,.kargo,.ek{border:1px dashed #aaa;padding:4px;margin:3px 0;border-radius:4px;display:flex;flex-wrap:wrap;gap:5px;}
-.summary{background:#e6f0ff;padding:5px;}
+.summary{background:#e6f0ff;padding:5px;border-radius:6px;}
 .item-wrapper{display:inline-flex;flex-wrap:wrap;align-items:center;margin:2px 5px 5px 0;}
 .item-input{width:60px;margin-left:5px;}
 .weight-display{font-size:.9em;color:#004080;margin-left:10px;}
 .midBadge{font-size:.78em;color:#444;margin:0 10px}
-textarea{width:100%;height:80px;margin-top:5px;}
+textarea{width:100%;height:80px;margin-top:5px;border-radius:4px;padding:3px;}
 </style>
 </head>
-<body ontouchmove="event.preventDefault();">
-
+<body>
 <h1>Harekat Load Control</h1>
 
 <section class="flex">
@@ -133,7 +132,6 @@ function updateCompartments(r){
  autoSave(); updateSummary();
 }
 
-// Sıralamayı bozmadan güncelleme
 function renumber(container, kind){
   let i=1;
   container.querySelectorAll(`.item-wrapper[data-kind="${kind}"]`).forEach(e=>{
@@ -200,7 +198,7 @@ function addItem(b,k){
  renumber(p.closest('.content'),k); updateSummary(); autoSave();
 }
 
-// B, C ve Mn harfleri göster
+// >>> Son final, uçak tipi ve yükleme tipi LocalStorage ile kaydedildi
 function updateCPTBadge(){
  document.querySelectorAll('.compartment').forEach(c=>{
   const loadTypeVal=loadType.value;
@@ -215,7 +213,12 @@ function updateCPTBadge(){
     c.querySelectorAll('.bagaj input').forEach(inp=>Btotal+=+inp.value||0);
   } else if(isULD){
     if(compNum===5){
-      c.querySelectorAll('.bagaj input').forEach(inp=>Btotal += +inp.value || 0);
+      const bagajInputs = c.querySelectorAll('.bagaj input');
+      if(bagajInputs.length){
+        bagajInputs.forEach(inp=>Btotal += +inp.value || 0);
+      } else {
+        Btotal = c.querySelectorAll('.konteyner-item').length;
+      }
     } else {
       Btotal=c.querySelectorAll('.konteyner-item').length;
     }
@@ -225,24 +228,14 @@ function updateCPTBadge(){
   if(isYIGMA){
     c.querySelectorAll('.item-wrapper[data-kind="Cargo"]').forEach(i=>Ctotal+=+i.querySelector('input').value||0);
   } else if(isULD){
-    const comp5 = compNum===5;
-    if(comp5){
-      c.querySelectorAll('.item-wrapper[data-kind="Cargo"]').forEach(i=>Ctotal+=+i.querySelector('input').value||0);
-    } else {
-      Ctotal=c.querySelectorAll('.item-wrapper[data-kind="Cargo"]').length;
-    }
+    Ctotal=c.querySelectorAll('.item-wrapper[data-kind="Cargo"]').length;
   }
 
   // Manuel
   if(isYIGMA){
     c.querySelectorAll('.item-wrapper[data-kind="Manuel"]').forEach(i=>Mtotal+=+i.querySelector('input').value||0);
   } else if(isULD){
-    const comp5 = compNum===5;
-    if(comp5){
-      c.querySelectorAll('.item-wrapper[data-kind="Manuel"]').forEach(i=>Mtotal+=+i.querySelector('input').value||0);
-    } else {
-      Mtotal=c.querySelectorAll('.item-wrapper[data-kind="Manuel"]').length;
-    }
+    Mtotal=c.querySelectorAll('.item-wrapper[data-kind="Manuel"]').length;
   }
 
   const h=c.querySelector('h3');
@@ -281,11 +274,19 @@ function updateSummary(){
  updateCPTBadge();
 }
 
-function autoSave(){localStorage.setItem("hlc",document.body.innerHTML);}
+function autoSave(){
+  localStorage.setItem("hlc",document.body.innerHTML);
+  localStorage.setItem("aircraftValue", aircraft.value);
+  localStorage.setItem("loadTypeValue", loadType.value);
+}
+
 function saveManual(){autoSave();}
 
+// Load saved state
 window.addEventListener('load', ()=>{
   if(localStorage.getItem("hlc")) document.body.innerHTML=localStorage.getItem("hlc");
+  if(localStorage.getItem("aircraftValue")) aircraft.value = localStorage.getItem("aircraftValue");
+  if(localStorage.getItem("loadTypeValue")) loadType.value = localStorage.getItem("loadTypeValue");
 });
 </script>
 </body>
