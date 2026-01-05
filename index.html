@@ -2,10 +2,10 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<title>HLC - Harekat Load Control PRO</title>
+<title>HLC - Pro Hybrid</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
 <style>
-/* GENEL TASARIM */
+/* GENEL TASARIM - Kompartmanlar eski boyutunda */
 html, body { overscroll-behavior-y: contain; }
 body{font-family: Arial, sans-serif; background:#f0f2f5; margin:5px; padding-bottom:120px; color: #333;}
 section{background:#fff; border:1px solid #ccc; border-radius:8px; padding:8px; margin-bottom:8px;}
@@ -14,11 +14,11 @@ h3{cursor:pointer; margin:4px 0; display:flex; justify-content:space-between; al
 .flex{display:flex; flex-wrap:wrap; align-items:center; gap:5px;}
 
 /* Input Ayarları */
-input[type=number], input[type=text]{width:65px; padding:4px; border:1px solid #ccc; border-radius:4px; font-size: 14px; color:#000;}
+input[type=number], input[type=text]{width:55px; padding:4px; border:1px solid #ccc; border-radius:4px; font-size: 14px; color:#000;}
 select{padding:4px; border:1px solid #ccc; border-radius:4px; font-size: 14px; color:#000;}
 button{background:#004080; color:#fff; border:none; border-radius:4px; padding:5px 10px; cursor:pointer; font-weight: bold;}
 
-/* KARGO/MANUEL - İKİLİ SİSTEM */
+/* KARGO/MANUEL - İKİLİ SİSTEM (Önceki Kodun Aynısı) */
 .items-container { display: flex; flex-wrap: wrap; gap: 4%; margin-top: 8px; }
 .item-wrapper {
     display: flex; align-items: center; justify-content: space-between;
@@ -28,27 +28,24 @@ button{background:#004080; color:#fff; border:none; border-radius:4px; padding:5
 .item-input { width: 42px !important; margin: 0 4px; font-weight: bold; border: 1px solid #777 !important; padding: 2px !important; color: #000;}
 .delete-btn { background: #cc0000; padding: 2px 5px; font-size: 0.8em; border-radius: 3px; color: white;}
 
-/* FİNAL PANELİ - KOMPAKT VE YAN YANA */
+/* FİNAL PANELİ - Sadece burada font küçüldü */
 .summary{ background:#004080; color: white; padding:12px; border-radius: 12px; border: 2px solid #002b57;}
-.summary h3 { color: white; border-bottom: 2px solid rgba(255,255,255,0.3); padding-bottom: 5px; font-size: 1.1em;}
-#summary { font-size: 0.9em; line-height: 1.6; } /* Font bir kademe küçüldü */
+.summary h3 { color: white; border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 5px; font-size: 1.1em;}
+#summary { font-size: 0.85em; line-height: 1.5; } 
 
-.weight-display { font-size: 0.9em; color: #004080; font-weight: bold; background: #e6f0ff; padding: 2px 6px; border-radius: 4px; }
+.weight-display { font-size: 0.95em; color: #004080; font-weight: bold; background: #e6f0ff; padding: 2px 6px; border-radius: 4px; }
 .midBadge { font-size: 0.8em; color: #666; font-weight: bold; margin-right: auto; margin-left: 10px;}
 
-/* Water ve Pantry Yan Yana Dizilim */
 .final-row { 
     display: flex; 
     justify-content: space-between; 
-    margin-top: 10px; 
-    font-size: 0.9em; /* Font bir kademe küçüldü */
+    margin-top: 8px; 
+    font-size: 0.85em; 
     border-top: 1px solid rgba(255,255,255,0.2); 
     padding-top: 8px; 
     font-weight: bold;
 }
-.final-row div { flex: 1; }
-
-#note { width: 100%; height: 90px; margin-top: 12px; border-radius: 10px; padding: 10px; font-size: 15px; color: #000; font-weight: bold; border:2px solid #fff;}
+#note { width: 100%; height: 90px; margin-top: 10px; border-radius: 10px; padding: 10px; font-size: 16px; color: #000; font-weight: bold; border:2px solid #fff;}
 </style>
 </head>
 <body>
@@ -67,8 +64,8 @@ button{background:#004080; color:#fff; border:none; border-radius:4px; padding:5
 </section>
 
 <section class="flex">
-    Water <input type="text" id="waterInput" placeholder="Sayı/Harf" oninput="saveAll();updateSummary()">
-    Pantry <input type="text" id="pantryInput" placeholder="Sayı/Harf" oninput="saveAll();updateSummary()">
+    Water <input type="text" id="waterInput" placeholder="" oninput="saveAll();updateSummary()">
+    Pantry <input type="text" id="pantryInput" placeholder="" oninput="saveAll();updateSummary()">
 </section>
 
 <section>
@@ -86,10 +83,10 @@ button{background:#004080; color:#fff; border:none; border-radius:4px; padding:5
     <h3>Final Kontrol</h3>
     <div id="summary"></div>
     <div class="final-row">
-        <div>Water: <span id="finalWater">-</span></div>
-        <div style="text-align: right;">Pantry: <span id="finalPantry">-</span></div>
+        <span>Water: <span id="finalWater">-</span></span>
+        <span>Pantry: <span id="finalPantry">-</span></span>
     </div>
-    <textarea id="note" placeholder="Notları buraya yazın..." oninput="saveAll()"></textarea>
+    <textarea id="note" placeholder="Not Ekle..." oninput="saveAll()"></textarea>
     <div class="flex" style="justify-content: space-between; margin-top: 15px;">
         <button onclick="saveAll()" style="background: #2ecc71; flex:1; margin-right:8px; padding:10px;">KAYDET</button>
         <button onclick="clearStorage()" style="background:#e74c3c; flex:1; padding:10px;">SIFIRLA</button>
