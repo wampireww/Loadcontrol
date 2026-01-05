@@ -5,23 +5,28 @@
 <title>Harekat Load Control - Final</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-body{font-family:Arial,sans-serif;background:#f4f6f8;margin:5px;}
-section{background:#fff;border:1px solid #ccc;border-radius:8px;padding:8px;margin-bottom:8px;box-shadow:0 2px 5px rgba(0,0,0,0.05);}
+/* Android pull-to-refresh (aşağı çekip yenileme) özelliğini engeller */
+html, body {
+  overscroll-behavior-y: contain;
+}
+
+body{font-family:Arial,sans-serif;background:#f0f2f5;margin:5px;}
+section{background:#fff;border:1px solid #ccc;border-radius:8px;padding:8px;margin-bottom:8px;}
 h1{text-align:center;color:#004080;font-weight:normal;margin:5px;font-size:1.4em;}
-h3{cursor:pointer;margin:4px 0;display:flex;justify-content:space-between;align-items:center;background:#e6f0ff;padding:4px;border-radius:4px;}
+h3{cursor:pointer;margin:4px 0;display:flex;justify-content:space-between;align-items:center;}
 .flex{display:flex;flex-wrap:wrap;align-items:center;gap:5px;}
 input[type=number],input[type=text]{width:60px;}
-button{background:#004080;color:#fff;border:none;border-radius:4px;padding:2px 6px;cursor:pointer;font-size:0.9em;}
+button{background:#004080;color:#fff;border:none;border-radius:4px;padding:2px 6px;cursor:pointer;}
 button:hover{background:#0066cc;}
 .compartment{border-top:1px solid #aaa;margin-top:5px;padding-top:5px;}
 .content{display:none;background:#fafafa;padding:4px;border-radius:4px;}
 .bagaj,.konteyner,.kargo,.ek{border:1px dashed #aaa;padding:4px;margin:3px 0;border-radius:4px;display:flex;flex-wrap:wrap;gap:5px;}
-.summary{background:#e6f0ff;padding:5px;border-radius:6px;}
+.summary{background:#e6f0ff;padding:5px;}
 .item-wrapper{display:inline-flex;flex-wrap:wrap;align-items:center;margin:2px 5px 5px 0;}
 .item-input{width:60px;margin-left:5px;}
-.weight-display{font-size:.9em;color:#004080;margin-left:10px}
+.weight-display{font-size:.9em;color:#004080;margin-left:10px;}
 .midBadge{font-size:.78em;color:#444;margin:0 10px}
-textarea{width:100%;height:80px;margin-top:5px;border-radius:4px;border:1px solid #ccc;padding:4px;}
+textarea{width:100%;height:80px;margin-top:5px;}
 </style>
 </head>
 <body>
@@ -43,8 +48,8 @@ textarea{width:100%;height:80px;margin-top:5px;border-radius:4px;border:1px soli
 </section>
 
 <section class="flex">
-Water <input type="text" id="waterInput" oninput="autoSave();updateSummary()">
-Pantry <input type="text" id="pantryInput" oninput="autoSave();updateSummary()">
+Water <input type="text" id="waterInput" oninput="saveAll();updateSummary()">
+Pantry <input type="text" id="pantryInput" oninput="saveAll();updateSummary()">
 </section>
 
 <section>
@@ -67,9 +72,10 @@ Mix <input type="number" id="mxAvg" readonly>
 </div>
 <div class="flex" style="justify-content:flex-end;gap:10px;margin-top:5px">
 <button onclick="updateSummary()">Güncelle</button>
-<button onclick="saveManual()">Kaydet</button>
+<button onclick="saveAll()">Kaydet</button>
+<button onclick="clearStorage()" style="background:#cc0000">Sıfırla</button>
 </div>
-<textarea id="note" placeholder="Not ekle" oninput="autoSave()"></textarea>
+<textarea id="note" placeholder="Not ekle" oninput="saveAll()"></textarea>
 </section>
 
 <script>
@@ -78,17 +84,24 @@ A330:[1,2,3,4,5],A350:[1,2,3,4,5],B777:[1,2,3,4,5],B787:[1,2,3,4,5]};
 const wide=["A330","A350","B777","B787"];
 
 function fullReset(){
-  document.querySelectorAll('input,textarea').forEach(i=>i.value="");
   compartments.innerHTML="";
   summary.innerHTML="";
   finalWater.textContent="Nil";
   finalPantry.textContent="Nil";
-  updateLocalSelections();
+  saveAll();
+}
+
+function clearStorage() {
+    if(confirm("Tüm veriler silinecek, emin misiniz?")) {
+        localStorage.removeItem("hlc_data");
+        location.reload();
+    }
 }
 
 function updateMix(){
   mxAvg.value=((+byAvg.value||0)+(+bcAvg.value||0))/2;
-  autoSave();updateSummary();
+  updateSummary();
+  saveAll();
 }
 
 function checkLoadType(){
@@ -97,24 +110,24 @@ function checkLoadType(){
  if((ac==="B737"&&lt==="ULD")||(wide.includes(ac)&&lt==="YIGMA")){
   alert("Seçim geçersiz!"); loadType.value=""; fullReset(); return;}
  updateCompartments(true);
- saveSelections();
 }
 
-function updateCompartments(clear){
- if(clear) compartments.innerHTML="";
+function updateCompartments(r){
+ if(r) compartments.innerHTML="";
  if(!aircraft.value || !loadType.value) return;
  comps[aircraft.value].forEach(n=>{
   const c=document.createElement("div");
   c.className="compartment";
-  c.innerHTML=`<h3 onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display=='none'?'block':'none'">
+  c.dataset.num = n;
+  c.innerHTML=`<h3 onclick="toggleContent(this)">
   CPT ${n}<span class="weight-display">0 kg</span></h3><div class="content"></div>`;
   const ct=c.querySelector(".content");
 
   if(loadType.value==="YIGMA"||n===5){
     ct.innerHTML+=`<div class="bagaj flex">
-      By <input type="number" class="by" oninput="autoSave();updateSummary()">
-      Bc <input type="number" class="bc" oninput="autoSave();updateSummary()">
-      Mix <input type="number" class="mx" oninput="autoSave();updateSummary()">
+      By <input type="number" class="by" oninput="updateSummary();saveAll()">
+      Bc <input type="number" class="bc" oninput="updateSummary();saveAll()">
+      Mix <input type="number" class="mx" oninput="updateSummary();saveAll()">
     </div>`;
   }
 
@@ -130,91 +143,76 @@ function updateCompartments(clear){
   <div class="ek flex">Manuel <button onclick="addItem(this,'Manuel')">+</button></div>`;
   compartments.appendChild(c);
  });
- autoSave(); updateSummary();
+ updateSummary();
+}
+
+function toggleContent(el) {
+    const content = el.nextElementSibling;
+    content.style.display = content.style.display === 'none' ? 'block' : 'none';
+}
+
+function addBagaj(b, savedVal = null){
+ const t=b.previousElementSibling.value, p=b.parentElement;
+ const d=createItemWrapper(t, "konteyner-item", savedVal, () => renumberGlobalBag(t));
+ p.appendChild(d);
+ renumberGlobalBag(t); updateSummary(); saveAll();
+}
+
+function addItem(b, k, savedVal = null){
+ const p=b.parentElement;
+ const d=createItemWrapper(k, "item-wrapper", savedVal, () => renumber(p.closest('.content'), k));
+ p.appendChild(d);
+ renumber(p.closest('.content'), k); updateSummary(); saveAll();
+}
+
+function createItemWrapper(label, className, val, renumFn) {
+ const d=document.createElement("div");
+ d.className=className + " item-wrapper";
+ d.dataset.type = label; d.dataset.kind = label;
+ d.innerHTML = `<span>${label}</span>
+    <input type="number" class="item-input" value="${val||''}" oninput="updateSummary();saveAll()">
+    <button onclick="this.parentElement.remove(); ${renumFn.name.includes('Global') ? `renumberGlobalBag('${label}')` : `renumber(this.closest('.content'),'${label}')`}; updateSummary(); saveAll()">Sil</button>`;
+ return d;
 }
 
 function renumber(container, kind){
+  if(!container) return;
   let i=1;
   container.querySelectorAll(`.item-wrapper[data-kind="${kind}"]`).forEach(e=>{
-    const labelSpan = e.querySelector('span');
-    if(labelSpan){labelSpan.textContent = kind+" "+(i++);}
+    e.querySelector('span').textContent = kind+" "+(i++);
   });
 }
 
 function renumberGlobalBag(type){
  let i=1;
  document.querySelectorAll('.konteyner-item[data-type="'+type+'"]').forEach(e=>{
-   const labelSpan = e.querySelector('span');
-   if(labelSpan){labelSpan.textContent = type+" "+(i++);}
+   e.querySelector('span').textContent = type+" "+(i++);
  });
-}
-
-function addBagaj(b){
- const t=b.previousElementSibling.value,p=b.parentElement;
- const d=document.createElement("div");
- d.className="konteyner-item item-wrapper"; d.dataset.type=t;
- const s=document.createElement('span'); s.textContent=t; d.appendChild(s);
- const input=document.createElement('input'); input.type="number"; input.className="item-input";
- input.oninput=function(){autoSave();updateSummary()};
- d.appendChild(input);
- const btn=document.createElement('button'); btn.textContent="Sil";
- btn.onclick=function(){d.remove(); renumberGlobalBag(t); updateSummary(); autoSave()};
- d.appendChild(btn);
- p.appendChild(d);
- renumberGlobalBag(t); updateSummary(); autoSave();
-}
-
-function addItem(b,k){
- const p=b.parentElement;
- const d=document.createElement("div");
- d.className="item-wrapper"; d.dataset.kind=k;
- const s=document.createElement('span'); s.textContent=k; d.appendChild(s);
- const input=document.createElement('input'); input.type="number"; input.className="item-input";
- input.oninput=function(){updateSummary();autoSave()};
- d.appendChild(input);
- const btn=document.createElement('button'); btn.textContent="Sil";
- btn.onclick=function(){d.remove(); renumber(p.closest('.content'),k); updateSummary(); autoSave()};
- d.appendChild(btn);
- p.appendChild(d);
- renumber(p.closest('.content'),k); updateSummary(); autoSave();
 }
 
 function updateCPTBadge(){
  document.querySelectorAll('.compartment').forEach(c=>{
-  const loadTypeVal=loadType.value;
-  const isULD=loadTypeVal==='ULD';
-  const isYIGMA=loadTypeVal==='YIGMA';
-  let Btotal=0, Ctotal=0, Mtotal=0;
+  const ltVal=loadType.value;
+  let B=0, C=0, M=0;
+  const cNum = parseInt(c.dataset.num);
 
-  const compNum = parseInt(c.querySelector('h3').childNodes[0].nodeValue.trim().split(" ")[1]);
-
-  if(isYIGMA){
-    c.querySelectorAll('.bagaj input').forEach(inp=>Btotal+=+inp.value||0);
-  } else if(isULD){
-    if(compNum===5){
-      c.querySelectorAll('.bagaj input').forEach(inp=>Btotal+=+inp.value||0);
-    } else {
-      Btotal=c.querySelectorAll('.konteyner-item').length;
-    }
-  }
-
-  if(isYIGMA){
-    c.querySelectorAll('.item-wrapper[data-kind="Cargo"]').forEach(i=>Ctotal+=+i.querySelector('input').value||0);
-    c.querySelectorAll('.item-wrapper[data-kind="Manuel"]').forEach(i=>Mtotal+=+i.querySelector('input').value||0);
-  } else if(isULD){
-    Ctotal=c.querySelectorAll('.item-wrapper[data-kind="Cargo"]').length;
-    Mtotal=c.querySelectorAll('.item-wrapper[data-kind="Manuel"]').length;
+  if(ltVal==='YIGMA' || cNum===5){
+    c.querySelectorAll('.bagaj input').forEach(i=>B+=+i.value||0);
+    c.querySelectorAll('.item-wrapper[data-kind="Cargo"]').forEach(i=>C+=+i.querySelector('input').value||0);
+    c.querySelectorAll('.item-wrapper[data-kind="Manuel"]').forEach(i=>M+=+i.querySelector('input').value||0);
+  } else {
+    B=c.querySelectorAll('.konteyner-item').length;
+    C=c.querySelectorAll('.item-wrapper[data-kind="Cargo"]').length;
+    M=c.querySelectorAll('.item-wrapper[data-kind="Manuel"]').length;
   }
 
   const h=c.querySelector('h3');
-  let mid=h.querySelector('.midBadge');
-  if(!mid){mid=document.createElement('span'); mid.className='midBadge'; h.insertBefore(mid,h.querySelector('.weight-display'));}
+  let mid=h.querySelector('.midBadge') || document.createElement('span');
+  mid.className='midBadge'; h.insertBefore(mid, h.querySelector('.weight-display'));
   let out=[];
-  if(Btotal) out.push("B "+Btotal);
-  if(Ctotal) out.push("C "+Ctotal);
-  if(Mtotal) out.push("M"+"n"); // <<< Büyük M küçük n yanyana
+  if(B) out.push("B "+B); if(C) out.push("C "+C); if(M) out.push("Mn "+M);
   mid.textContent=out.join(" / ");
-});
+ });
 }
 
 function updateSummary(){
@@ -223,18 +221,16 @@ function updateSummary(){
  document.querySelectorAll(".compartment").forEach(c=>{
    let t=0;
    c.querySelectorAll(".bagaj").forEach(b=>{
-     t+=(+b.querySelector(".by").value||0)*byA;
-     t+=(+b.querySelector(".bc").value||0)*bcA;
-     t+=(+b.querySelector(".mx").value||0)*mxA;
+     t+=(+b.querySelector(".by").value||0)*byA + (+b.querySelector(".bc").value||0)*bcA + (+b.querySelector(".mx").value||0)*mxA;
    });
    c.querySelectorAll(".konteyner-item").forEach(k=>{
-     const a=+k.querySelector("input").value||0;
+     const v=+k.querySelector("input").value||0;
      const avg=k.dataset.type==="By"?byA:k.dataset.type==="Bc"?bcA:mxA;
-     t+=(a*avg+70)-a;
+     t+=(v*avg+70)-v;
    });
-   c.querySelectorAll('.item-wrapper').forEach(i=>t+=+i.querySelector("input").value||0);
+   c.querySelectorAll('.item-wrapper:not(.konteyner-item)').forEach(i=>t+=+i.querySelector("input").value||0);
    c.querySelector(".weight-display").textContent=Math.round(t)+" kg";
-   out+=`<div>${c.querySelector("h3").childNodes[0].nodeValue.trim()}: ${Math.round(t)} kg</div>`;
+   out+=`<div>CPT ${c.dataset.num}: ${Math.round(t)} kg</div>`;
  });
  summary.innerHTML=out;
  finalWater.textContent=waterInput.value||"Nil";
@@ -242,60 +238,68 @@ function updateSummary(){
  updateCPTBadge();
 }
 
-function saveManual(){autoSave();}
+function saveAll(){
+  const data = {
+    ac: aircraft.value, lt: loadType.value,
+    w: waterInput.value, p: pantryInput.value,
+    by: byAvg.value, bc: bcAvg.value, n: note.value,
+    comps: []
+  };
 
-function autoSave(){localStorage.setItem("hlc",document.body.innerHTML);}
-function saveSelections(){
-  localStorage.setItem("aircraft",aircraft.value);
-  localStorage.setItem("loadType",loadType.value);
-}
-function updateLocalSelections(){
-  localStorage.setItem("aircraft",aircraft.value);
-  localStorage.setItem("loadType",loadType.value);
-}
-
-function restoreEvents(){
-  document.querySelectorAll('.konteyner-item button').forEach(btn => {
-    btn.onclick = function() {
-      const d = btn.parentElement;
-      const type = d.dataset.type;
-      d.remove();
-      renumberGlobalBag(type);
-      updateSummary();
-      autoSave();
-    }
+  document.querySelectorAll('.compartment').forEach(c => {
+    let cObj = { num: c.dataset.num, yigma: [], items: [] };
+    c.querySelectorAll('.bagaj input').forEach(i => cObj.yigma.push(i.value));
+    c.querySelectorAll('.item-wrapper').forEach(iw => {
+      cObj.items.push({
+        k: iw.dataset.kind || iw.dataset.type,
+        v: iw.querySelector('input').value,
+        isK: iw.classList.contains('konteyner-item')
+      });
+    });
+    data.comps.push(cObj);
   });
-  document.querySelectorAll('.item-wrapper').forEach(div => {
-    const btn = div.querySelector('button');
-    const input = div.querySelector('input');
-    const kind = div.dataset.kind;
-    if(btn) btn.onclick = function() { div.remove(); renumber(div.closest('.content'), kind); updateSummary(); autoSave(); }
-    if(input) input.oninput = function(){ updateSummary(); autoSave(); }
-  });
+  localStorage.setItem("hlc_data", JSON.stringify(data));
 }
 
-// Prevent pull-to-refresh on mobile
-let lastTouchY = 0;
-let maybePrevent = false;
-window.addEventListener('touchstart', function(e){
-  lastTouchY = e.touches[0].clientY;
-}, {passive: false});
-window.addEventListener('touchmove', function(e){
-  const touchY = e.touches[0].clientY;
-  const touchYDelta = touchY - lastTouchY;
-  if(window.scrollY === 0 && touchYDelta > 0) maybePrevent = true;
-  if(maybePrevent) { e.preventDefault(); maybePrevent = false; }
-}, {passive: false});
+function loadAll(){
+  const raw = localStorage.getItem("hlc_data");
+  if(!raw) return;
+  const data = JSON.parse(raw);
 
-window.addEventListener('load', ()=>{
-  if(localStorage.getItem("hlc")) document.body.innerHTML = localStorage.getItem("hlc");
-  if(localStorage.getItem("aircraft")) aircraft.value = localStorage.getItem("aircraft");
-  if(localStorage.getItem("loadType")) loadType.value = localStorage.getItem("loadType");
+  aircraft.value = data.ac;
+  loadType.value = data.lt;
+  if(!data.ac || !data.lt) return;
 
   updateCompartments(true);
+
+  waterInput.value = data.w;
+  pantryInput.value = data.p;
+  byAvg.value = data.by;
+  bcAvg.value = data.bc;
+  mxAvg.value = ((+data.by||0)+(+data.bc||0))/2;
+  note.value = data.n;
+
+  const domComps = document.querySelectorAll('.compartment');
+  data.comps.forEach((cData, idx) => {
+    const dc = domComps[idx];
+    if(!dc) return;
+    const yInputs = dc.querySelectorAll('.bagaj input');
+    cData.yigma.forEach((val, i) => { if(yInputs[i]) yInputs[i].value = val; });
+    cData.items.forEach(item => {
+      if(item.isK) {
+        const btn = dc.querySelector('.konteyner button');
+        dc.querySelector('.bagType').value = item.k;
+        addBagaj(btn, item.v);
+      } else {
+        const targetBtn = item.k === 'Cargo' ? dc.querySelector('.kargo button') : dc.querySelector('.ek button');
+        addItem(targetBtn, item.k, item.v);
+      }
+    });
+  });
   updateSummary();
-  restoreEvents();
-});
+}
+
+window.onload = loadAll;
 </script>
 </body>
 </html>
