@@ -2,77 +2,115 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<title>Harekat Load Control - Kesin Çözüm</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Harekat Load Control - Pro</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
 <style>
-html, body { overscroll-behavior-y: contain; }
-body{font-family:Arial,sans-serif;background:#f0f2f5;margin:5px;padding-bottom:50px;}
-section{background:#fff;border:1px solid #ccc;border-radius:8px;padding:8px;margin-bottom:8px;}
-h1{text-align:center;color:#004080;margin:5px;font-size:1.4em;}
-h3{cursor:pointer;margin:4px 0;display:flex;justify-content:space-between;align-items:center;}
-.flex{display:flex;flex-wrap:wrap;align-items:center;gap:5px;}
-input[type=number],input[type=text]{width:60px;padding:3px;border:1px solid #ccc;border-radius:4px;}
-button{background:#004080;color:#fff;border:none;border-radius:4px;padding:4px 8px;cursor:pointer;}
-button:hover{background:#0066cc;}
-.compartment{border-top:1px solid #aaa;margin-top:5px;padding-top:5px;}
-.content{display:none;background:#fafafa;padding:6px;border-radius:4px;}
-.bagaj,.konteyner,.kargo,.ek{border:1px dashed #aaa;padding:6px;margin:5px 0;border-radius:4px;display:flex;flex-wrap:wrap;gap:5px;align-items:center;}
-.summary{background:#e6f0ff;padding:8px;border:2px solid #004080;}
-.item-wrapper{display:inline-flex;flex-wrap:wrap;align-items:center;margin:2px 5px 5px 0;background:#eee;padding:3px;border-radius:4px;}
-.item-input{width:65px !important;margin:0 5px;}
-.weight-display{font-size:.95em;color:#004080;font-weight:bold;}
-.midBadge{font-size:.8em;color:#555;margin:0 10px;font-weight:normal;}
-textarea{width:100%;height:80px;margin-top:10px;box-sizing:border-box;}
-.delete-btn{background:#cc0000;padding:2px 6px;font-size:0.8em;}
+html, body { overscroll-behavior-y: contain; height: 100%; overflow-x: hidden; }
+body{font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; background:#f0f2f5; margin:8px; padding-bottom:120px; color: #333;}
+
+section{background:#fff; border-radius:10px; padding:12px; margin-bottom:10px; box-shadow: 0 1px 4px rgba(0,0,0,0.15);}
+h1{text-align:center; color:#004080; margin:10px 0; font-size:1.4em; font-weight: bold;}
+h3{cursor:pointer; margin:4px 0; font-size: 1.05em; display:flex; justify-content:space-between; align-items:center; color: #004080; font-weight: 600;}
+
+.flex{display:flex; flex-wrap:wrap; align-items:center; gap:10px;}
+select, input[type=number], input[type=text]{ 
+    padding: 10px; border: 1px solid #bbb; border-radius: 8px; font-size: 15px; outline: none; color: #000;
+}
+select{ background: #fff; flex: 1; min-width: 90px;}
+input[type=number]{ width: 75px; font-weight: 500;}
+
+button{ background:#004080; color:#fff; border:none; border-radius:8px; padding:10px 14px; cursor:pointer; font-weight: 600; -webkit-tap-highlight-color: transparent;}
+button:active{ background:#002b57; transform: scale(0.96); }
+
+.compartment{ border-top: 1px solid #eee; margin-top: 10px; padding-top: 10px; }
+.content{ display:none; background:#f9f9f9; padding:10px; border-radius:8px; border: 1px solid #e0e0e0; margin-top: 8px;}
+
+.items-container { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+
+.item-wrapper {
+    display: flex; align-items: center; background: #fff; padding: 6px 10px; border-radius: 8px; 
+    border: 1px solid #004080; font-size: 0.9em; white-space: nowrap; font-weight: 600; color: #000;
+}
+.item-input { width: 60px !important; margin: 0 8px; padding: 6px !important; border: 1px solid #004080 !important; color: #000 !important; font-weight: bold;}
+
+.delete-btn { background: #e60000; padding: 5px 10px; font-size: 0.85em; margin-left: 5px; border-radius: 6px;}
+
+.summary{ background:#004080; color: white; padding:15px; border-radius: 15px;}
+.summary h3 { color: white; border-bottom: 2px solid rgba(255,255,255,0.3); padding-bottom: 8px; margin-bottom: 10px;}
+.weight-display { font-size: 0.95em; color: #fff; background: #0066cc; padding: 4px 8px; border-radius: 6px; }
+.midBadge { font-size: 0.8em; color: #555; font-weight: 600; margin-right: auto; margin-left: 12px;}
+
+/* NOT EKLE KISMI DÜZENLEMESİ */
+#note { 
+    width: 100%; 
+    height: 100px; 
+    margin-top: 15px; 
+    border-radius: 10px; 
+    padding: 12px; 
+    border: 2px solid #004080; 
+    box-sizing: border-box; 
+    font-family: inherit; 
+    font-size: 16px; /* Yazı boyutu büyüdü */
+    color: #000000;  /* Yazı rengi tam siyah yapıldı */
+    font-weight: 500;
+    background-color: #ffffff;
+}
+#note::placeholder { color: #888; font-weight: normal; }
+
+.final-row { display: flex; justify-content: space-between; margin-top: 12px; font-size: 1em; border-top: 1px solid rgba(255,255,255,0.3); padding-top: 10px; font-weight: bold;}
 </style>
 </head>
 <body>
+
 <h1>Harekat Load Control</h1>
 
 <section class="flex">
-<div style="flex:1">Uçak
-<select id="aircraft" onchange="fullReset();checkLoadType()">
-<option value="">Seç</option>
-<option>A319</option><option>A320</option><option>A321</option><option>B737</option>
-<option>A330</option><option>A350</option><option>B777</option><option>B787</option>
-</select></div>
-<div style="flex:1">Yükleme
-<select id="loadType" onchange="checkLoadType()">
-<option value="">Seçiniz</option>
-<option value="YIGMA">Yığma</option>
-<option value="ULD">ULD</option>
-</select></div>
+    <div style="flex:1">Uçak: 
+        <select id="aircraft" onchange="fullReset();checkLoadType()">
+            <option value="">Seç</option>
+            <option>A319</option><option>A320</option><option>A321</option><option>B737</option>
+            <option>A330</option><option>A350</option><option>B777</option><option>B787</option>
+        </select>
+    </div>
+    <div style="flex:1">Yükleme: 
+        <select id="loadType" onchange="checkLoadType()">
+            <option value="">Seç</option>
+            <option value="YIGMA">Yığma</option>
+            <option value="ULD">ULD</option>
+        </select>
+    </div>
 </section>
 
 <section class="flex">
-Water <input type="text" id="waterInput" oninput="saveAll();updateSummary()">
-Pantry <input type="text" id="pantryInput" oninput="saveAll();updateSummary()">
+    Water <input type="number" id="waterInput" oninput="saveAll();updateSummary()">
+    Pantry <input type="number" id="pantryInput" oninput="saveAll();updateSummary()">
 </section>
 
 <section>
-<h3>Bagaj Ortalamaları</h3>
-<div class="flex">
-By <input type="number" id="byAvg" oninput="updateMix()">
-Bc <input type="number" id="bcAvg" oninput="updateMix()">
-Mix <input type="number" id="mxAvg" readonly>
-</div>
+    <h3 style="margin-bottom:10px">Bagaj Ortalamaları</h3>
+    <div class="flex">
+        By <input type="number" id="byAvg" value="13" oninput="updateMix()">
+        Bc <input type="number" id="bcAvg" value="11" oninput="updateMix()">
+        Mix <input type="number" id="mxAvg" readonly>
+    </div>
 </section>
 
 <section id="compartments"></section>
 
 <section class="summary">
-<h3>Final Kontrol</h3>
-<div id="summary"></div>
-<div class="flex" style="margin-top:10px;font-weight:bold;border-top:1px solid #004080;padding-top:5px;">
-<span>Water: <span id="finalWater">Nil</span></span>
-<span>Pantry: <span id="finalPantry">Nil</span></span>
-</div>
-<div class="flex" style="justify-content:flex-end;gap:10px;margin-top:10px">
-<button onclick="updateSummary()">Güncelle</button>
-<button onclick="saveAll()">Kaydet</button>
-<button onclick="clearStorage()" style="background:#cc0000">Sıfırla</button>
-</div>
-<textarea id="note" placeholder="Ekip notları..." oninput="saveAll()"></textarea>
+    <h3>Final Kontrol</h3>
+    <div id="summary" style="font-size: 1em; line-height: 1.8;"></div>
+    <div class="final-row">
+        <span>Water: <span id="finalWater">0</span></span>
+        <span>Pantry: <span id="finalPantry">0</span></span>
+    </div>
+    
+    <textarea id="note" placeholder="Operasyonel notlarınızı buraya yazın..." oninput="saveAll()"></textarea>
+
+    <div class="flex" style="justify-content: space-between; margin-top: 15px;">
+        <button onclick="saveAll()" style="background: #2ecc71; flex:1; margin-right:8px; font-size: 1.1em;">Kaydet</button>
+        <button onclick="clearStorage()" style="background:#e74c3c; flex:1; font-size: 1.1em;">Sıfırla</button>
+    </div>
 </section>
 
 <script>
@@ -83,13 +121,11 @@ const wide=["A330","A350","B777","B787"];
 function fullReset(){
   document.getElementById('compartments').innerHTML="";
   document.getElementById('summary').innerHTML="";
-  document.getElementById('finalWater').textContent="Nil";
-  document.getElementById('finalPantry').textContent="Nil";
   saveAll();
 }
 
 function clearStorage() {
-    if(confirm("DİKKAT: Tüm veriler silinecek! Emin misiniz?")) {
+    if(confirm("DİKKAT: Tüm veriler temizlenecektir. Emin misiniz?")) {
         localStorage.removeItem("hlc_data");
         location.reload();
     }
@@ -98,7 +134,7 @@ function clearStorage() {
 function updateMix(){
   const by = +document.getElementById('byAvg').value||0;
   const bc = +document.getElementById('bcAvg').value||0;
-  document.getElementById('mxAvg').value = (by + bc) / 2;
+  document.getElementById('mxAvg').value = (by + bc) > 0 ? (by + bc) / 2 : "";
   updateSummary();
   saveAll();
 }
@@ -107,7 +143,7 @@ function checkLoadType(){
  const ac=document.getElementById('aircraft').value, lt=document.getElementById('loadType').value;
  if(!lt){fullReset(); return;}
  if((ac==="B737"&&lt==="ULD")||(wide.includes(ac)&&lt==="YIGMA")){
-  alert("Bu uçak tipi için seçilen yükleme usulü uygun değildir!"); document.getElementById('loadType').value=""; fullReset(); return;}
+  alert("Uçak ve yükleme tipi uyumsuz!"); document.getElementById('loadType').value=""; fullReset(); return;}
  updateCompartments(true);
 }
 
@@ -121,27 +157,37 @@ function updateCompartments(r){
   c.className="compartment";
   c.dataset.num = n;
   c.innerHTML=`<h3 onclick="toggleContent(this)">
-  CPT ${n}<span class="weight-display">0 kg</span></h3><div class="content"></div>`;
-  const ct=c.querySelector(".content");
+  CPT ${n} <span class="midBadge"></span> <span class="weight-display">0 kg</span></h3>
+  <div class="content">
+    <div class="inner-items"></div>
+  </div>`;
+  const ct = c.querySelector(".content");
+  const inner = ct.querySelector(".inner-items");
 
   if(document.getElementById('loadType').value==="YIGMA" || n===5){
-    ct.innerHTML+=`<div class="bagaj flex">
-      By <input type="number" class="by" oninput="updateSummary();saveAll()">
-      Bc <input type="number" class="bc" oninput="updateSummary();saveAll()">
-      Mix <input type="number" class="mx" oninput="updateSummary();saveAll()">
+    inner.innerHTML+=`<div style="margin-bottom:10px; border-bottom:1px solid #ddd; padding-bottom:10px;" class="flex">
+      <div style="font-size:0.8em">By <input type="number" class="by" oninput="updateSummary();saveAll()"></div>
+      <div style="font-size:0.8em">Bc <input type="number" class="bc" oninput="updateSummary();saveAll()"></div>
+      <div style="font-size:0.8em">Mx <input type="number" class="mx" oninput="updateSummary();saveAll()"></div>
     </div>`;
   }
 
   if(document.getElementById('loadType').value==="ULD" && n!==5){
     const lbl=wide.includes(document.getElementById('aircraft').value)?"AKE":"AKH";
-    ct.innerHTML+=`<div class="konteyner flex"><strong>${lbl}</strong>
+    inner.innerHTML+=`<div style="margin-bottom:10px; border-bottom:1px solid #ddd; padding-bottom:10px;">
+      <div class="flex"><strong>${lbl}</strong>
       <select class="bagType"><option>By</option><option>Bc</option><option>Mix</option></select>
-      <button onclick="addBagaj(this)">+</button>
+      <button onclick="addBagaj(this)">+</button></div>
+      <div class="items-container"></div>
     </div>`;
   }
 
-  ct.innerHTML+=`<div class="kargo flex">Cargo <button onclick="addItem(this,'Cargo')">+</button></div>
-  <div class="ek flex">Manuel <button onclick="addItem(this,'Manuel')">+</button></div>`;
+  inner.innerHTML+=`<div style="margin-bottom:10px; border-bottom:1px solid #ddd; padding-bottom:10px;">
+    Cargo <button onclick="addItem(this,'Cargo')">+</button>
+    <div class="items-container"></div></div>
+  <div>Manuel <button onclick="addItem(this,'Manuel')">+</button>
+    <div class="items-container"></div></div>`;
+  
   container.appendChild(c);
  });
  updateSummary();
@@ -152,8 +198,6 @@ function toggleContent(el) {
     content.style.display = (content.style.display === 'block') ? 'none' : 'block';
 }
 
-// --- SIRALAMA SİSTEMİ (RENUMBERING) ---
-
 function renumberGlobalBag(type){
  let i=1;
  document.querySelectorAll(`.konteyner-item[data-type="${type}"]`).forEach(e=>{
@@ -162,40 +206,35 @@ function renumberGlobalBag(type){
 }
 
 function renumberLocal(container, kind){
-  if(!container) return;
   let i=1;
-  container.querySelectorAll(`.item-wrapper[data-kind="${kind}"]:not(.konteyner-item)`).forEach(e=>{
+  container.querySelectorAll(`.local-item[data-kind="${kind}"]`).forEach(e=>{
     e.querySelector('span').textContent = kind + " " + (i++);
   });
 }
 
-// --- EKLEME FONKSİYONLARI ---
-
 function addBagaj(b, savedVal = null){
- const t=b.previousElementSibling.value, p=b.parentElement;
+ const t=b.previousElementSibling.value, holder=b.parentElement.nextElementSibling;
  const d=document.createElement("div");
  d.className="konteyner-item item-wrapper";
  d.dataset.type = t; d.dataset.kind = t;
  d.innerHTML = `<span>${t}</span>
     <input type="number" class="item-input" value="${savedVal||''}" oninput="updateSummary();saveAll()">
     <button class="delete-btn" onclick="this.parentElement.remove(); renumberGlobalBag('${t}'); updateSummary(); saveAll()">X</button>`;
- p.appendChild(d);
+ holder.appendChild(d);
  renumberGlobalBag(t); updateSummary(); saveAll();
 }
 
 function addItem(b, k, savedVal = null){
- const p=b.parentElement;
+ const holder=b.nextElementSibling;
  const d=document.createElement("div");
- d.className="item-wrapper";
+ d.className="local-item item-wrapper";
  d.dataset.kind = k;
  d.innerHTML = `<span>${k}</span>
     <input type="number" class="item-input" value="${savedVal||''}" oninput="updateSummary();saveAll()">
-    <button class="delete-btn" onclick="const cont=this.closest('.content'); this.parentElement.remove(); renumberLocal(cont,'${k}'); updateSummary(); saveAll()">X</button>`;
- p.appendChild(d);
- renumberLocal(p.closest('.content'), k); updateSummary(); saveAll();
+    <button class="delete-btn" onclick="const h=this.parentElement.parentElement; this.parentElement.remove(); renumberLocal(h,'${k}'); updateSummary(); saveAll()">X</button>`;
+ holder.appendChild(d);
+ renumberLocal(holder, k); updateSummary(); saveAll();
 }
-
-// --- HESAPLAMA ---
 
 function updateSummary(){
  let out="";
@@ -205,23 +244,24 @@ function updateSummary(){
 
  document.querySelectorAll(".compartment").forEach(c=>{
    let t=0;
-   c.querySelectorAll(".bagaj").forEach(b=>{
-     t+=(+b.querySelector(".by").value||0)*byA + (+b.querySelector(".bc").value||0)*bcA + (+b.querySelector(".mx").value||0)*mxA;
-   });
+   c.querySelectorAll(".by").forEach(i=>t+=(+i.value||0)*byA);
+   c.querySelectorAll(".bc").forEach(i=>t+=(+i.value||0)*bcA);
+   c.querySelectorAll(".mx").forEach(i=>t+=(+i.value||0)*mxA);
+   
    c.querySelectorAll(".konteyner-item").forEach(k=>{
      const v=+k.querySelector("input").value||0;
      const avg=(k.dataset.type==="By")?byA:(k.dataset.type==="Bc")?bcA:mxA;
      t+=(v*avg+70)-v;
    });
-   c.querySelectorAll('.item-wrapper:not(.konteyner-item)').forEach(i=>t+=+i.querySelector("input").value||0);
+   c.querySelectorAll('.local-item').forEach(i=>t+=+i.querySelector("input").value||0);
    
    c.querySelector(".weight-display").textContent=Math.round(t)+" kg";
-   out+=`<div><strong>CPT ${c.dataset.num}:</strong> ${Math.round(t)} kg</div>`;
+   out+=`<div>CPT ${c.dataset.num}: <strong>${Math.round(t)} kg</strong></div>`;
  });
  
  document.getElementById('summary').innerHTML=out;
- document.getElementById('finalWater').textContent=document.getElementById('waterInput').value||"Nil";
- document.getElementById('finalPantry').textContent=document.getElementById('pantryInput').value||"Nil";
+ document.getElementById('finalWater').textContent=document.getElementById('waterInput').value||"0";
+ document.getElementById('finalPantry').textContent=document.getElementById('pantryInput').value||"0";
  updateCPTBadge();
 }
 
@@ -231,22 +271,18 @@ function updateCPTBadge(){
   let B=0, C=0, M=0;
   const cNum = parseInt(c.dataset.num);
   if(ltVal==='YIGMA' || cNum===5){
-    c.querySelectorAll('.bagaj input').forEach(i=>B+=+i.value||0);
+    c.querySelectorAll('.by, .bc, .mx').forEach(i=>B+=+i.value||0);
   } else {
     B=c.querySelectorAll('.konteyner-item').length;
   }
-  C=c.querySelectorAll('.item-wrapper[data-kind="Cargo"]').length;
-  M=c.querySelectorAll('.item-wrapper[data-kind="Manuel"]').length;
-  const h=c.querySelector('h3');
-  let mid=h.querySelector('.midBadge') || document.createElement('span');
-  mid.className='midBadge'; h.insertBefore(mid, h.querySelector('.weight-display'));
+  C=c.querySelectorAll('.local-item[data-kind="Cargo"]').length;
+  M=c.querySelectorAll('.local-item[data-kind="Manuel"]').length;
+  const mid=c.querySelector('.midBadge');
   let out=[];
   if(B) out.push("B "+B); if(C) out.push("C "+C); if(M) out.push("Mn "+M);
   mid.textContent=out.join(" / ");
  });
 }
-
-// --- KAYIT SİSTEMİ ---
 
 function saveAll(){
   const data = {
@@ -261,7 +297,7 @@ function saveAll(){
   };
   document.querySelectorAll('.compartment').forEach(c => {
     let cObj = { num: c.dataset.num, yigma: [], items: [] };
-    c.querySelectorAll('.bagaj input').forEach(i => cObj.yigma.push(i.value));
+    c.querySelectorAll('.by, .bc, .mx').forEach(i => cObj.yigma.push(i.value));
     c.querySelectorAll('.item-wrapper').forEach(iw => {
       cObj.items.push({
         k: iw.dataset.kind || iw.dataset.type,
@@ -291,14 +327,15 @@ function loadAll(){
   const domComps = document.querySelectorAll('.compartment');
   data.comps.forEach((cData, idx) => {
     const dc = domComps[idx]; if(!dc) return;
-    const yInputs = dc.querySelectorAll('.bagaj input');
+    const yInputs = dc.querySelectorAll('.by, .bc, .mx');
     cData.yigma.forEach((val, i) => { if(yInputs[i]) yInputs[i].value = val; });
     cData.items.forEach(item => {
       if(item.isK) {
         dc.querySelector('.bagType').value = item.k;
-        addBagaj(dc.querySelector('.konteyner button'), item.v);
+        addBagaj(dc.querySelector('.inner-items button'), item.v);
       } else {
-        const targetBtn = item.k === 'Cargo' ? dc.querySelector('.kargo button') : dc.querySelector('.ek button');
+        const targetBtn = item.k === 'Cargo' ? dc.querySelectorAll('.inner-items button')[1] : dc.querySelectorAll('.inner-items button')[2];
+        // Not: ULD/Yigma farkına göre buton indexi değişebilir, bu yüzden tip kontrolü ile eklenir
         addItem(targetBtn, item.k, item.v);
       }
     });
