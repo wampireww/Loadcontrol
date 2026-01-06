@@ -25,7 +25,7 @@ input[type=number], input[type=text], select{padding:2px 4px; border:1px solid #
 #note { width: 100%; height: 60px; margin-top: 8px; border-radius: 8px; padding: 8px; font-size: 14px; font-weight: bold; border: 1px solid #fff; box-sizing: border-box; resize: none;}
 .action-btn { flex: 1; padding: 10px; border-radius: 6px; border: none; color: white; font-weight: bold; font-size: 13px; cursor: pointer; }
 .content { display: none; padding: 8px 10px; border-top: 1px solid #eee; }
-.water-controls { display: flex; flex-direction: column; gap: 8px; width: 100%; margin-bottom: 8px; }
+.water-controls { display: flex; flex-direction: column; gap: 5px; width: 100%; margin-bottom: 8px; }
 </style>
 </head>
 <body>
@@ -33,7 +33,7 @@ input[type=number], input[type=text], select{padding:2px 4px; border:1px solid #
 <h1>Harekat Load Control</h1>
 
 <section class="flex">
-    Uçak: <select id="aircraft" onchange="fullReset();checkLoadType();updateWaterUI();saveAll()">
+    Uçak: <select id="aircraft" onchange="fullReset();checkLoadType();updateWaterUI();updateSummary();saveAll()">
         <option value="">Seç</option>
         <option>A319</option><option>A320</option><option>A321</option><option>B737</option>
         <option>A330</option><option>A350</option><option>B777</option><option>B787</option>
@@ -44,8 +44,7 @@ input[type=number], input[type=text], select{padding:2px 4px; border:1px solid #
 </section>
 
 <section>
-    <div id="waterUI" class="water-controls">
-        </div>
+    <div id="waterUI" class="water-controls"></div>
     <div class="flex">
         Pantry: <input type="text" id="pantryInput" style="flex-grow:1" oninput="saveAll();updateSummary()">
     </div>
@@ -107,34 +106,20 @@ const waterData = {
 const comps={A319:[1,4,5],A320:[1,3,4,5],A321:[1,2,3,4,5],B737:[1,2,3,4],A330:[1,2,3,4,5],A350:[1,2,3,4,5],B777:[1,2,3,4,5],B787:[1,2,3,4,5]};
 const wide=["A330","A350","B777","B787"];
 
-// DİNAMİK NUMARALANDIRMA (Asla Bozulmaz)
-function renumberGlobalBags(){
-    ['By','Bc','Mix'].forEach(kind => {
-        let count = 1;
-        document.querySelectorAll(`.konteyner-item[data-kind="${kind}"]`).forEach(el => {
-            el.querySelector('span').textContent = `${kind} ${count++}`;
-        });
-    });
-}
-function renumberLocalItems(container, kind){
-    let count = 1;
-    container.querySelectorAll(`.local-item[data-kind="${kind}"]`).forEach(el => {
-        el.querySelector('span').textContent = `${kind} ${count++}`;
-    });
-}
-
 function updateWaterUI() {
     const ac = document.getElementById('aircraft').value;
     const ui = document.getElementById('waterUI');
     ui.innerHTML = "";
+    if (!ac) return;
+
     if (ac === "A330" || ac === "A350") {
         let label = ac === "A330" ? "A330 Tescil Grubu:" : "A350 Tescil Grubu:";
         let opts = ac === "A330" 
             ? `<option value="JNA ... JNB">TC-JNA ... JNB Serisi</option><option value="JNF ... JNK">TC-JNF ... JNK Serisi</option><option value="JNH ... JNZ">TC-JNH ... JNZ Serisi</option><option value="TC-LOA ... LOZ">TC-LOA ... LOZ Serisi</option>`
             : `<option value="LGA ... LGP (A-C Grubu)">LGA ... LGP (A, B, C...)</option><option value="LGI ... LGL (I-L Grubu)">LGI ... LGL (I, J, K, L...)</option>`;
-        ui.innerHTML += `<div style="font-weight:bold; font-size:13px;">${label}</div><select id="tailGroup" style="width:100%" onchange="updateWaterRatios();updateSummary();saveAll()"><option value="">Tescil Seçiniz</option>${opts}</select>`;
+        ui.innerHTML += `<div style="font-weight:bold; font-size:13px; margin-top:5px;">${label}</div><select id="tailGroup" style="width:100%" onchange="updateWaterRatios(); updateSummary(); saveAll()"><option value="">Tescil Seçiniz</option>${opts}</select>`;
     }
-    ui.innerHTML += `<div style="font-weight:bold; font-size:13px;">Water Oranı:</div><select id="waterRatio" style="width:100%" onchange="updateSummary();saveAll()"><option value="">Oran Seçiniz</option></select>`;
+    ui.innerHTML += `<div style="font-weight:bold; font-size:13px; margin-top:5px;">Water Oranı:</div><select id="waterRatio" style="width:100%" onchange="updateSummary(); saveAll()"><option value="">Oran Seçiniz</option></select>`;
     updateWaterRatios();
 }
 
@@ -142,6 +127,7 @@ function updateWaterRatios() {
     const ac = document.getElementById('aircraft').value;
     const ratioSel = document.getElementById('waterRatio');
     if(!ac || !ratioSel) return;
+    let current = ratioSel.value;
     ratioSel.innerHTML = '<option value="">Oran Seçiniz</option>';
     let opts = (ac==="B787"||ac==="B777") ? ["1/8","2/8","3/8","4/8","5/8","6/8","7/8","FULL"] : 
                (ac==="A350" ? ["1/10","2/10","3/10","4/10","5/10","6/10","7/10","8/10","9/10","FULL"] : ["25","50","75","FULL"]);
@@ -149,6 +135,47 @@ function updateWaterRatios() {
         let el = document.createElement("option"); el.value=o; el.textContent=(o==="FULL"?"FULL":(o.includes("/")?o:"%"+o));
         ratioSel.appendChild(el);
     });
+    if(current) ratioSel.value = current;
+}
+
+function updateSummary(){
+    let out=""; const byA=+document.getElementById('byAvg').value||0, bcA=+document.getElementById('bcAvg').value||0, mxA=+document.getElementById('mxAvg').value||0;
+    document.querySelectorAll(".compartment").forEach(c=>{
+        let t=0; const eic=c.querySelector(".eic-input"); if(eic) t+=+eic.value||0;
+        c.querySelectorAll(".by").forEach(i=>t+=(+i.value||0)*byA);
+        c.querySelectorAll(".bc").forEach(i=>t+=(+i.value||0)*bcA);
+        c.querySelectorAll(".mx").forEach(i=>t+=(+i.value||0)*mxA);
+        c.querySelectorAll(".konteyner-item").forEach(k=>{
+            const count=+k.querySelector("input").value||0;
+            const avg=(k.dataset.kind==="By")?byA:(k.dataset.kind==="Bc")?bcA:mxA;
+            t += 70 + (count * avg);
+        });
+        c.querySelectorAll(".local-item").forEach(i=>t+=+i.querySelector("input").value||0);
+        c.querySelector(".weight-display").textContent=Math.round(t)+" kg";
+        out+=`<div>CPT ${c.dataset.num}: <strong>${Math.round(t)} kg</strong></div>`;
+    });
+    document.getElementById('summary').innerHTML=out;
+
+    // SU HESAPLAMA MANTIĞI GÜNCELLENDİ
+    const ac=document.getElementById('aircraft').value;
+    const ratioSel=document.getElementById('waterRatio');
+    const ratio = ratioSel ? ratioSel.value : "";
+    let wDisp="-";
+
+    if(ac && ratio && waterData[ac]){
+        let v = null;
+        if(ac==="A330" || ac==="A350"){
+            const tgEl = document.getElementById('tailGroup');
+            const tg = tgEl ? tgEl.value : "";
+            if(tg && waterData[ac][tg]) v = waterData[ac][tg][ratio];
+        } else {
+            v = waterData[ac][ratio];
+        }
+        if(v) wDisp=(ratio==="FULL"?"FULL":(ratio.includes("/")?ratio:"%"+ratio))+" / "+v[0]+" kg / "+v[1];
+    }
+    document.getElementById('finalWater').textContent=wDisp;
+    document.getElementById('finalPantry').textContent=document.getElementById('pantryInput').value||"-";
+    updateCPTBadge();
 }
 
 function fullReset(){ document.getElementById('compartments').innerHTML=""; updateSummary(); }
@@ -190,56 +217,37 @@ function updateCompartments(r){
     updateSummary();
 }
 
-function updateSummary(){
-    let out=""; const byA=+document.getElementById('byAvg').value||0, bcA=+document.getElementById('bcAvg').value||0, mxA=+document.getElementById('mxAvg').value||0;
-    document.querySelectorAll(".compartment").forEach(c=>{
-        let t=0; const eic=c.querySelector(".eic-input"); if(eic) t+=+eic.value||0;
-        c.querySelectorAll(".by").forEach(i=>t+=(+i.value||0)*byA);
-        c.querySelectorAll(".bc").forEach(i=>t+=(+i.value||0)*bcA);
-        c.querySelectorAll(".mx").forEach(i=>t+=(+i.value||0)*mxA);
-        c.querySelectorAll(".konteyner-item").forEach(k=>{
-            const count=+k.querySelector("input").value||0;
-            const avg=(k.dataset.kind==="By")?byA:(k.dataset.kind==="Bc")?bcA:mxA;
-            t += 70 + (count * avg);
+function renumberGlobalBags(){
+    ['By','Bc','Mix'].forEach(kind => {
+        let count = 1;
+        document.querySelectorAll(`.konteyner-item[data-kind="${kind}"]`).forEach(el => {
+            el.querySelector('span').textContent = `${kind} ${count++}`;
         });
-        c.querySelectorAll(".local-item").forEach(i=>t+=+i.querySelector("input").value||0);
-        c.querySelector(".weight-display").textContent=Math.round(t)+" kg";
-        out+=`<div>CPT ${c.dataset.num}: <strong>${Math.round(t)} kg</strong></div>`;
     });
-    document.getElementById('summary').innerHTML=out;
-    const ac=document.getElementById('aircraft').value, ratio=document.getElementById('waterRatio').value;
-    let wDisp="-";
-    if(ac && ratio && waterData[ac]){
-        let v;
-        if(ac==="A330" || ac==="A350"){ const tg=document.getElementById('tailGroup').value; v=(tg&&waterData[ac][tg])?waterData[ac][tg][ratio]:null; }
-        else v=waterData[ac][ratio];
-        if(v) wDisp=(ratio==="FULL"?"FULL":(ratio.includes("/")?ratio:"%"+ratio))+" / "+v[0]+" kg / "+v[1];
-    }
-    document.getElementById('finalWater').textContent=wDisp;
-    document.getElementById('finalPantry').textContent=document.getElementById('pantryInput').value||"-";
-    updateCPTBadge();
 }
-
+function renumberLocalItems(container, kind){
+    let count = 1;
+    container.querySelectorAll(`.local-item[data-kind="${kind}"]`).forEach(el => {
+        el.querySelector('span').textContent = `${kind} ${count++}`;
+    });
+}
 function updateMix(){
     const by=+document.getElementById('byAvg').value||0, bc=+document.getElementById('bcAvg').value||0;
     document.getElementById('mxAvg').value=(by+bc)>0?Math.round((by+bc)/2):""; updateSummary(); saveAll();
 }
 function toggleContent(el){ const c=el.nextElementSibling; if(c) c.style.display=(c.style.display==='block'?'none':'block'); }
-
 function addBagaj(b,v=null){
     const t=b.parentElement.querySelector('.bagType').value, h=b.parentElement.nextElementSibling;
     const d=document.createElement("div"); d.className="konteyner-item item-wrapper"; d.dataset.kind=t;
     d.innerHTML=`<span>${t}</span><input type="number" class="item-input" value="${v||''}" oninput="updateSummary();saveAll()"><button class="delete-btn" onclick="this.parentElement.remove(); renumberGlobalBags(); updateSummary(); saveAll()">X</button>`;
     h.appendChild(d); renumberGlobalBags(); updateSummary(); saveAll();
 }
-
 function addItem(b,k,v=null){
     const h=b.parentElement.nextElementSibling;
     const d=document.createElement("div"); d.className="local-item item-wrapper"; d.dataset.kind=k;
     d.innerHTML=`<span>${k}</span><input type="number" class="item-input" value="${v||''}" oninput="updateSummary();saveAll()"><button class="delete-btn" onclick="const container = this.parentElement.parentElement; this.parentElement.remove(); renumberLocalItems(container, '${k}'); updateSummary(); saveAll()">X</button>`;
     h.appendChild(d); renumberLocalItems(h, k); updateSummary(); saveAll();
 }
-
 function updateCPTBadge(){
     document.querySelectorAll('.compartment').forEach(c=>{
         const lt=document.getElementById('loadType').value, n=parseInt(c.dataset.num);
@@ -249,13 +257,15 @@ function updateCPTBadge(){
         c.querySelector('.midBadge').textContent=res.join(" / ");
     });
 }
-
 function saveAll(){
+    const tgEl = document.getElementById('tailGroup');
+    const wrEl = document.getElementById('waterRatio');
     const data={
         ac:document.getElementById('aircraft').value, lt:document.getElementById('loadType').value,
         p:document.getElementById('pantryInput').value, by:document.getElementById('byAvg').value, bc:document.getElementById('bcAvg').value,
-        n:document.getElementById('note').value, wR:document.getElementById('waterRatio').value,
-        tG:document.getElementById('tailGroup')?document.getElementById('tailGroup').value:"",
+        n:document.getElementById('note').value, 
+        wR:wrEl ? wrEl.value : "",
+        tG:tgEl ? tgEl.value : "",
         comps:[]
     };
     document.querySelectorAll('.compartment').forEach(c=>{
@@ -269,7 +279,6 @@ function saveAll(){
     });
     localStorage.setItem("hlc_pro_data", JSON.stringify(data));
 }
-
 function loadAll(){
     const raw=localStorage.getItem("hlc_pro_data"); if(!raw) return;
     const d=JSON.parse(raw);
@@ -279,7 +288,7 @@ function loadAll(){
     document.getElementById('pantryInput').value=d.p||""; document.getElementById('byAvg').value=d.by||""; document.getElementById('bcAvg').value=d.bc||"";
     document.getElementById('note').value=d.n||"";
     if(d.tG && document.getElementById('tailGroup')){document.getElementById('tailGroup').value=d.tG; updateWaterRatios();}
-    if(document.getElementById('waterRatio')) document.getElementById('waterRatio').value=d.wR||"";
+    if(d.wR && document.getElementById('waterRatio')) document.getElementById('waterRatio').value=d.wR;
     const domC=document.querySelectorAll('.compartment');
     d.comps.forEach((cd,idx)=>{
         const dc=domC[idx]; if(!dc) return;
