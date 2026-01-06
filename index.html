@@ -12,9 +12,9 @@ h1{text-align:center; color:#004080; margin:5px; font-size:1.3em;}
 h3{cursor:pointer; margin:4px 0; display:flex; align-items:center; font-size: 1.05em; color:#004080; font-weight: bold;}
 .flex{display:flex; flex-wrap:wrap; align-items:center; gap:6px;}
 
-input[type=number], input[type=text]{width:55px; padding:4px; border:1px solid #ccc; border-radius:4px; font-size: 14px; font-weight: bold;}
-select{padding:4px; border:1px solid #ccc; border-radius:4px; font-size: 14px; font-weight: bold;}
-.add-btn {background:#004080; color:#fff; border:none; border-radius:5px; padding:3px 10px; cursor:pointer; font-weight: bold; font-size: 15px;}
+input[type=number], input[type=text]{width:55px; height: 16px; padding:2px 4px; border:1px solid #ccc; border-radius:4px; font-size: 14px; font-weight: bold;}
+select{padding:2px 4px; height: 22px; border:1px solid #ccc; border-radius:4px; font-size: 14px; font-weight: bold;}
+.add-btn {background:#004080; color:#fff; border:none; border-radius:5px; padding:2px 10px; cursor:pointer; font-weight: bold; font-size: 15px;}
 
 .midBadge { font-size: 0.9em; color: #004080; font-weight: 900; flex-grow: 1; text-align: center; }
 
@@ -24,11 +24,13 @@ select{padding:4px; border:1px solid #ccc; border-radius:4px; font-size: 14px; f
     width: 48%; box-sizing: border-box; font-size: 0.9em; margin-bottom: 5px; font-weight: bold;
 }
 
-.eic-wrapper { background: #fff2cc !important; border-color: #f1c232 !important; width: 100% !important; margin-bottom: 8px; }
-.items-container { display: flex; flex-wrap: wrap; gap: 4%; }
+.eic-wrapper { background: #fff2cc !important; border-color: #f1c232 !important; width: 100% !important; margin-bottom: 6px; }
 
-.item-input { width: 46px !important; margin: 0 4px; font-weight: 900; border: 1.5px solid #555 !important; padding: 2px !important; height: 20px; font-size: 14px !important; text-align: center; }
-.delete-btn { background: #cc0000; padding: 2px 6px; font-size: 0.8em; border-radius: 4px; color: white; border:none; font-weight: bold;}
+/* 3px ile 1 milimlik o çok az boşluk sağlandı */
+.items-container { display: flex; flex-wrap: wrap; gap: 4%; margin-top: 3px; }
+
+.item-input { width: 42px !important; height: 16px !important; margin: 0 4px; font-weight: 900; border: 1.5px solid #555 !important; padding: 1px !important; font-size: 13px !important; text-align: center; }
+.delete-btn { background: #cc0000; padding: 1px 6px; font-size: 0.8em; border-radius: 4px; color: white; border:none; font-weight: bold;}
 .section-title { margin-top:8px; font-weight: 700 !important; font-size:0.95em; color: #333; display: flex; align-items: center; gap: 8px; }
 .weight-display { font-size: 0.9em; color: #004080; font-weight: 900; background: #e6f0ff; padding: 3px 6px; border-radius: 5px; min-width: 55px; text-align: center; }
 
@@ -82,7 +84,7 @@ select{padding:4px; border:1px solid #ccc; border-radius:4px; font-size: 14px; f
     </div>
     <textarea id="note" placeholder="Not Ekle..." oninput="saveAll()"></textarea>
     <div class="flex" style="justify-content: space-between; margin-top: 10px; gap: 5px;">
-        <button class="action-btn" onclick="saveToHistory()" style="background: #2ecc71;">ARŞİVE EKLE</button>
+        <button class="action-btn" onclick="saveAll()" style="background: #2ecc71;">KAYDET</button>
         <button class="action-btn" onclick="clearStorage()" style="background:#e74c3c;">SIFIRLA</button>
     </div>
 </section>
@@ -137,13 +139,15 @@ function updateCompartments(r){
         const bagSec = s.querySelector(".bag-section");
         if(lt==="YIGMA" || n===5){
             bagSec.classList.remove("items-container");
+            bagSec.style.marginTop = "0";
             bagSec.innerHTML=`<div class="flex" style="font-weight:bold;">By <input type="number" class="by" oninput="updateSummary();saveAll()"> Bc <input type="number" class="bc" oninput="updateSummary();saveAll()"> Mix <input type="number" class="mx" oninput="updateSummary();saveAll()"></div>`;
         } else {
             const lbl=wide.includes(ac)?"AKE":"AKH";
-            bagSec.innerHTML=`<div class="section-title" style="width:100%"><strong>${lbl}</strong> <select class="bagType"><option>By</option><option>Bc</option><option>Mix</option></select> <button class="add-btn" onclick="addBagaj(this)">+</button></div><div class="items-container uld-items" style="width:100%"></div>`;
+            bagSec.innerHTML=`<div class="section-title" style="width:100%; margin-top:0;"><strong>${lbl}</strong> <select class="bagType"><option>By</option><option>Bc</option><option>Mix</option></select> <button class="add-btn" onclick="addBagaj(this)">+</button></div><div class="items-container uld-items" style="width:100%"></div>`;
         }
         container.appendChild(s);
     });
+    updateSummary();
 }
 
 function toggleContent(el){ const c = el.nextElementSibling; if(c) c.style.display = (c.style.display === 'block') ? 'none' : 'block'; }
@@ -192,7 +196,6 @@ function updateSummary(){
         c.querySelector(".weight-display").textContent=Math.round(t)+" kg";
         out+=`<div>CPT ${c.dataset.num}: <strong>${Math.round(t)} kg</strong></div>`;
     });
-    // GENEL TOPLAM SATIRI TAMAMEN SİLİNDİ
     document.getElementById('summary').innerHTML=out;
     document.getElementById('finalWater').textContent=document.getElementById('waterInput').value || "-";
     document.getElementById('finalPantry').textContent=document.getElementById('pantryInput').value || "-";
@@ -211,8 +214,6 @@ function updateCPTBadge(){
     });
 }
 
-function saveToHistory(){ alert("Arşive kaydedildi!"); }
-
 function saveAll(){
     const data = { ac: document.getElementById('aircraft').value, lt: document.getElementById('loadType').value, w: document.getElementById('waterInput').value, p: document.getElementById('pantryInput').value, by: document.getElementById('byAvg').value, bc: document.getElementById('bcAvg').value, n: document.getElementById('note').value, comps: [] };
     document.querySelectorAll('.compartment').forEach(c => {
@@ -227,6 +228,7 @@ function saveAll(){
         data.comps.push(cObj);
     });
     localStorage.setItem("hlc_pro_data", JSON.stringify(data));
+    // Alert sildi; sessizce kaydediyor.
 }
 
 function loadAll(){
