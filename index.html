@@ -24,7 +24,7 @@ select{padding:4px; border:1px solid #ccc; border-radius:4px; font-size: 14px; f
     width: 48%; box-sizing: border-box; font-size: 0.9em; margin-bottom: 5px; font-weight: bold;
 }
 
-/* EIC Özel Görünüm */
+/* EIC Satırı Stili */
 .eic-wrapper { background: #fff2cc !important; border-color: #f1c232 !important; width: 100% !important; margin-bottom: 8px; }
 
 .item-input { width: 46px !important; margin: 0 4px; font-weight: 900; border: 1.5px solid #555 !important; padding: 2px !important; height: 20px; font-size: 14px !important; text-align: center; }
@@ -43,6 +43,7 @@ select{padding:4px; border:1px solid #ccc; border-radius:4px; font-size: 14px; f
 #history-section h2 { background: #004080; color: white; margin: 0; padding: 10px; font-size: 1em; text-align: center; }
 .history-table { width: 100%; border-collapse: collapse; font-size: 0.85em; }
 .history-table th, .history-table td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+.history-table th { background: #f2f2f2; font-weight: bold; }
 </style>
 </head>
 <body>
@@ -94,7 +95,16 @@ select{padding:4px; border:1px solid #ccc; border-radius:4px; font-size: 14px; f
 
 <div id="history-section">
     <h2>Yükleme Geçmişi</h2>
-    <table class="history-table"><tbody id="history-body"></tbody></table>
+    <table class="history-table">
+        <thead>
+            <tr>
+                <th>Tarih/Uçak</th>
+                <th>Toplam</th>
+                <th>İşlem</th>
+            </tr>
+        </thead>
+        <tbody id="history-body"></tbody>
+    </table>
 </div>
 
 <script>
@@ -102,10 +112,11 @@ const comps={A319:[1,4,5],A320:[1,3,4,5],A321:[1,2,3,4,5],B737:[1,2,3,4],A330:[1
 const wide=["A330","A350","B777","B787"];
 
 function fullReset(){ document.getElementById('compartments').innerHTML=""; updateSummary(); }
-function clearStorage() { if(confirm("Tüm veriler silinecek?")) { localStorage.clear(); location.reload(); } }
+function clearStorage() { if(confirm("Tüm veriler silinecek?")) { localStorage.removeItem("hlc_pro_data"); location.reload(); } }
 
 function updateMix(){
-    const by = +document.getElementById('byAvg').value||0, bc = +document.getElementById('bcAvg').value||0;
+    const by = +document.getElementById('byAvg').value||0;
+    const bc = +document.getElementById('bcAvg').value||0;
     document.getElementById('mxAvg').value = (by+bc)>0 ? (by+bc)/2 : "";
     updateSummary(); saveAll();
 }
@@ -113,7 +124,9 @@ function updateMix(){
 function checkLoadType(){
     const ac=document.getElementById('aircraft').value, lt=document.getElementById('loadType').value;
     if(!lt){fullReset(); return;}
-    if((ac==="B737"&&lt==="ULD")||(wide.includes(ac)&&lt==="YIGMA")){ alert("Uyumsuz tip!"); document.getElementById('loadType').value=""; fullReset(); return; }
+    if((ac==="B737"&&lt==="ULD")||(wide.includes(ac)&&lt==="YIGMA")){
+        alert("Uyumsuz tip!"); document.getElementById('loadType').value=""; fullReset(); return;
+    }
     updateCompartments(true);
 }
 
@@ -122,7 +135,7 @@ function updateCompartments(r){
     if(r) container.innerHTML="";
     const ac=document.getElementById('aircraft').value, lt=document.getElementById('loadType').value;
     if(!ac || !lt) return;
-    
+
     let eicTarget = 5; let defaultEic = 0;
     if(ac === "B737") { eicTarget = 4; defaultEic = 23; }
     else if(ac === "A319" || ac === "A320" || ac === "A321") { eicTarget = 5; defaultEic = 35; }
@@ -134,7 +147,7 @@ function updateCompartments(r){
         s.className="compartment"; s.dataset.num=n;
         s.innerHTML=`<h3 onclick="toggleContent(this)">CPT ${n} <span class="midBadge"></span> <span class="weight-display">0 kg</span></h3>
         <div class="content">
-            ${n === eicTarget ? `<div class="item-wrapper eic-wrapper"><span>EIC (Equip.)</span><input type="number" class="eic-input" value="${defaultEic}" oninput="updateSummary();saveAll()"></div>` : ''}
+            ${n === eicTarget ? `<div class="item-wrapper eic-wrapper"><span>EIC</span><input type="number" class="eic-input" value="${defaultEic}" oninput="updateSummary();saveAll()"></div>` : ''}
             <div class="bag-section"></div>
             <div class="section-title">Cargo <button class="add-btn" onclick="addItem(this,'Cargo')">+</button></div>
             <div class="items-container"></div>
@@ -219,19 +232,27 @@ function updateCPTBadge(){
 
 function saveToHistory(){
     const ac = document.getElementById('aircraft').value;
-    if(!ac) { alert("Uçak seçin!"); return; }
+    if(!ac) { alert("Lütfen önce uçak seçin!"); return; }
     const summaryText = document.getElementById('summary').innerText.split('TOPLAM:')[1] || "0 kg";
     const date = new Date().toLocaleString('tr-TR', {hour:'2-digit', minute:'2-digit', day:'2-digit', month:'2-digit'});
     const record = { id: Date.now(), title: ac + " (" + date + ")", total: summaryText };
     let history = JSON.parse(localStorage.getItem("hlc_history") || "[]");
-    history.unshift(record); localStorage.setItem("hlc_history", JSON.stringify(history));
-    renderHistory(); alert("Arşive eklendi!");
+    history.unshift(record);
+    localStorage.setItem("hlc_history", JSON.stringify(history));
+    renderHistory();
+    alert("Arşive kaydedildi!");
 }
 
 function renderHistory(){
     const history = JSON.parse(localStorage.getItem("hlc_history") || "[]");
     const body = document.getElementById('history-body');
-    body.innerHTML = history.map(r => `<tr><td>${r.title}</td><td><strong>${r.total}</strong></td><td><button onclick="deleteHistory(${r.id})" style="background:red; color:white; border:none; border-radius:4px;">Sil</button></td></tr>`).join('');
+    body.innerHTML = history.map(r => `
+        <tr>
+            <td>${r.title}</td>
+            <td><strong>${r.total}</strong></td>
+            <td><button onclick="deleteHistory(${r.id})" style="background:red; color:white; border:none; border-radius:4px; padding:2px 5px;">Sil</button></td>
+        </tr>
+    `).join('');
 }
 
 function deleteHistory(id){
@@ -257,7 +278,8 @@ function saveAll(){
 }
 
 function loadAll(){
-    const raw = localStorage.getItem("hlc_pro_data"); renderHistory();
+    const raw = localStorage.getItem("hlc_pro_data"); 
+    renderHistory();
     if(!raw) return;
     const data = JSON.parse(raw);
     document.getElementById('aircraft').value=data.ac; document.getElementById('loadType').value=data.lt;
