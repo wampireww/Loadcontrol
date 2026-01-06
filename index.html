@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
 <style>
 html, body { overscroll-behavior-y: contain; }
-body{font-family: Arial, sans-serif; background:#f0f2f5; margin:5px; padding-bottom:120px; color: #333;}
+body{font-family: Arial, sans-serif; background:#f0f2f5; margin:5px; padding-bottom:150px; color: #333;}
 section{background:#fff; border:1px solid #ccc; border-radius:8px; padding:8px; margin-bottom:8px;}
 h1{text-align:center; color:#004080; margin:5px; font-size:1.3em;}
 h3{cursor:pointer; margin:4px 0; display:flex; align-items:center; font-size: 1.05em; color:#004080; font-weight: bold;}
@@ -18,45 +18,31 @@ select{padding:4px; border:1px solid #ccc; border-radius:4px; font-size: 14px; f
 
 .midBadge { font-size: 0.9em; color: #004080; font-weight: 900; flex-grow: 1; text-align: center; }
 
-/* Kompakt ve Dengeli Item Kutuları */
-.items-container { display: flex; flex-wrap: wrap; gap: 4%; margin-top: 6px; }
 .item-wrapper {
     display: flex; align-items: center; justify-content: space-between;
-    background: #fff; 
-    padding: 4px 8px; /* İdeal seviyeye çekildi */
-    border-radius: 6px; border: 1.5px solid #004080;
-    width: 48%; box-sizing: border-box; font-size: 0.9em; color: #000; 
-    margin-bottom: 5px; font-weight: bold;
+    background: #fff; padding: 4px 8px; border-radius: 6px; border: 1.5px solid #004080;
+    width: 48%; box-sizing: border-box; font-size: 0.9em; margin-bottom: 5px; font-weight: bold;
 }
 
-.item-input { 
-    width: 46px !important; margin: 0 4px; font-weight: 900; border: 1.5px solid #555 !important; 
-    padding: 2px !important; height: 20px; font-size: 14px !important; text-align: center;
-}
+/* EIC Özel Görünüm */
+.eic-wrapper { background: #fff2cc !important; border-color: #f1c232 !important; width: 100% !important; margin-bottom: 8px; }
+
+.item-input { width: 46px !important; margin: 0 4px; font-weight: 900; border: 1.5px solid #555 !important; padding: 2px !important; height: 20px; font-size: 14px !important; text-align: center; }
 .delete-btn { background: #cc0000; padding: 2px 6px; font-size: 0.8em; border-radius: 4px; color: white; border:none; font-weight: bold;}
-
 .section-title { margin-top:8px; font-weight: 700 !important; font-size:0.95em; color: #333; display: flex; align-items: center; gap: 8px; }
-
 .weight-display { font-size: 0.9em; color: #004080; font-weight: 900; background: #e6f0ff; padding: 3px 6px; border-radius: 5px; min-width: 55px; text-align: center; }
 
-/* Final Panel */
 .summary{ background:#004080; color: white; padding:12px; border-radius: 12px; border: 2px solid #002b57; box-sizing: border-box;}
 .summary h3 { font-size: 1.1em; margin-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 5px; color: white; }
-#summary { font-size: 1em; line-height: 1.5; font-weight: bold;} 
+#note { width: 100%; height: 60px; margin-top: 8px; border-radius: 8px; padding: 8px; font-size: 14px; font-weight: bold; border: 1px solid #fff; box-sizing: border-box; resize: none;}
 
-#note { width: 100%; height: 60px; margin-top: 8px; border-radius: 8px; padding: 8px; font-size: 14px; color: #000; font-weight: bold; border: 1px solid #fff; box-sizing: border-box; resize: none;}
-
-.action-btn { 
-    flex: 1; 
-    padding: 8px; 
-    border-radius: 6px; 
-    border: none; 
-    color: white; 
-    font-weight: bold; 
-    font-size: 13px; /* Daha okunaklı */
-    cursor: pointer;
-}
+.action-btn { flex: 1; padding: 8px; border-radius: 6px; border: none; color: white; font-weight: bold; font-size: 13px; cursor: pointer; }
 .content { display: none; padding: 8px 10px; border-top: 1px solid #eee; }
+
+#history-section { margin-top: 20px; background: #fff; border: 1px solid #004080; border-radius: 8px; overflow: hidden; }
+#history-section h2 { background: #004080; color: white; margin: 0; padding: 10px; font-size: 1em; text-align: center; }
+.history-table { width: 100%; border-collapse: collapse; font-size: 0.85em; }
+.history-table th, .history-table td { border: 1px solid #ddd; padding: 8px; text-align: center; }
 </style>
 </head>
 <body>
@@ -95,27 +81,31 @@ select{padding:4px; border:1px solid #ccc; border-radius:4px; font-size: 14px; f
 <section class="summary">
     <h3>Final Kontrol</h3>
     <div id="summary"></div>
-    <div class="final-row" style="display:flex; justify-content: space-between; margin-top:10px; border-top: 1px solid rgba(255,255,255,0.2); padding-top:10px; font-weight:bold; font-size:1em;">
+    <div class="final-row" style="display:flex; justify-content: space-between; margin-top:10px; border-top: 1px solid rgba(255,255,255,0.2); padding-top:10px; font-weight:bold;">
         <span>Water: <span id="finalWater">-</span></span>
         <span>Pantry: <span id="finalPantry">-</span></span>
     </div>
     <textarea id="note" placeholder="Not Ekle..." oninput="saveAll()"></textarea>
-    <div class="flex" style="justify-content: space-between; margin-top: 10px;">
-        <button class="action-btn" onclick="saveAll()" style="background: #2ecc71; margin-right:8px;">KAYDET</button>
+    <div class="flex" style="justify-content: space-between; margin-top: 10px; gap: 5px;">
+        <button class="action-btn" onclick="saveToHistory()" style="background: #2ecc71;">ARŞİVE EKLE</button>
         <button class="action-btn" onclick="clearStorage()" style="background:#e74c3c;">SIFIRLA</button>
     </div>
 </section>
+
+<div id="history-section">
+    <h2>Yükleme Geçmişi</h2>
+    <table class="history-table"><tbody id="history-body"></tbody></table>
+</div>
 
 <script>
 const comps={A319:[1,4,5],A320:[1,3,4,5],A321:[1,2,3,4,5],B737:[1,2,3,4],A330:[1,2,3,4,5],A350:[1,2,3,4,5],B777:[1,2,3,4,5],B787:[1,2,3,4,5]};
 const wide=["A330","A350","B777","B787"];
 
 function fullReset(){ document.getElementById('compartments').innerHTML=""; updateSummary(); }
-function clearStorage() { if(confirm("Tüm veriler silinecek?")) { localStorage.removeItem("hlc_pro_data"); location.reload(); } }
+function clearStorage() { if(confirm("Tüm veriler silinecek?")) { localStorage.clear(); location.reload(); } }
 
 function updateMix(){
-    const by = +document.getElementById('byAvg').value||0;
-    const bc = +document.getElementById('bcAvg').value||0;
+    const by = +document.getElementById('byAvg').value||0, bc = +document.getElementById('bcAvg').value||0;
     document.getElementById('mxAvg').value = (by+bc)>0 ? (by+bc)/2 : "";
     updateSummary(); saveAll();
 }
@@ -123,9 +113,7 @@ function updateMix(){
 function checkLoadType(){
     const ac=document.getElementById('aircraft').value, lt=document.getElementById('loadType').value;
     if(!lt){fullReset(); return;}
-    if((ac==="B737"&&lt==="ULD")||(wide.includes(ac)&&lt==="YIGMA")){
-        alert("Uyumsuz tip!"); document.getElementById('loadType').value=""; fullReset(); return;
-    }
+    if((ac==="B737"&&lt==="ULD")||(wide.includes(ac)&&lt==="YIGMA")){ alert("Uyumsuz tip!"); document.getElementById('loadType').value=""; fullReset(); return; }
     updateCompartments(true);
 }
 
@@ -134,11 +122,19 @@ function updateCompartments(r){
     if(r) container.innerHTML="";
     const ac=document.getElementById('aircraft').value, lt=document.getElementById('loadType').value;
     if(!ac || !lt) return;
+    
+    let eicTarget = 5; let defaultEic = 0;
+    if(ac === "B737") { eicTarget = 4; defaultEic = 23; }
+    else if(ac === "A319" || ac === "A320" || ac === "A321") { eicTarget = 5; defaultEic = 35; }
+    else if(ac === "A330" || ac === "A350") { eicTarget = 5; defaultEic = 58; }
+    else if(ac === "B777" || ac === "B787") { eicTarget = 5; defaultEic = 30; }
+
     comps[ac].forEach(n=>{
         const s=document.createElement("section");
         s.className="compartment"; s.dataset.num=n;
         s.innerHTML=`<h3 onclick="toggleContent(this)">CPT ${n} <span class="midBadge"></span> <span class="weight-display">0 kg</span></h3>
         <div class="content">
+            ${n === eicTarget ? `<div class="item-wrapper eic-wrapper"><span>EIC (Equip.)</span><input type="number" class="eic-input" value="${defaultEic}" oninput="updateSummary();saveAll()"></div>` : ''}
             <div class="bag-section"></div>
             <div class="section-title">Cargo <button class="add-btn" onclick="addItem(this,'Cargo')">+</button></div>
             <div class="items-container"></div>
@@ -156,26 +152,19 @@ function updateCompartments(r){
     });
 }
 
-function toggleContent(el){ 
-    const c = el.nextElementSibling;
-    if(c) c.style.display = (c.style.display === 'block') ? 'none' : 'block'; 
-}
+function toggleContent(el){ const c = el.nextElementSibling; if(c) c.style.display = (c.style.display === 'block') ? 'none' : 'block'; }
 
 function renumberGlobalBags(){
     const types=['By','Bc','Mix'];
     types.forEach(t=>{
         let count=1;
-        document.querySelectorAll(`.konteyner-item[data-kind="${t}"]`).forEach(el=>{
-            el.querySelector('span').textContent = t + " " + count++;
-        });
+        document.querySelectorAll(`.konteyner-item[data-kind="${t}"]`).forEach(el=>{ el.querySelector('span').textContent = t + " " + count++; });
     });
 }
 
 function renumberLocalItems(container, kind){
     let count=1;
-    container.querySelectorAll(`.local-item[data-kind="${kind}"]`).forEach(el=>{
-        el.querySelector('span').textContent = kind + " " + count++;
-    });
+    container.querySelectorAll(`.local-item[data-kind="${kind}"]`).forEach(el=>{ el.querySelector('span').textContent = kind + " " + count++; });
 }
 
 function addBagaj(b, savedVal=null){
@@ -193,9 +182,10 @@ function addItem(b, k, savedVal=null){
 }
 
 function updateSummary(){
-    let out=""; const byA=+document.getElementById('byAvg').value||0, bcA=+document.getElementById('bcAvg').value||0, mxA=+document.getElementById('mxAvg').value||0;
+    let out="", totalAll=0; const byA=+document.getElementById('byAvg').value||0, bcA=+document.getElementById('bcAvg').value||0, mxA=+document.getElementById('mxAvg').value||0;
     document.querySelectorAll(".compartment").forEach(c=>{
         let t=0;
+        const eic = c.querySelector(".eic-input"); if(eic) t += (+eic.value||0);
         c.querySelectorAll(".by").forEach(i=>t+=(+i.value||0)*byA);
         c.querySelectorAll(".bc").forEach(i=>t+=(+i.value||0)*bcA);
         c.querySelectorAll(".mx").forEach(i=>t+=(+i.value||0)*mxA);
@@ -207,8 +197,9 @@ function updateSummary(){
         c.querySelectorAll(".local-item").forEach(i=>t+=+i.querySelector("input").value||0);
         c.querySelector(".weight-display").textContent=Math.round(t)+" kg";
         out+=`<div>CPT ${c.dataset.num}: <strong>${Math.round(t)} kg</strong></div>`;
+        totalAll += t;
     });
-    document.getElementById('summary').innerHTML=out;
+    document.getElementById('summary').innerHTML=out + `<div style="margin-top:5px; border-top:1px solid white;">TOPLAM: ${Math.round(totalAll)} kg</div>`;
     document.getElementById('finalWater').textContent=document.getElementById('waterInput').value || "-";
     document.getElementById('finalPantry').textContent=document.getElementById('pantryInput').value || "-";
     updateCPTBadge();
@@ -218,24 +209,47 @@ function updateCPTBadge(){
     document.querySelectorAll('.compartment').forEach(c=>{
         const lt=document.getElementById('loadType').value, n=parseInt(c.dataset.num);
         let B=0, C=c.querySelectorAll('.local-item[data-kind="Cargo"]').length, M=c.querySelectorAll('.local-item[data-kind="Manuel"]').length;
-        if(lt==='YIGMA' || n===5) {
-            c.querySelectorAll('.by, .bc, .mx').forEach(i=>B+=+i.value||0);
-        } else {
-            B=c.querySelectorAll('.konteyner-item').length;
-        }
+        if(lt==='YIGMA' || n===5) { c.querySelectorAll('.by, .bc, .mx').forEach(i=>B+=+i.value||0); } 
+        else { B=c.querySelectorAll('.konteyner-item').length; }
         const mid=c.querySelector('.midBadge');
         let res=[]; if(B) res.push("B "+B); if(C) res.push("C "+C); if(M) res.push("Mn "+M);
         mid.textContent=res.join(" / ");
     });
 }
 
+function saveToHistory(){
+    const ac = document.getElementById('aircraft').value;
+    if(!ac) { alert("Uçak seçin!"); return; }
+    const summaryText = document.getElementById('summary').innerText.split('TOPLAM:')[1] || "0 kg";
+    const date = new Date().toLocaleString('tr-TR', {hour:'2-digit', minute:'2-digit', day:'2-digit', month:'2-digit'});
+    const record = { id: Date.now(), title: ac + " (" + date + ")", total: summaryText };
+    let history = JSON.parse(localStorage.getItem("hlc_history") || "[]");
+    history.unshift(record); localStorage.setItem("hlc_history", JSON.stringify(history));
+    renderHistory(); alert("Arşive eklendi!");
+}
+
+function renderHistory(){
+    const history = JSON.parse(localStorage.getItem("hlc_history") || "[]");
+    const body = document.getElementById('history-body');
+    body.innerHTML = history.map(r => `<tr><td>${r.title}</td><td><strong>${r.total}</strong></td><td><button onclick="deleteHistory(${r.id})" style="background:red; color:white; border:none; border-radius:4px;">Sil</button></td></tr>`).join('');
+}
+
+function deleteHistory(id){
+    let history = JSON.parse(localStorage.getItem("hlc_history") || "[]");
+    history = history.filter(r => r.id !== id);
+    localStorage.setItem("hlc_history", JSON.stringify(history));
+    renderHistory();
+}
+
 function saveAll(){
     const data = { ac: document.getElementById('aircraft').value, lt: document.getElementById('loadType').value, w: document.getElementById('waterInput').value, p: document.getElementById('pantryInput').value, by: document.getElementById('byAvg').value, bc: document.getElementById('bcAvg').value, n: document.getElementById('note').value, comps: [] };
     document.querySelectorAll('.compartment').forEach(c => {
-        let cObj = { num: c.dataset.num, yigma: [], items: [] };
+        let cObj = { num: c.dataset.num, yigma: [], items: [], eic: c.querySelector('.eic-input') ? c.querySelector('.eic-input').value : null };
         c.querySelectorAll('.by, .bc, .mx').forEach(i => cObj.yigma.push(i.value));
         c.querySelectorAll('.item-wrapper').forEach(iw => {
-            cObj.items.push({ kind: iw.dataset.kind, val: iw.querySelector('input').value, isK: iw.classList.contains('konteyner-item') });
+            if(!iw.classList.contains('eic-wrapper')) {
+                cObj.items.push({ kind: iw.dataset.kind, val: iw.querySelector('input').value, isK: iw.classList.contains('konteyner-item') });
+            }
         });
         data.comps.push(cObj);
     });
@@ -243,19 +257,19 @@ function saveAll(){
 }
 
 function loadAll(){
-    const raw = localStorage.getItem("hlc_pro_data"); if(!raw) return;
+    const raw = localStorage.getItem("hlc_pro_data"); renderHistory();
+    if(!raw) return;
     const data = JSON.parse(raw);
     document.getElementById('aircraft').value=data.ac; document.getElementById('loadType').value=data.lt;
     if(!data.ac || !data.lt) return;
     updateCompartments(true);
-    document.getElementById('waterInput').value=data.w||""; 
-    document.getElementById('pantryInput').value=data.p||"";
-    document.getElementById('byAvg').value=data.by||""; 
-    document.getElementById('bcAvg').value=data.bc||"";
+    document.getElementById('waterInput').value=data.w||""; document.getElementById('pantryInput').value=data.p||"";
+    document.getElementById('byAvg').value=data.by||""; document.getElementById('bcAvg').value=data.bc||"";
     document.getElementById('note').value=data.n||"";
     const domComps = document.querySelectorAll('.compartment');
     data.comps.forEach((cData, idx) => {
         const dc = domComps[idx]; if(!dc) return;
+        if(cData.eic !== null && dc.querySelector('.eic-input')) dc.querySelector('.eic-input').value = cData.eic;
         const yI = dc.querySelectorAll('.by, .bc, .mx');
         cData.yigma.forEach((val, i) => { if(yI[i]) yI[i].value = val; });
         cData.items.forEach(item => {
