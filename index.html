@@ -11,28 +11,21 @@ section{background:#fff; border:1px solid #ccc; border-radius:8px; padding:8px; 
 h1{text-align:center; color:#004080; margin:5px; font-size:1.3em;}
 h3{cursor:pointer; margin:4px 0; display:flex; align-items:center; font-size: 1.05em; color:#004080; font-weight: bold;}
 .flex{display:flex; flex-wrap:wrap; align-items:center; gap:6px;}
-
-/* Seçim kutuları boyutları eşitlendi */
-input[type=number], input[type=text], select{padding:2px 4px; border:1px solid #ccc; border-radius:4px; font-size: 14px; font-weight: bold; height: 28px; box-sizing: border-box;}
+input[type=number], input[type=text], select{padding:2px 4px; border:1px solid #ccc; border-radius:4px; font-size: 14px; font-weight: bold; height: 30px; box-sizing: border-box;}
 .add-btn {background:#004080; color:#fff; border:none; border-radius:5px; padding:2px 10px; cursor:pointer; font-weight: bold; font-size: 15px;}
 .midBadge { font-size: 0.85em; color: #004080; font-weight: 900; flex-grow: 1; text-align: center; }
-
-.item-wrapper { display: flex; align-items: center; justify-content: space-between; background: #fff; padding: 4px 8px; border-radius: 6px; border: 1.5px solid #004080; width: 48%; box-sizing: border-box; font-size: 0.9em; margin-bottom: 5px; font-weight: bold; }
+.item-wrapper { display: flex; align-items: center; justify-content: space-between; background: #fff; padding: 4px 8px; border-radius: 6px; border: 1.5px solid #004080; width: 48%; box-sizing: border-box; font-size: 0.85em; margin-bottom: 5px; font-weight: bold; }
 .eic-wrapper { background: #fff2cc !important; border-color: #f1c232 !important; width: 100% !important; margin-bottom: 6px; }
 .items-container { display: flex; flex-wrap: wrap; gap: 4%; margin-top: 4px; }
 .item-input { width: 42px !important; height: 22px !important; margin: 0 4px; font-weight: 900; border: 1.5px solid #555 !important; padding: 1px !important; font-size: 13px !important; text-align: center; }
 .delete-btn { background: #cc0000; padding: 1px 6px; font-size: 0.8em; border-radius: 4px; color: white; border:none; font-weight: bold;}
 .weight-display { font-size: 0.9em; color: #004080; font-weight: 900; background: #e6f0ff; padding: 3px 6px; border-radius: 5px; min-width: 55px; text-align: center; }
-
-.summary{ background:#004080; color: white; padding:12px; border-radius: 12px; border: 2px solid #002b57; box-sizing: border-box;}
+.summary{ background:#004080; color: white; padding:12px; border-radius: 12px; border: 2px solid #002b57;}
 .summary h3 { font-size: 1.1em; margin-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 5px; color: white; }
 #note { width: 100%; height: 60px; margin-top: 8px; border-radius: 8px; padding: 8px; font-size: 14px; font-weight: bold; border: 1px solid #fff; box-sizing: border-box; resize: none;}
 .action-btn { flex: 1; padding: 10px; border-radius: 6px; border: none; color: white; font-weight: bold; font-size: 13px; cursor: pointer; }
 .content { display: none; padding: 8px 10px; border-top: 1px solid #eee; }
-
-/* Water seçim alanı düzeni */
-.water-controls { display: flex; gap: 5px; align-items: center; width: 100%; margin-bottom: 8px; }
-.water-controls select { flex: 1; }
+.water-controls { display: flex; flex-direction: column; gap: 8px; width: 100%; margin-bottom: 8px; }
 </style>
 </head>
 <body>
@@ -52,8 +45,7 @@ input[type=number], input[type=text], select{padding:2px 4px; border:1px solid #
 
 <section>
     <div id="waterUI" class="water-controls">
-        Water: <select id="waterRatio" onchange="updateSummary();saveAll()"><option value="">Oran</option></select>
-    </div>
+        </div>
     <div class="flex">
         Pantry: <input type="text" id="pantryInput" style="flex-grow:1" oninput="saveAll();updateSummary()">
     </div>
@@ -89,14 +81,20 @@ input[type=number], input[type=text], select{padding:2px 4px; border:1px solid #
 <script>
 const waterData = {
     "A330": {
-        "JNA-JNB": {"25": [-525,-2.6], "50": [-350,-1.7], "75": [-175,-0.9], "FULL": [0,0]},
-        "JNF-JNK": {"25": [-788,-3.5], "50": [-525,-2.4], "75": [-263,-1.2], "FULL": [0,0]},
-        "JNH-JNZ": {"25": [-525,-2.0], "50": [-350,-1.4], "75": [-175,-0.7], "FULL": [0,0]},
-        "TC-LON":  {"25": [-788,-4.2], "50": [-525,-2.8], "75": [-263,-1.4], "FULL": [0,0]}
+        "JNA ... JNB": {"25": [-525,-2.6],"50": [-350,-1.7],"75": [-175,-0.9],"FULL": [0,0]},
+        "JNF ... JNK": {"25": [-788,-3.5],"50": [-525,-2.4],"75": [-263,-1.2],"FULL": [0,0]},
+        "JNH ... JNZ": {"25": [-525,-2.0],"50": [-350,-1.4],"75": [-175,-0.7],"FULL": [0,0]},
+        "TC-LOA ... LOZ": {"25": [-788,-4.2],"50": [-525,-2.8],"75": [-263,-1.4],"FULL": [0,0]}
     },
     "A350": {
-        "LGA-LGP (A-C)": {"1/10": [-954,-4.4], "2/10": [-848,-3.9], "4/10": [-636,-2.9], "FULL": [0,0]},
-        "LGI-LGL (I-L)": {"1/10": [-1017,-6.6], "2/10": [-904,-5.9], "4/10": [-678,-4.3], "FULL": [0,0]}
+        "LGA ... LGP (A-C Grubu)": {
+            "1/10": [-954,-4.4], "2/10": [-848,-3.9], "3/10": [-742,-3.4], "4/10": [-636,-2.9], 
+            "5/10": [-530,-2.4], "6/10": [-424,-1.9], "7/10": [-318,-1.5], "8/10": [-212,-1.0], "9/10": [-106,-0.5], "FULL": [0,0]
+        },
+        "LGI ... LGL (I-L Grubu)": {
+            "1/10": [-1017,-6.6], "2/10": [-904,-5.9], "3/10": [-791,-5.1], "4/10": [-678,-4.3], 
+            "5/10": [-565,-3.6], "6/10": [-452,-2.9], "7/10": [-339,-2.2], "8/10": [-226,-1.4], "9/10": [-113,-0.7], "FULL": [0,0]
+        }
     },
     "B787": {"1/8": [-924,-3.9], "2/8": [-792,-3.3], "3/8": [-660,-2.8], "4/8": [-528,-2.2], "5/8": [-396,-1.7], "6/8": [-264,-1.1], "7/8": [-132,-0.6], "FULL": [0,0]},
     "B777": {"1/8": [-1172,-3.9], "2/8": [-1004,-3.3], "3/8": [-837,-2.8], "4/8": [-670,-2.2], "5/8": [-502,-1.6], "6/8": [-335,-1.1], "7/8": [-167,-0.5], "FULL": [0,0]},
@@ -109,17 +107,34 @@ const waterData = {
 const comps={A319:[1,4,5],A320:[1,3,4,5],A321:[1,2,3,4,5],B737:[1,2,3,4],A330:[1,2,3,4,5],A350:[1,2,3,4,5],B777:[1,2,3,4,5],B787:[1,2,3,4,5]};
 const wide=["A330","A350","B777","B787"];
 
+// DİNAMİK NUMARALANDIRMA (Asla Bozulmaz)
+function renumberGlobalBags(){
+    ['By','Bc','Mix'].forEach(kind => {
+        let count = 1;
+        document.querySelectorAll(`.konteyner-item[data-kind="${kind}"]`).forEach(el => {
+            el.querySelector('span').textContent = `${kind} ${count++}`;
+        });
+    });
+}
+function renumberLocalItems(container, kind){
+    let count = 1;
+    container.querySelectorAll(`.local-item[data-kind="${kind}"]`).forEach(el => {
+        el.querySelector('span').textContent = `${kind} ${count++}`;
+    });
+}
+
 function updateWaterUI() {
     const ac = document.getElementById('aircraft').value;
     const ui = document.getElementById('waterUI');
-    ui.innerHTML = "Water: ";
+    ui.innerHTML = "";
     if (ac === "A330" || ac === "A350") {
+        let label = ac === "A330" ? "A330 Tescil Grubu:" : "A350 Tescil Grubu:";
         let opts = ac === "A330" 
-            ? `<option value="JNA-JNB">JNA-JNB</option><option value="JNF-JNK">JNF-JNK</option><option value="JNH-JNZ">JNH-JNZ</option><option value="TC-LON">TC-LON</option>`
-            : `<option value="LGA-LGP (A-C)">LGA-LGP (A-C)</option><option value="LGI-LGL (I-L)">LGI-LGL (I-L)</option>`;
-        ui.innerHTML += `<select id="tailGroup" onchange="updateWaterRatios();updateSummary();saveAll()"><option value="">Tescil</option>${opts}</select>`;
+            ? `<option value="JNA ... JNB">TC-JNA ... JNB Serisi</option><option value="JNF ... JNK">TC-JNF ... JNK Serisi</option><option value="JNH ... JNZ">TC-JNH ... JNZ Serisi</option><option value="TC-LOA ... LOZ">TC-LOA ... LOZ Serisi</option>`
+            : `<option value="LGA ... LGP (A-C Grubu)">LGA ... LGP (A, B, C...)</option><option value="LGI ... LGL (I-L Grubu)">LGI ... LGL (I, J, K, L...)</option>`;
+        ui.innerHTML += `<div style="font-weight:bold; font-size:13px;">${label}</div><select id="tailGroup" style="width:100%" onchange="updateWaterRatios();updateSummary();saveAll()"><option value="">Tescil Seçiniz</option>${opts}</select>`;
     }
-    ui.innerHTML += `<select id="waterRatio" onchange="updateSummary();saveAll()"><option value="">Oran</option></select>`;
+    ui.innerHTML += `<div style="font-weight:bold; font-size:13px;">Water Oranı:</div><select id="waterRatio" style="width:100%" onchange="updateSummary();saveAll()"><option value="">Oran Seçiniz</option></select>`;
     updateWaterRatios();
 }
 
@@ -127,8 +142,9 @@ function updateWaterRatios() {
     const ac = document.getElementById('aircraft').value;
     const ratioSel = document.getElementById('waterRatio');
     if(!ac || !ratioSel) return;
-    ratioSel.innerHTML = '<option value="">Oran</option>';
-    let opts = (ac==="B787"||ac==="B777") ? ["1/8","2/8","3/8","4/8","5/8","6/8","7/8","FULL"] : (ac==="A350" ? ["1/10","2/10","4/10","FULL"] : ["25","50","75","FULL"]);
+    ratioSel.innerHTML = '<option value="">Oran Seçiniz</option>';
+    let opts = (ac==="B787"||ac==="B777") ? ["1/8","2/8","3/8","4/8","5/8","6/8","7/8","FULL"] : 
+               (ac==="A350" ? ["1/10","2/10","3/10","4/10","5/10","6/10","7/10","8/10","9/10","FULL"] : ["25","50","75","FULL"]);
     opts.forEach(o => {
         let el = document.createElement("option"); el.value=o; el.textContent=(o==="FULL"?"FULL":(o.includes("/")?o:"%"+o));
         ratioSel.appendChild(el);
@@ -140,7 +156,7 @@ function checkLoadType(){
     const ac=document.getElementById('aircraft').value, lt=document.getElementById('loadType').value;
     if(!lt){fullReset(); return;}
     if((ac==="B737"&&lt==="ULD")||(wide.includes(ac)&&lt==="YIGMA")){
-        alert("Uyumsuz!"); document.getElementById('loadType').value=""; fullReset(); return;
+        alert("Hatalı Yükleme Tipi!"); document.getElementById('loadType').value=""; fullReset(); return;
     }
     updateCompartments(true);
 }
@@ -191,8 +207,6 @@ function updateSummary(){
         out+=`<div>CPT ${c.dataset.num}: <strong>${Math.round(t)} kg</strong></div>`;
     });
     document.getElementById('summary').innerHTML=out;
-    
-    // WATER FINAL KONTROL
     const ac=document.getElementById('aircraft').value, ratio=document.getElementById('waterRatio').value;
     let wDisp="-";
     if(ac && ratio && waterData[ac]){
@@ -211,17 +225,19 @@ function updateMix(){
     document.getElementById('mxAvg').value=(by+bc)>0?Math.round((by+bc)/2):""; updateSummary(); saveAll();
 }
 function toggleContent(el){ const c=el.nextElementSibling; if(c) c.style.display=(c.style.display==='block'?'none':'block'); }
+
 function addBagaj(b,v=null){
     const t=b.parentElement.querySelector('.bagType').value, h=b.parentElement.nextElementSibling;
     const d=document.createElement("div"); d.className="konteyner-item item-wrapper"; d.dataset.kind=t;
-    d.innerHTML=`<span>${t}</span><input type="number" class="item-input" value="${v||''}" oninput="updateSummary();saveAll()"><button class="delete-btn" onclick="this.parentElement.remove();updateSummary();saveAll()">X</button>`;
-    h.appendChild(d); updateSummary(); saveAll();
+    d.innerHTML=`<span>${t}</span><input type="number" class="item-input" value="${v||''}" oninput="updateSummary();saveAll()"><button class="delete-btn" onclick="this.parentElement.remove(); renumberGlobalBags(); updateSummary(); saveAll()">X</button>`;
+    h.appendChild(d); renumberGlobalBags(); updateSummary(); saveAll();
 }
+
 function addItem(b,k,v=null){
     const h=b.parentElement.nextElementSibling;
     const d=document.createElement("div"); d.className="local-item item-wrapper"; d.dataset.kind=k;
-    d.innerHTML=`<span>${k}</span><input type="number" class="item-input" value="${v||''}" oninput="updateSummary();saveAll()"><button class="delete-btn" onclick="this.parentElement.remove();updateSummary();saveAll()">X</button>`;
-    h.appendChild(d); updateSummary(); saveAll();
+    d.innerHTML=`<span>${k}</span><input type="number" class="item-input" value="${v||''}" oninput="updateSummary();saveAll()"><button class="delete-btn" onclick="const container = this.parentElement.parentElement; this.parentElement.remove(); renumberLocalItems(container, '${k}'); updateSummary(); saveAll()">X</button>`;
+    h.appendChild(d); renumberLocalItems(h, k); updateSummary(); saveAll();
 }
 
 function updateCPTBadge(){
@@ -276,7 +292,7 @@ function loadAll(){
     });
     updateSummary();
 }
-function clearStorage() { if(confirm("Sıfırlansın mı?")) { localStorage.removeItem("hlc_pro_data"); location.reload(); } }
+function clearStorage() { if(confirm("Tüm veriler silinecek! Onaylıyor musunuz?")) { localStorage.removeItem("hlc_pro_data"); location.reload(); } }
 window.onload=loadAll;
 </script>
 </body>
