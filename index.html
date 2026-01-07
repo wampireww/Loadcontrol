@@ -7,23 +7,23 @@
 <style>
 html, body { overscroll-behavior-y: contain; }
 body{font-family: Arial, sans-serif; background:#f0f2f5; margin:5px; padding-bottom:150px; color: #333;}
-section{background:#fff; border:1px solid #ccc; border-radius:8px; padding:6px; margin-bottom:6px;}
-h1{text-align:center; color:#004080; margin:5px; font-size:1.2em;}
-h3{cursor:pointer; margin:2px 0; display:flex; align-items:center; font-size: 1em; color:#004080; font-weight: bold;}
-.flex{display:flex; flex-wrap:wrap; align-items:center; gap:5px;}
+section{background:#fff; border:1px solid #ccc; border-radius:8px; padding:8px; margin-bottom:8px;}
+h1{text-align:center; color:#004080; margin:5px; font-size:1.3em;}
+h3{cursor:pointer; margin:4px 0; display:flex; align-items:center; font-size: 1.05em; color:#004080; font-weight: bold;}
+.flex{display:flex; flex-wrap:wrap; align-items:center; gap:6px;}
 
-/* İnput Yükseklikleri - Zarifleştirildi */
-input[type=number], input[type=text], select{padding:2px 6px; border:1px solid #ccc; border-radius:4px; font-size: 15px; font-weight: bold; height: 30px; box-sizing: border-box;}
-.add-btn {background:#004080; color:#fff; border:none; border-radius:5px; padding:2px 12px; cursor:pointer; font-weight: bold; font-size: 16px; height: 30px;}
+/* İnput ve Select - Daha Zarif ve Standart Yükseklik */
+input[type=number], input[type=text], select{padding:2px 6px; border:1px solid #ccc; border-radius:4px; font-size: 15px; font-weight: bold; height: 32px; box-sizing: border-box;}
+.add-btn {background:#004080; color:#fff; border:none; border-radius:5px; padding:2px 14px; cursor:pointer; font-weight: bold; font-size: 16px; height: 32px;}
 .midBadge { font-size: 0.85em; color: #004080; font-weight: 900; flex-grow: 1; text-align: center; }
 
-/* Kutular - Yan yana düzen korundu */
+/* Kutular - Yan yana 2 tane sığacak genişlik */
 .item-wrapper { 
     display: flex; 
     align-items: center; 
     justify-content: space-between; 
     background: #fff; 
-    padding: 5px 8px; 
+    padding: 4px 6px; 
     border-radius: 6px; 
     border: 2px solid #004080; 
     width: 48.5%; 
@@ -31,52 +31,45 @@ input[type=number], input[type=text], select{padding:2px 6px; border:1px solid #
     margin-bottom: 6px; 
 }
 
-.eic-wrapper { background: #fff2cc !important; border-color: #f1c232 !important; width: 100% !important; }
+.eic-wrapper { background: #fff2cc !important; border-color: #f1c232 !important; width: 100% !important; margin-bottom: 8px; }
 .items-container { display: flex; flex-wrap: wrap; gap: 3%; margin-top: 6px; }
 
-/* Şikayet Edilen İnput Genişliği - Artırıldı */
+/* İstediğin Geniş İnput Alanı */
 .item-input { 
-    width: 75px !important; /* Rakamların sığması için genişletildi */
-    height: 26px !important; 
-    margin: 0 4px; 
+    width: 82px !important; 
+    height: 28px !important; 
+    margin: 0 2px; 
     font-weight: 900; 
     border: 1.5px solid #555 !important; 
+    padding: 2px !important; 
     font-size: 15px !important; 
     text-align: center; 
+    border-radius: 4px;
 }
 
-.delete-btn { background: #cc0000; padding: 2px 8px; font-size: 0.85em; border-radius: 4px; color: white; border:none; font-weight: bold; cursor:pointer;}
+.delete-btn { background: #cc0000; padding: 0 8px; height: 28px; font-size: 0.85em; border-radius: 4px; color: white; border:none; font-weight: bold; cursor:pointer;}
 .weight-display { font-size: 0.95em; color: #004080; font-weight: 900; background: #e6f0ff; padding: 4px 8px; border-radius: 5px; min-width: 60px; text-align: center; }
 
-/* Özet ve Butonlar - Yükseklik Optimize Edildi */
-.summary{ background:#004080; color: white; padding:12px; border-radius: 12px;}
-.summary h3 { font-size: 1.1em; color: white; border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 5px;}
-#note { width: 100%; height: 55px; margin-top: 8px; border-radius: 8px; padding: 8px; font-size: 14px; font-weight: bold; border: none; box-sizing: border-box; resize: none;}
-
-.action-btn { 
-    flex: 1; 
-    height: 38px; /* Kaba görüntüden kurtarıldı */
-    border-radius: 6px; 
-    border: none; 
-    color: white; 
-    font-weight: bold; 
-    font-size: 14px; 
-    cursor: pointer; 
-}
-.content { display: none; padding: 8px; border-top: 1px solid #eee; }
+/* Özet Alanı ve Butonlar */
+.summary{ background:#004080; color: white; padding:12px; border-radius: 12px; border: 2px solid #002b57;}
+.summary h3 { font-size: 1.1em; margin-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 5px; color: white; border-top:none; cursor: default;}
+#note { width: 100%; height: 60px; margin-top: 8px; border-radius: 8px; padding: 8px; font-size: 14px; font-weight: bold; border: 1px solid #fff; box-sizing: border-box; resize: none;}
+.action-btn { flex: 1; height: 40px; border-radius: 6px; border: none; color: white; font-weight: bold; font-size: 14px; cursor: pointer; }
+.content { display: none; padding: 10px; border-top: 1px solid #eee; }
+.water-controls { display: flex; flex-direction: column; gap: 8px; width: 100%; }
 </style>
 </head>
 <body>
 
-<h1>HLC Professional</h1>
+<h1>Harekat Load Control</h1>
 
 <section class="flex">
-    Uçak: <select id="aircraft" onchange="fullReset();checkLoadType();updateWaterUI();updateSummary();saveAll()">
+    Uçak: <select id="aircraft" onchange="fullReset();checkLoadType();updateWaterUI();updateSummary();saveAll()" style="flex:1;">
         <option value="">Seç</option>
         <option>A319</option><option>A320</option><option>A321</option><option>B737</option>
         <option>A330</option><option>A350</option><option>B777</option><option>B787</option>
     </select>
-    Yükleme: <select id="loadType" onchange="checkLoadType();saveAll()">
+    Yükleme: <select id="loadType" onchange="checkLoadType();saveAll()" style="flex:1;">
         <option value="">Seç</option><option value="YIGMA">Yığma</option><option value="ULD">ULD</option>
     </select>
 </section>
@@ -84,7 +77,7 @@ input[type=number], input[type=text], select{padding:2px 6px; border:1px solid #
 <section>
     <h3 onclick="toggleContent(this)">Water & Pantry</h3>
     <div class="content">
-        <div id="waterUI" class="flex" style="flex-direction:column; gap:8px;"></div>
+        <div id="waterUI" class="water-controls"></div>
         <div class="flex" style="margin-top:8px;">
             Pantry: <input type="text" id="pantryInput" style="flex-grow:1" oninput="saveAll();updateSummary()">
         </div>
@@ -95,9 +88,9 @@ input[type=number], input[type=text], select{padding:2px 6px; border:1px solid #
     <h3 onclick="toggleContent(this)">Bagaj Ortalamaları</h3>
     <div class="content" style="display: block;">
         <div class="flex" style="font-weight: bold; justify-content: space-between;">
-            By <input type="number" id="byAvg" style="width:60px" oninput="updateMix()">
-            Bc <input type="number" id="bcAvg" style="width:60px" oninput="updateMix()">
-            Mix <input type="number" id="mxAvg" style="width:60px" readonly>
+            <div class="flex">By <input type="number" id="byAvg" style="width:75px" oninput="updateMix()"></div>
+            <div class="flex">Bc <input type="number" id="bcAvg" style="width:75px" oninput="updateMix()"></div>
+            <div class="flex">Mix <input type="number" id="mxAvg" style="width:75px" readonly></div>
         </div>
     </div>
 </section>
@@ -119,7 +112,7 @@ input[type=number], input[type=text], select{padding:2px 6px; border:1px solid #
 </section>
 
 <script>
-// Sahanın onayladığı tüm JS mantığı birebir korunmuştur.
+// V26 Kuralları ve Hesaplama Mantığı Birebir Korunmuştur
 const waterData = {
     "A330": {
         "JNA ... JNB": {"25": [-525,-2.6],"50": [-350,-1.7],"75": [-175,-0.9],"FULL": [0,0]},
@@ -128,8 +121,8 @@ const waterData = {
         "TC-LOA ... LOZ": {"25": [-788,-4.2],"50": [-525,-2.8],"75": [-263,-1.4],"FULL": [0,0]}
     },
     "A350": {
-        "LGA ... LGP (A-C Grubu)": {"1/10":[-954,-4.4],"2/10":[-848,-3.9],"3/10":[-742,-3.4],"4/10":[-636,-2.9],"5/10":[-530,-2.4],"6/10":[-424,-1.9],"7/10":[-318,-1.5],"8/10":[-212,-1.0],"9/10":[-106,-0.5],"FULL":[0,0]},
-        "LGI ... LGL (I-L Grubu)": {"1/10":[-1017,-6.6],"2/10":[-904,-5.9],"3/10":[-791,-5.1],"4/10":[-678,-4.3],"5/10":[-565,-3.6],"6/10":[-452,-2.9],"7/10":[-339,-2.2],"8/10":[-226,-1.4],"9/10":[-113,-0.7],"FULL":[0,0]}
+        "LGA ... LGP (A-C Grubu)": {"1/10": [-954,-4.4], "2/10": [-848,-3.9], "3/10": [-742,-3.4], "4/10": [-636,-2.9], "5/10": [-530,-2.4], "6/10": [-424,-1.9], "7/10": [-318,-1.5], "8/10": [-212,-1.0], "9/10": [-106,-0.5], "FULL": [0,0]},
+        "LGI ... LGL (I-L Grubu)": {"1/10": [-1017,-6.6], "2/10": [-904,-5.9], "3/10": [-791,-5.1], "4/10": [-678,-4.3], "5/10": [-565,-3.6], "6/10": [-452,-2.9], "7/10": [-339,-2.2], "8/10": [-226,-1.4], "9/10": [-113,-0.7], "FULL": [0,0]}
     },
     "B787": {"1/8": [-924,-3.9], "2/8": [-792,-3.3], "3/8": [-660,-2.8], "4/8": [-528,-2.2], "5/8": [-396,-1.7], "6/8": [-264,-1.1], "7/8": [-132,-0.6], "FULL": [0,0]},
     "B777": {"1/8": [-1172,-3.9], "2/8": [-1004,-3.3], "3/8": [-837,-2.8], "4/8": [-670,-2.2], "5/8": [-502,-1.6], "6/8": [-335,-1.1], "7/8": [-167,-0.5], "FULL": [0,0]},
@@ -146,17 +139,22 @@ function updateWaterUI() {
     const ac = document.getElementById('aircraft').value, ui = document.getElementById('waterUI'); ui.innerHTML = "";
     if (!ac) return;
     if (ac === "A330" || ac === "A350") {
-        ui.innerHTML += `<div style="font-weight:bold; font-size:13px;">Tescil:</div><select id="tailGroup" style="width:100%" onchange="updateWaterRatios(); updateSummary(); saveAll()"><option value="">Seçiniz</option>${Object.keys(waterData[ac]).map(k=>`<option value="${k}">${k}</option>`).join('')}</select>`;
+        let label = "Tescil Grubu:";
+        let opts = ac === "A330" 
+            ? `<option value="JNA ... JNB">TC-JNA ... JNB</option><option value="JNF ... JNK">TC-JNF ... JNK</option><option value="JNH ... JNZ">TC-JNH ... JNZ</option><option value="TC-LOA ... LOZ">TC-LOA ... LOZ</option>`
+            : `<option value="LGA ... LGP (A-C Grubu)">LGA ... LGP (A-C)</option><option value="LGI ... LGL (I-L Grubu)">LGI ... LGL (I-L)</option>`;
+        ui.innerHTML += `<div style="font-weight:bold; font-size:13px;">${label}</div><select id="tailGroup" style="width:100%" onchange="updateWaterRatios(); updateSummary(); saveAll()"><option value="">Seçiniz</option>${opts}</select>`;
     }
-    ui.innerHTML += `<div style="font-weight:bold; font-size:13px;">Su Oranı:</div><select id="waterRatio" style="width:100%" onchange="updateSummary(); saveAll()"><option value="">Seçiniz</option></select>`;
+    ui.innerHTML += `<div style="font-weight:bold; font-size:13px; margin-top:5px;">Su Oranı:</div><select id="waterRatio" style="width:100%" onchange="updateSummary(); saveAll()"><option value="">Seçiniz</option></select>`;
     updateWaterRatios();
 }
 
 function updateWaterRatios() {
     const ac = document.getElementById('aircraft').value, ratioSel = document.getElementById('waterRatio'); if(!ac || !ratioSel) return;
     let current = ratioSel.value; ratioSel.innerHTML = '<option value="">Seçiniz</option>';
-    let opts = (ac==="B787"||ac==="B777") ? ["1/8","2/8","3/8","4/8","5/8","6/8","7/8","FULL"] : (ac==="A350" ? ["1/10","2/10","3/10","4/10","5/10","6/10","7/10","8/10","9/10","FULL"] : ["25","50","75","FULL"]);
-    opts.forEach(o => { let el = document.createElement("option"); el.value=o; el.textContent=(o==="FULL"?o:(o.includes("/")?o:"%"+o)); ratioSel.appendChild(el); });
+    let opts = (ac==="B787"||ac==="B777") ? ["1/8","2/8","3/8","4/8","5/8","6/8","7/8","FULL"] : 
+               (ac==="A350" ? ["1/10","2/10","3/10","4/10","5/10","6/10","7/10","8/10","9/10","FULL"] : ["25","50","75","FULL"]);
+    opts.forEach(o => { let el = document.createElement("option"); el.value=o; el.textContent=(o==="FULL"?"FULL":(o.includes("/")?o:"%"+o)); ratioSel.appendChild(el); });
     if(current) ratioSel.value = current;
 }
 
@@ -167,88 +165,159 @@ function updateSummary(){
         c.querySelectorAll(".by").forEach(i=>t+=(+i.value||0)*byA);
         c.querySelectorAll(".bc").forEach(i=>t+=(+i.value||0)*bcA);
         c.querySelectorAll(".mx").forEach(i=>t+=(+i.value||0)*mxA);
-        c.querySelectorAll(".konteyner-item").forEach(k=>{ t += 70 + ((+k.querySelector("input").value||0) * (k.dataset.kind==="By"?byA:k.dataset.kind==="Bc"?bcA:mxA)); });
+        c.querySelectorAll(".konteyner-item").forEach(k=>{
+            const count=+k.querySelector("input").value||0;
+            const avg=(k.dataset.kind==="By")?byA:(k.dataset.kind==="Bc")?bcA:mxA;
+            t += 70 + (count * avg);
+        });
         c.querySelectorAll(".local-item").forEach(i=>t+=+i.querySelector("input").value||0);
         c.querySelector(".weight-display").textContent=Math.round(t)+" kg";
         out+=`<div>CPT ${c.dataset.num}: <strong>${Math.round(t)} kg</strong></div>`;
     });
     document.getElementById('summary').innerHTML=out;
-    const ac=document.getElementById('aircraft').value, ratio=document.getElementById('waterRatio')?.value;
+    const ac=document.getElementById('aircraft').value, ratioSel=document.getElementById('waterRatio'), ratio = ratioSel ? ratioSel.value : "";
     let wDisp="-";
     if(ac && ratio && waterData[ac]){
-        let v; if(ac==="A330" || ac==="A350"){ const tg=document.getElementById('tailGroup')?.value; v=tg?waterData[ac][tg][ratio]:null; } else v=waterData[ac][ratio];
-        if(v) wDisp=`${ratio} / ${v[0]}kg / ${v[1]}`;
+        let v = null;
+        if(ac==="A330" || ac==="A350"){
+            const tg = document.getElementById('tailGroup') ? document.getElementById('tailGroup').value : "";
+            if(tg && waterData[ac][tg]) v = waterData[ac][tg][ratio];
+        } else v = waterData[ac][ratio];
+        if(v) wDisp=(ratio==="FULL"?"FULL":(ratio.includes("/")?ratio:"%"+ratio))+" / "+v[0]+" kg / "+v[1];
     }
     document.getElementById('finalWater').textContent=wDisp;
     document.getElementById('finalPantry').textContent=document.getElementById('pantryInput').value||"-";
     updateCPTBadge();
 }
 
+function toggleContent(el){ const c=el.nextElementSibling; if(c) c.style.display=(c.style.display==='block'?'none':'block'); }
+
+function checkLoadType(){
+    const ac=document.getElementById('aircraft').value, lt=document.getElementById('loadType').value;
+    if(!lt){fullReset(); return;}
+    if((ac==="B737"&&lt==="ULD")||(wide.includes(ac)&&lt==="YIGMA")){
+        alert("Geçersiz Kombinasyon!"); document.getElementById('loadType').value=""; fullReset(); return;
+    }
+    updateCompartments(true);
+}
+
 function updateCompartments(r){
     const container = document.getElementById('compartments'); if(r) container.innerHTML="";
     const ac=document.getElementById('aircraft').value, lt=document.getElementById('loadType').value;
     if(!ac || !lt) return;
-    let eicV = (ac==="B737")?23:(["A319","A320","A321"].includes(ac))?35:(["A330","A350"].includes(ac))?58:30;
+    let eicT=5, eicV=0;
+    if(ac==="B737"){eicT=4; eicV=23;} else if(["A319","A320","A321"].includes(ac)){eicT=5; eicV=35;} else if(["A330","A350"].includes(ac)){eicT=5; eicV=58;} else {eicT=5; eicV=30;}
+
     comps[ac].forEach(n=>{
         const s=document.createElement("section"); s.className="compartment"; s.dataset.num=n;
         s.innerHTML=`<h3 onclick="toggleContent(this)">CPT ${n} <span class="midBadge"></span> <span class="weight-display">0 kg</span></h3>
         <div class="content">
-            ${(n===5||(ac==="B737"&&n===4))?`<div class="item-wrapper eic-wrapper"><span>EIC</span><input type="number" class="eic-input" value="${eicV}" oninput="updateSummary();saveAll()"></div>`:''}
+            ${n===eicT?`<div class="item-wrapper eic-wrapper"><span>EIC</span><input type="number" class="eic-input" value="${eicV}" oninput="updateSummary();saveAll()"></div>`:''}
             <div class="bag-section"></div>
-            <div style="margin-top:8px;">Cargo <button class="add-btn" onclick="addItem(this,'Cargo')">+</button></div><div class="items-container cargo-items"></div>
-            <div style="margin-top:8px;">Manuel <button class="add-btn" onclick="addItem(this,'Manuel')">+</button></div><div class="items-container manuel-items"></div>
+            <div class="section-title" style="margin-top:10px; font-weight:bold; font-size:14px; color:#004080;">C <button class="add-btn" onclick="addItem(this,'C')">+</button></div>
+            <div class="items-container cargo-items"></div>
+            <div class="section-title" style="margin-top:10px; font-weight:bold; font-size:14px; color:#004080;">Mn <button class="add-btn" onclick="addItem(this,'Mn')">+</button></div>
+            <div class="items-container manuel-items"></div>
         </div>`;
         const bSec = s.querySelector(".bag-section");
-        if(lt==="YIGMA" || n===5) bSec.innerHTML=`<div class="flex">By <input type="number" class="by" style="width:50px" oninput="updateSummary()"> Bc <input type="number" class="bc" style="width:50px" oninput="updateSummary()"> Mix <input type="number" class="mx" style="width:50px" oninput="updateSummary()"></div>`;
-        else bSec.innerHTML=`<div class="flex"><strong>${wide.includes(ac)?"AKE":"AKH"}</strong> <select class="bagType"><option>By</option><option>Bc</option><option>Mix</option></select> <button class="add-btn" onclick="addBagaj(this)">+</button></div><div class="items-container uld-items"></div>`;
+        if(lt==="YIGMA" || n===5){
+            bSec.innerHTML=`<div class="flex" style="font-weight:bold;">By <input type="number" class="by" style="width:60px" oninput="updateSummary();saveAll()"> Bc <input type="number" class="bc" style="width:60px" oninput="updateSummary();saveAll()"> Mix <input type="number" class="mx" style="width:60px" oninput="updateSummary();saveAll()"></div>`;
+        } else {
+            bSec.innerHTML=`<div style="display:flex; gap:8px; align-items:center;"><strong>${wide.includes(ac)?"AKE":"AKH"}</strong> <select class="bagType"><option>By</option><option>Bc</option><option>Mix</option></select> <button class="add-btn" onclick="addBagaj(this)">+</button></div><div class="items-container uld-items"></div>`;
+        }
         container.appendChild(s);
-    });
-}
-
-function addItem(b,k,v=null){
-    const h=b.parentElement.nextElementSibling, d=document.createElement("div"); d.className="local-item item-wrapper"; d.dataset.kind=k;
-    d.innerHTML=`<span>${k}</span><input type="number" class="item-input" value="${v||''}" oninput="updateSummary();saveAll()"><button class="delete-btn" onclick="this.parentElement.remove(); renumberLocalItems('${k}'); updateSummary(); saveAll()">X</button>`;
-    h.appendChild(d); renumberLocalItems(k); updateSummary();
-}
-function addBagaj(b,v=null){
-    const t=b.parentElement.querySelector('.bagType').value, h=b.parentElement.nextElementSibling, d=document.createElement("div"); d.className="konteyner-item item-wrapper"; d.dataset.kind=t;
-    d.innerHTML=`<span>${t}</span><input type="number" class="item-input" value="${v||''}" oninput="updateSummary();saveAll()"><button class="delete-btn" onclick="this.parentElement.remove(); renumberGlobalBags(); updateSummary(); saveAll()">X</button>`;
-    h.appendChild(d); renumberGlobalBags(); updateSummary();
-}
-
-function renumberGlobalBags(){ ['By','Bc','Mix'].forEach(k=>{ let c=1; document.querySelectorAll(`.konteyner-item[data-kind="${k}"] span`).forEach(s=>s.textContent=`${k} ${c++}`); }); }
-function renumberLocalItems(k){ let c=1; document.querySelectorAll(`.local-item[data-kind="${k}"] span`).forEach(s=>s.textContent=`${k} ${c++}`); }
-function toggleContent(el){ let c=el.nextElementSibling; if(c) c.style.display=(c.style.display==='block'?'none':'block'); }
-function updateMix(){ let by=+document.getElementById('byAvg').value||0, bc=+document.getElementById('bcAvg').value||0; document.getElementById('mxAvg').value=(by+bc)>0?Math.round((by+bc)/2):""; updateSummary(); }
-function fullReset(){ document.getElementById('compartments').innerHTML=""; updateSummary(); }
-function checkLoadType(){ let ac=document.getElementById('aircraft').value, lt=document.getElementById('loadType').value; if(ac&&lt) updateCompartments(true); }
-function updateCPTBadge(){ document.querySelectorAll('.compartment').forEach(c=>{ let B=0, C=c.querySelectorAll('.local-item[data-kind="Cargo"]').length, M=c.querySelectorAll('.local-item[data-kind="Manuel"]').length; let lt=document.getElementById('loadType').value; if(lt==='YIGMA'||c.dataset.num==="5"){c.querySelectorAll('.by,.bc,.mx').forEach(i=>B+=+i.value||0);}else{B=c.querySelectorAll('.konteyner-item').length;} let r=[]; if(B)r.push("B"+B); if(C)r.push("C"+C); if(M)r.push("M"+M); c.querySelector('.midBadge').textContent=r.join("/"); }); }
-
-function saveAll(){
-    const data={ ac:document.getElementById('aircraft').value, lt:document.getElementById('loadType').value, p:document.getElementById('pantryInput').value, by:document.getElementById('byAvg').value, bc:document.getElementById('bcAvg').value, n:document.getElementById('note').value, wR:document.getElementById('waterRatio')?.value, tG:document.getElementById('tailGroup')?.value, comps:[] };
-    document.querySelectorAll('.compartment').forEach(c=>{
-        let co={num:c.dataset.num, y:[], i:[], e:c.querySelector('.eic-input')?.value};
-        c.querySelectorAll('.by,.bc,.mx').forEach(i=>co.y.push(i.value));
-        c.querySelectorAll('.item-wrapper:not(.eic-wrapper)').forEach(iw=>co.i.push({k:iw.dataset.kind, v:iw.querySelector('input').value, isK:iw.classList.contains('konteyner-item')}));
-        data.comps.push(co);
-    });
-    localStorage.setItem("hlc_v30", JSON.stringify(data));
-}
-function loadAll(){
-    const raw=localStorage.getItem("hlc_v30"); if(!raw) return;
-    const d=JSON.parse(raw); document.getElementById('aircraft').value=d.ac; updateWaterUI(); document.getElementById('loadType').value=d.lt; checkLoadType();
-    document.getElementById('pantryInput').value=d.p||""; document.getElementById('byAvg').value=d.by||""; document.getElementById('bcAvg').value=d.bc||""; document.getElementById('note').value=d.n||"";
-    if(d.tG && document.getElementById('tailGroup')){ document.getElementById('tailGroup').value=d.tG; updateWaterRatios(); }
-    if(d.wR && document.getElementById('waterRatio')) document.getElementById('waterRatio').value=d.wR;
-    const domC=document.querySelectorAll('.compartment');
-    d.comps.forEach((cd,idx)=>{
-        const dc=domC[idx]; if(!dc) return; if(cd.e && dc.querySelector('.eic-input')) dc.querySelector('.eic-input').value=cd.e;
-        const yi=dc.querySelectorAll('.by,.bc,.mx'); cd.y.forEach((v,i)=>{if(yi[i]) yi[i].value=v;});
-        cd.i.forEach(it=>{ if(it.isK){ dc.querySelector('.bagType').value=it.k; addBagaj(dc.querySelector('.uld-items').previousElementSibling.querySelector('button'), it.v); } else { addItem(dc.querySelector(it.k==='Cargo'?'.cargo-items':'.manuel-items').previousElementSibling.querySelector('button'), it.k, it.v); } });
     });
     updateSummary();
 }
-function clearStorage(){ if(confirm("Sıfırlansın mı?")){ localStorage.removeItem("hlc_v30"); location.reload(); } }
+
+function renumberGlobalBags(){
+    ['By','Bc','Mix'].forEach(kind => {
+        let count = 1;
+        document.querySelectorAll(`.konteyner-item[data-kind="${kind}"]`).forEach(el => {
+            el.querySelector('span').textContent = `${kind} ${count++}`;
+        });
+    });
+}
+function renumberLocalItems(container, kind){
+    let count = 1;
+    container.querySelectorAll(`.local-item[data-kind="${kind}"]`).forEach(el => {
+        el.querySelector('span').textContent = `${kind} ${count++}`;
+    });
+}
+function updateMix(){
+    const by=+document.getElementById('byAvg').value||0, bc=+document.getElementById('bcAvg').value||0;
+    document.getElementById('mxAvg').value=(by+bc)>0?Math.round((by+bc)/2):""; updateSummary(); saveAll();
+}
+function addBagaj(b,v=null){
+    const t=b.parentElement.querySelector('.bagType').value, h=b.parentElement.nextElementSibling;
+    const d=document.createElement("div"); d.className="konteyner-item item-wrapper"; d.dataset.kind=t;
+    // By 1 formatı korundu
+    d.innerHTML=`<span>${t} 1</span><input type="number" class="item-input" value="${v||''}" oninput="updateSummary();saveAll()"><button class="delete-btn" onclick="this.parentElement.remove(); renumberGlobalBags(); updateSummary(); saveAll()">X</button>`;
+    h.appendChild(d); renumberGlobalBags(); updateSummary(); saveAll();
+}
+function addItem(b,k,v=null){
+    const h=b.parentElement.nextElementSibling;
+    const d=document.createElement("div"); d.className="local-item item-wrapper"; d.dataset.kind=k;
+    // C 1 ve Mn 1 formatı uygulandı
+    d.innerHTML=`<span>${k} 1</span><input type="number" class="item-input" value="${v||''}" oninput="updateSummary();saveAll()"><button class="delete-btn" onclick="const container = this.parentElement.parentElement; this.parentElement.remove(); renumberLocalItems(container, '${k}'); updateSummary(); saveAll()">X</button>`;
+    h.appendChild(d); renumberLocalItems(h, k); updateSummary(); saveAll();
+}
+function updateCPTBadge(){
+    document.querySelectorAll('.compartment').forEach(c=>{
+        const lt=document.getElementById('loadType').value, n=parseInt(c.dataset.num);
+        let B=0, C=c.querySelectorAll('.local-item[data-kind="C"]').length, M=c.querySelectorAll('.local-item[data-kind="Mn"]').length;
+        if(lt==='YIGMA'||n===5){c.querySelectorAll('.by,.bc,.mx').forEach(i=>B+=+i.value||0);} else {B=c.querySelectorAll('.konteyner-item').length;}
+        let res=[]; if(B) res.push("B "+B); if(C) res.push("C "+C); if(M) res.push("Mn "+M);
+        c.querySelector('.midBadge').textContent=res.join(" / ");
+    });
+}
+function saveAll(){
+    const data={
+        ac:document.getElementById('aircraft').value, lt:document.getElementById('loadType').value,
+        p:document.getElementById('pantryInput').value, by:document.getElementById('byAvg').value, bc:document.getElementById('bcAvg').value,
+        n:document.getElementById('note').value, wR:document.getElementById('waterRatio')?document.getElementById('waterRatio').value:"",
+        tG:document.getElementById('tailGroup')?document.getElementById('tailGroup').value:"",
+        comps:[]
+    };
+    document.querySelectorAll('.compartment').forEach(c=>{
+        let co={num:c.dataset.num, y:[], i:[]};
+        const e=c.querySelector('.eic-input'); if(e) co.e=e.value;
+        c.querySelectorAll('.by,.bc,.mx').forEach(i=>co.y.push(i.value));
+        c.querySelectorAll('.item-wrapper').forEach(iw=>{
+            if(!iw.classList.contains('eic-wrapper')) co.i.push({k:iw.dataset.kind, v:iw.querySelector('input').value, isK:iw.classList.contains('konteyner-item')});
+        });
+        data.comps.push(co);
+    });
+    localStorage.setItem("hlc_pro_data_v27", JSON.stringify(data));
+}
+function fullReset(){ document.getElementById('compartments').innerHTML=""; updateSummary(); }
+function loadAll(){
+    const raw=localStorage.getItem("hlc_pro_data_v27"); if(!raw) return;
+    const d=JSON.parse(raw);
+    document.getElementById('aircraft').value=d.ac; updateWaterUI();
+    document.getElementById('loadType').value=d.lt; if(!d.ac||!d.lt) return;
+    updateCompartments(true);
+    document.getElementById('pantryInput').value=d.p||""; document.getElementById('byAvg').value=d.by||""; document.getElementById('bcAvg').value=d.bc||"";
+    document.getElementById('note').value=d.n||"";
+    if(d.tG && document.getElementById('tailGroup')){document.getElementById('tailGroup').value=d.tG; updateWaterRatios();}
+    if(d.wR && document.getElementById('waterRatio')) document.getElementById('waterRatio').value=d.wR;
+    const domC=document.querySelectorAll('.compartment');
+    d.comps.forEach((cd,idx)=>{
+        const dc=domC[idx]; if(!dc) return;
+        const e=dc.querySelector('.eic-input'); if(e) e.value=cd.e;
+        const yi=dc.querySelectorAll('.by,.bc,.mx'); cd.y.forEach((v,i)=>{if(yi[i]) yi[i].value=v;});
+        cd.i.forEach(it=>{
+            if(it.isK){dc.querySelector('.bagType').value=it.k; addBagaj(dc.querySelector('.uld-items').previousElementSibling.querySelector('button'), it.v);}
+            else { 
+                const kindClass = it.k==='C'?'.cargo-items':'.manuel-items';
+                const container = dc.querySelector(kindClass);
+                if(container) addItem(container.previousElementSibling.querySelector('button'), it.k, it.v); 
+            }
+        });
+    });
+    updateSummary();
+}
+function clearStorage() { if(confirm("Tüm veriler silinecek! Onaylıyor musunuz?")) { localStorage.removeItem("hlc_pro_data_v27"); location.reload(); } }
 window.onload=loadAll;
 </script>
 </body>
