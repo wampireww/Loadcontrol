@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<title>HLC - Pro Master V34.6 FINAL</title>
+<title>HLC - Pro Master V33.7 STABIL</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
 <style>
 html, body { overscroll-behavior-y: contain; }
@@ -15,17 +15,15 @@ input[type=number], input[type=text], select{padding:2px 6px; border:1px solid #
 .add-btn { background:#004080; color:#fff; border:none; border-radius:4px; width: 28px; height: 28px; cursor:pointer; font-weight: bold; font-size: 18px; display: flex; align-items: center; justify-content: center;}
 .midBadge { font-size: 0.82em; color: #d35400; font-weight: 800; flex-grow: 1; text-align: center; }
 .item-wrapper { display: flex; align-items: center; justify-content: space-between; background: #fff; padding: 3px 5px; border-radius: 6px; border: 1.8px solid #004080; width: 48.5%; box-sizing: border-box; margin-bottom: 5px; }
-.item-wrapper span { font-size: 11px; font-weight: 800; color: #004080; }
+.item-wrapper span { font-size: 13px; font-weight: 600; color: #444; }
+.eic-wrapper { background: #fff2cc !important; border-color: #f1c232 !important; width: 48.5% !important; margin-bottom: 8px; }
 .items-container { display: flex; flex-wrap: wrap; gap: 3%; margin-top: 5px; }
-.item-input { width: 60px !important; height: 26px !important; margin: 0 2px; font-weight: 900; border: 1.2px solid #777 !important; text-align: center;}
+.item-input { width: 70px !important; height: 26px !important; margin: 0 2px; font-weight: 900; border: 1.2px solid #777 !important; text-align: center;}
 .delete-btn { background: #cc0000; padding: 0 6px; height: 26px; border-radius: 4px; color: white; border:none; font-weight: bold;}
 .weight-display { font-size: 0.92em; color: #004080; font-weight: 900; background: #e6f0ff; padding: 4px 6px; border-radius: 5px; }
-
-/* Not Alanı 2 Satır Azaltıldı (160px) */
-#note { width: 100%; height: 160px; margin-top: 15px; border-radius: 8px; padding: 10px; font-size: 14px; font-weight: bold; border: 1.5px solid #ccc; box-sizing: border-box; line-height: 1.4; resize: none;}
-
+#note { width: 100%; height: 80px; margin-top: 15px; border-radius: 8px; padding: 8px; font-size: 14px; font-weight: bold; border: 1px solid #ccc; box-sizing: border-box; }
 .summary{ background:#004080; color: white; padding:15px; border-radius: 12px; border: 2px solid #002b57; margin-top: 10px;}
-.action-btn { flex: 1; height: 38px; border-radius: 6px; border: none; color: white; font-weight: bold; font-size: 13px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px;}
+.action-btn { flex: 1; height: 36px; border-radius: 6px; border: none; color: white; font-weight: bold; font-size: 13px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px;}
 .summary-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 8px; margin-bottom: 15px; }
 .summary-header h3 { color: white !important; margin: 0 !important; font-size: 16px !important; font-weight: 800 !important; }
 .header-inputs { display: flex; gap: 4px; align-items: center; font-size: 16px; font-weight: 800; }
@@ -34,14 +32,14 @@ input[type=number], input[type=text], select{padding:2px 6px; border:1px solid #
 .summary-label { color: rgba(255,255,255,0.7); width: 60px; font-weight: 400; font-size: 15px; }
 .summary-val { font-weight: 800; font-size: 17px; }
 .summary-divider { height: 1px; background: rgba(255,255,255,0.15); margin: 15px 0; }
-.total-payload { font-size: 1.1em; color: #ffeb3b; border-top: 1.5px solid rgba(255,255,255,0.2); padding-top: 12px; margin-top: 10px; text-align: center; width: 100%; font-weight: 900; }
+.total-payload { font-size: 1.05em; color: #ffeb3b; border-top: 1.5px solid rgba(255,255,255,0.2); padding-top: 12px; margin-top: 10px; text-align: center; width: 100%; font-weight: 800; }
 .content { display: none; padding: 10px; border-top: 1px solid #eee; }
-.add-row { display: flex; align-items: center; gap: 8px; margin-top: 10px; font-weight: bold; }
+.add-row { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
 </style>
 </head>
 <body>
 
-<h1>HLC Pro Master V34.6</h1>
+<h1>HLC Pro Master V33.7 STABIL</h1>
 
 <section class="flex">
     Uçak: <select id="aircraft" onchange="fullReset();checkLoadType();updateWaterUI();updateSummary();saveAll()" style="flex:1;">
@@ -55,19 +53,19 @@ input[type=number], input[type=text], select{padding:2px 6px; border:1px solid #
     </select>
 </section>
 
-<section><h3 onclick="toggleContent(this)">Water & Pantry</h3><div class="content"><div id="waterUI"></div><div class="flex" style="margin-top:12px;">Pantry: <input type="text" id="pantryInput" style="flex-grow:1" oninput="saveAll();updateSummary()"></div></div></section>
-<section><h3 onclick="toggleContent(this)">Bagaj Ortalamaları</h3><div class="content" style="display: block;"><div class="flex">By <input type="number" id="byAvg" style="width:70px" oninput="updateMix()"> Bc <input type="number" id="bcAvg" style="width:70px" oninput="updateMix()"> Mix <input type="number" id="mxAvg" style="width:70px" readonly></div></div></section>
+<section><h3 onclick="toggleContent(this)">Water & Pantry</h3><div class="content"><div id="waterUI" style="display:flex; flex-direction:column; gap:8px;"></div><div class="flex" style="margin-top:12px;">Pantry Code: <input type="text" id="pantryInput" style="flex-grow:1" oninput="saveAll();updateSummary()"></div></div></section>
+<section><h3 onclick="toggleContent(this)">Bagaj Ortalamaları</h3><div class="content" style="display: block;"><div class="flex" style="font-weight: bold; justify-content: space-between;"><div>By <input type="number" id="byAvg" style="width:78px" oninput="updateMix()"></div><div>Bc <input type="number" id="bcAvg" style="width:78px" oninput="updateMix()"></div><div>Mix <input type="number" id="mxAvg" style="width:78px" readonly></div></div></div></section>
 
 <div id="compartments"></div>
 
 <section class="summary">
-    <div class="summary-header"><h3>FINAL KONTROL</h3><div class="header-inputs">TC-<input type="text" id="tailInput" class="header-input" placeholder="---" oninput="saveAll()"> / <input type="text" id="destInput" class="header-input" placeholder="---" oninput="saveAll()"></div></div>
-    <div id="summary-list"></div><div class="summary-divider"></div>
-    <div class="summary-line"><span class="summary-label">WATER:</span><span class="summary-val" id="finalWater">-</span></div>
-    <div class="summary-line"><span class="summary-label">PANTRY:</span><span class="summary-val" id="finalPantry">-</span></div>
+    <div class="summary-header"><h3>FINAL KONTROL</h3><div class="header-inputs"><span>TC-</span><input type="text" id="tailInput" class="header-input" style="width:55px;" oninput="saveAll()"><span style="color:white; margin-left:5px;">/</span><input type="text" id="destInput" class="header-input" style="width:50px;" oninput="saveAll()"></div></div>
+    <div id="summary-list"></div><div class="summary-divider"></div><div id="summary-details"></div><div class="summary-divider"></div>
+    <div class="summary-line"><span class="summary-label" style="width:80px">WATER:</span><span class="summary-val" id="finalWater">-</span></div>
+    <div class="summary-line"><span class="summary-label" style="width:80px">PANTRY:</span><span class="summary-val" id="finalPantry">-</span></div>
     <div class="total-payload">TOTAL PAYLOAD: <span id="totalPayload">0</span> kg</div>
     <textarea id="note" placeholder="Operasyon Notu Ekle..." oninput="saveAll()"></textarea>
-    <div class="flex" style="margin-top: 15px; gap: 10px;"><button class="action-btn" onclick="saveAll()" style="background: #27ae60;">KAYDET</button><button class="action-btn" onclick="clearStorage()" style="background:#c0392b;">SIFIRLA</button></div>
+    <div class="flex" style="justify-content: space-between; margin-top: 15px; gap: 10px;"><button class="action-btn" onclick="saveAll()" style="background: #27ae60;">KAYDET</button><button class="action-btn" onclick="clearStorage()" style="background:#c0392b;">SIFIRLA</button></div>
 </section>
 
 <script>
@@ -75,21 +73,21 @@ const waterData = { "A330": { "JNA, JNB (Grup A)": {"25": [-525,-2.6],"50": [-35
 const comps={A319:[1,4,5],A320:[1,3,4,5],A321:[1,2,3,4,5],"B737-800":[1,2,3,4],"B737-900":[1,2,3,4],A330:[1,2,3,4,5],A350:[1,2,3,4,5],B777:[1,2,3,4,5],B787:[1,2,3,4,5]};
 
 function updateSummary(){
-    let outHtml="", totalPayload=0;
+    let outHtml="", totalPayload=0, totalBags=0, totalULDCount=0, totalCargo=0, totalManuel=0;
     const ac=document.getElementById('aircraft').value, lt=document.getElementById('loadType').value;
     const byA=+document.getElementById('byAvg').value||0, bcA=+document.getElementById('bcAvg').value||0, mxA=+document.getElementById('mxAvg').value||0;
 
     document.querySelectorAll(".compartment").forEach(c=>{
         let cptW=0, cptBags=0, cptULDs=0;
         const cptNum = parseInt(c.dataset.num);
-        c.querySelectorAll(".by,.bc,.mx").forEach(i=>{ let v=+i.value||0; cptBags+=v; cptW+=v*(i.classList.contains('by')?byA:(i.classList.contains('bc')?bcA:mxA)); });
+        c.querySelectorAll(".by,.bc,.mx").forEach(i=>{ let v=+i.value||0; cptBags+=v; totalBags+=v; cptW+=v*(i.classList.contains('by')?byA:(i.classList.contains('bc')?bcA:mxA)); });
         c.querySelectorAll(".konteyner-item").forEach(k=>{
             const count=+k.querySelector("input").value||0;
-            cptW += 70 + (count * ((k.dataset.kind.includes("By"))?byA:(k.dataset.kind.includes("Bc"))?bcA:mxA)); cptULDs++;
+            cptW += 70 + (count * ((k.dataset.kind==="By")?byA:(k.dataset.kind==="Bc")?bcA:mxA)); totalBags+=count; cptULDs++; totalULDCount++;
         });
-        const C = c.querySelectorAll(".local-item[data-type='C']");
+        const C = c.querySelectorAll(".local-item[data-kind='C']"); totalCargo += C.length;
         C.forEach(i=>cptW+=+i.querySelector("input").value||0);
-        const M = c.querySelectorAll(".local-item[data-type='Mn']");
+        const M = c.querySelectorAll(".local-item[data-kind='Mn']"); totalManuel += M.length;
         M.forEach(i=>cptW+=+i.querySelector("input").value||0);
         const eic=c.querySelector(".eic-input"); if(eic) cptW+=+eic.value||0;
         
@@ -102,7 +100,10 @@ function updateSummary(){
         totalPayload += cptW;
         if(c.querySelector(".weight-display")) c.querySelector(".weight-display").textContent=Math.round(cptW)+" kg";
     });
+    let uldLabel = (["A330","A350","B777","B787"].includes(ac)) ? "AKE" : "AKH";
     document.getElementById('summary-list').innerHTML = outHtml;
+    document.getElementById('summary-details').innerHTML = lt === "ULD" ? `<div class="summary-detail">📦 Toplam ${uldLabel}: ${totalULDCount} (${totalBags} Bagaj)</div>` : `<div class="summary-detail">📦 Toplam Bagaj: ${totalBags}</div>`;
+    document.getElementById('summary-details').innerHTML += `<div class="summary-detail">🚛 Toplam Kargo (C): ${totalCargo}</div><div class="summary-detail">🛠️ Toplam Manuel (Mn): ${totalManuel}</div>`;
     document.getElementById('totalPayload').textContent = Math.round(totalPayload);
     updateWaterSummary();
 }
@@ -116,40 +117,24 @@ function updateCompartments(r){
         const s=document.createElement("section"); s.className="compartment"; s.dataset.num=n;
         s.innerHTML=`<h3 onclick="toggleContent(this)">CPT ${n} <span class="midBadge"></span> <span class="weight-display">0 kg</span></h3>
         <div class="content">
-            ${n===eicT?`<div class="item-wrapper eic-wrapper" style="background:#fff2cc; border:1.5px solid #f1c232;"><span>EIC</span><input type="number" class="eic-input item-input" value="${eicV}" oninput="updateSummary();saveAll()"></div>`:''}
+            ${n===eicT?`<div class="item-wrapper eic-wrapper"><span>EIC</span><input type="number" class="eic-input item-input" value="${eicV}" oninput="updateSummary();saveAll()"></div>`:''}
             <div class="bag-section"></div>
-            <div class="add-row">Cargo <button class="add-btn" onclick="addItem(this,'C')">+</button></div>
+            <div class="add-row"><span>Cargo</span><button class="add-btn" onclick="addItem(this,'C')">+</button></div>
             <div class="items-container cargo-items"></div>
-            <div class="add-row">Manuel <button class="add-btn" onclick="addItem(this,'Mn')">+</button></div>
+            <div class="add-row"><span>Manuel</span><button class="add-btn" onclick="addItem(this,'Mn')">+</button></div>
             <div class="items-container manuel-items"></div>
         </div>`;
         const bSec = s.querySelector(".bag-section");
-        if(lt==="YIGMA" || n===5) bSec.innerHTML=`<div class="flex">By<input type="number" class="by" style="width:55px" oninput="updateSummary();saveAll()"> Bc<input type="number" class="bc" style="width:55px" oninput="updateSummary();saveAll()"> Mix<input type="number" class="mx" style="width:55px" oninput="updateSummary();saveAll()"></div>`;
+        if(lt==="YIGMA" || n===5) bSec.innerHTML=`<div class="flex">By<input type="number" class="by" style="width:60px" oninput="updateSummary();saveAll()"> Bc<input type="number" class="bc" style="width:60px" oninput="updateSummary();saveAll()"> Mix<input type="number" class="mx" style="width:60px" oninput="updateSummary();saveAll()"></div>`;
         else bSec.innerHTML=`<div class="add-row"><strong>${ac.includes("B737")||ac.includes("A32")?"AKH":"AKE"}</strong> <select class="bagType"><option>By</option><option>Bc</option><option>Mix</option></select> <button class="add-btn" onclick="addBagaj(this)">+</button></div><div class="items-container uld-items"></div>`;
         container.appendChild(s);
     });
 }
 
-function addItem(btn, type, val=null){
-    const container = btn.parentElement.nextElementSibling;
-    const count = container.children.length + 1;
-    const label = type === 'C' ? `Cargo ${count}` : `Mn ${count}`;
-    const div = document.createElement("div"); div.className="local-item item-wrapper"; div.dataset.type = type;
-    div.innerHTML = `<span>${label}</span><input type="number" class="item-input" value="${val||''}" oninput="updateSummary();saveAll()"><button class="delete-btn" onclick="this.parentElement.remove(); updateSummary(); saveAll()">X</button>`;
-    container.appendChild(div);
-    updateSummary(); if(!val) saveAll();
-}
-
-function addBagaj(btn, val=null, kind=null){
-    const type = kind || btn.parentElement.querySelector('.bagType').value;
-    const container = btn.parentElement.nextElementSibling;
-    const count = container.children.length + 1;
-    const label = `${type} ${count}`;
-    const div = document.createElement("div"); div.className="konteyner-item item-wrapper"; div.dataset.kind = type;
-    div.innerHTML = `<span>${label}</span><input type="number" class="item-input" value="${val||''}" oninput="updateSummary();saveAll()"><button class="delete-btn" onclick="this.parentElement.remove(); updateSummary(); saveAll()">X</button>`;
-    container.appendChild(div);
-    updateSummary(); if(!val) saveAll();
-}
+function addItem(b,k,v=null){ const h=b.parentElement.nextElementSibling; const d=document.createElement("div"); d.className="local-item item-wrapper"; d.dataset.kind=k; d.innerHTML=`<span>${k} 1</span><input type="number" class="item-input" value="${v||''}" oninput="updateSummary();saveAll()"><button class="delete-btn" onclick="this.parentElement.remove(); renumberLocalItems(); updateSummary(); saveAll()">X</button>`; h.appendChild(d); renumberLocalItems(); updateSummary(); saveAll(); }
+function addBagaj(b,v=null,kind=null){ const t=kind||b.parentElement.querySelector('.bagType').value, h=b.parentElement.nextElementSibling; const d=document.createElement("div"); d.className="konteyner-item item-wrapper"; d.dataset.kind=t; d.innerHTML=`<span>${t} 1</span><input type="number" class="item-input" value="${v||''}" oninput="updateSummary();saveAll()"><button class="delete-btn" onclick="this.parentElement.remove(); renumberGlobalBags(); updateSummary(); saveAll()">X</button>`; h.appendChild(d); renumberGlobalBags(); updateSummary(); saveAll(); }
+function renumberGlobalBags(){ ['By','Bc','Mix'].forEach(kind => { let count = 1; document.querySelectorAll(`.konteyner-item[data-kind="${kind}"]`).forEach(el => { el.querySelector('span').textContent = `${kind} ${count++}`; }); }); }
+function renumberLocalItems(){ document.querySelectorAll('.compartment').forEach(c => { ['C','Mn'].forEach(kind => { let count = 1; c.querySelectorAll(`.local-item[data-kind="${kind}"]`).forEach(el => { el.querySelector('span').textContent = `${kind} ${count++}`; }); }); }); }
 
 function saveAll(){
     const compsData = [];
@@ -157,23 +142,14 @@ function saveAll(){
         const cargo = []; c.querySelectorAll(".cargo-items .item-input").forEach(i => cargo.push(i.value));
         const manuel = []; c.querySelectorAll(".manuel-items .item-input").forEach(i => manuel.push(i.value));
         const ulds = []; c.querySelectorAll(".uld-items .konteyner-item").forEach(k => ulds.push({k: k.dataset.kind, v: k.querySelector("input").value}));
-        compsData.push({ 
-            n: c.dataset.num, cargo, manuel, ulds, 
-            bulk: { by: c.querySelector(".by")?.value||"", bc: c.querySelector(".bc")?.value||"", mx: c.querySelector(".mx")?.value||"" },
-            eic: c.querySelector(".eic-input")?.value||""
-        });
+        compsData.push({ n: c.dataset.num, cargo, manuel, ulds, bulk: { by: c.querySelector(".by")?.value||"", bc: c.querySelector(".bc")?.value||"", mx: c.querySelector(".mx")?.value||"" }, eic: c.querySelector(".eic-input")?.value||"" });
     });
-    const data={
-        ac:document.getElementById('aircraft').value, lt:document.getElementById('loadType').value,
-        p:document.getElementById('pantryInput').value, by:document.getElementById('byAvg').value, bc:document.getElementById('bcAvg').value,
-        n:document.getElementById('note').value, wR:document.getElementById('waterRatio')?.value||"", tG:document.getElementById('tailGroup')?.value||"",
-        tail:document.getElementById('tailInput').value, dest:document.getElementById('destInput').value, compsData
-    };
-    localStorage.setItem("hlc_v34_final_stable_v3", JSON.stringify(data));
+    const data={ ac:document.getElementById('aircraft').value, lt:document.getElementById('loadType').value, p:document.getElementById('pantryInput').value, by:document.getElementById('byAvg').value, bc:document.getElementById('bcAvg').value, n:document.getElementById('note').value, wR:document.getElementById('waterRatio')?.value||"", tG:document.getElementById('tailGroup')?.value||"", tail:document.getElementById('tailInput').value, dest:document.getElementById('destInput').value, compsData };
+    localStorage.setItem("hlc_v33_final_v2", JSON.stringify(data));
 }
 
 function loadAll(){
-    const raw=localStorage.getItem("hlc_v34_final_stable_v3"); if(!raw) return;
+    const raw=localStorage.getItem("hlc_v33_final_v2"); if(!raw) return;
     const d=JSON.parse(raw);
     document.getElementById('aircraft').value=d.ac; updateWaterUI();
     document.getElementById('loadType').value=d.lt; if(!d.ac||!d.lt) return;
@@ -205,12 +181,12 @@ function updateWaterSummary(){
     document.getElementById('finalPantry').textContent = document.getElementById('pantryInput').value || "-";
 }
 function checkLoadType(){ const ac=document.getElementById('aircraft').value, lt=document.getElementById('loadType').value; if(!lt) return; updateCompartments(true); updateSummary(); saveAll(); }
-function updateWaterUI() { const ac = document.getElementById('aircraft').value, ui = document.getElementById('waterUI'); ui.innerHTML = ""; if (!ac) return; if (ac === "A330" || ac === "A350") { let opts = ""; Object.keys(waterData[ac]).forEach(g => opts += `<option value="${g}">${g}</option>`); ui.innerHTML += `<select id="tailGroup" style="width:100%" onchange="updateWaterRatios(); updateSummary(); saveAll()">${opts}</select>`; } ui.innerHTML += `<select id="waterRatio" style="width:100%; margin-top:5px;" onchange="updateSummary(); saveAll()"><option value="">Su Oranı...</option></select>`; updateWaterRatios(); }
-function updateWaterRatios() { const ac = document.getElementById('aircraft').value, sel = document.getElementById('waterRatio'); if(!ac || !sel) return; let curr = sel.value; sel.innerHTML = '<option value="">Su Oranı...</option>'; let list = (ac==="B787"||ac==="B777") ? ["1/8","FULL"] : (ac==="A350" ? ["1/10","FULL"] : ["25","50","75","FULL"]); list.forEach(o => { let el=document.createElement("option"); el.value=o; el.textContent=(o==="FULL"?o:"%"+o); sel.appendChild(el); }); if(curr) sel.value = curr; }
+function updateWaterUI() { const ac = document.getElementById('aircraft').value, ui = document.getElementById('waterUI'); ui.innerHTML = ""; if (!ac) return; if (ac === "A330" || ac === "A350") { let opts = ""; Object.keys(waterData[ac]).forEach(g => opts += `<option value="${g}">${g}</option>`); ui.innerHTML += `<div style="font-size:13px; font-weight:bold;">Tescil Grubu:</div><select id="tailGroup" style="width:100%" onchange="updateWaterRatios(); updateSummary(); saveAll()">${opts}</select>`; } ui.innerHTML += `<div style="font-size:13px; font-weight:bold; margin-top:8px;">Su Oranı:</div><select id="waterRatio" style="width:100%" onchange="updateSummary(); saveAll()"><option value="">Seç...</option></select>`; updateWaterRatios(); }
+function updateWaterRatios() { const ac = document.getElementById('aircraft').value, sel = document.getElementById('waterRatio'); if(!ac || !sel) return; let curr = sel.value; sel.innerHTML = '<option value="">Seç...</option>'; let list = (ac==="B787"||ac==="B777") ? ["1/8","FULL"] : (ac==="A350" ? ["1/10","FULL"] : ["25","50","75","FULL"]); list.forEach(o => { let el=document.createElement("option"); el.value=o; el.textContent=(o==="FULL"?o:"%"+o); sel.appendChild(el); }); if(curr) sel.value = curr; }
 function updateMix(){ const by=+document.getElementById('byAvg').value||0, bc=+document.getElementById('bcAvg').value||0; document.getElementById('mxAvg').value=(by+bc)>0?Math.round((by+bc)/2):""; updateSummary(); saveAll(); }
 function toggleContent(el){ const c=el.nextElementSibling; c.style.display=(c.style.display==='block'?'none':'block'); }
 function fullReset(){ document.getElementById('compartments').innerHTML=""; updateSummary(); }
-function clearStorage() { if(confirm("Tüm veriler silinsin mi?")) { localStorage.removeItem("hlc_v34_final_stable_v3"); location.reload(); } }
+function clearStorage() { if(confirm("Tüm veriler silinsin mi?")) { localStorage.removeItem("hlc_v33_final_v2"); location.reload(); } }
 window.onload=loadAll;
 </script>
 </body>
