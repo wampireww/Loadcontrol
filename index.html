@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<title>HLC - Pro Master V33.7 STABIL</title>
+<title>HLC - Pro Master V33.7</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
 <style>
 html, body { overscroll-behavior-y: contain; }
@@ -39,7 +39,7 @@ input[type=number], input[type=text], select{padding:2px 6px; border:1px solid #
 </head>
 <body>
 
-<h1>HLC Pro Master V33.7 STABIL</h1>
+<h1>HLC Pro Master V33.7</h1>
 
 <section class="flex">
     Uçak: <select id="aircraft" onchange="fullReset();checkLoadType();updateWaterUI();updateSummary();saveAll()" style="flex:1;">
@@ -131,6 +131,7 @@ function updateCompartments(r){
     });
 }
 
+function checkLoadType(){ const ac=document.getElementById('aircraft').value, lt=document.getElementById('loadType').value; if(!lt) return; if((ac.includes("B737") && lt==="ULD") || (["A330","A350","B777","B787"].includes(ac) && lt==="YIGMA")){ alert("Konfigürasyon uygun değil!"); document.getElementById('loadType').value=""; return; } updateCompartments(true); updateSummary(); saveAll(); }
 function addItem(b,k,v=null){ const h=b.parentElement.nextElementSibling; const d=document.createElement("div"); d.className="local-item item-wrapper"; d.dataset.kind=k; d.innerHTML=`<span>${k} 1</span><input type="number" class="item-input" value="${v||''}" oninput="updateSummary();saveAll()"><button class="delete-btn" onclick="this.parentElement.remove(); renumberLocalItems(); updateSummary(); saveAll()">X</button>`; h.appendChild(d); renumberLocalItems(); updateSummary(); saveAll(); }
 function addBagaj(b,v=null,kind=null){ const t=kind||b.parentElement.querySelector('.bagType').value, h=b.parentElement.nextElementSibling; const d=document.createElement("div"); d.className="konteyner-item item-wrapper"; d.dataset.kind=t; d.innerHTML=`<span>${t} 1</span><input type="number" class="item-input" value="${v||''}" oninput="updateSummary();saveAll()"><button class="delete-btn" onclick="this.parentElement.remove(); renumberGlobalBags(); updateSummary(); saveAll()">X</button>`; h.appendChild(d); renumberGlobalBags(); updateSummary(); saveAll(); }
 function renumberGlobalBags(){ ['By','Bc','Mix'].forEach(kind => { let count = 1; document.querySelectorAll(`.konteyner-item[data-kind="${kind}"]`).forEach(el => { el.querySelector('span').textContent = `${kind} ${count++}`; }); }); }
@@ -145,11 +146,11 @@ function saveAll(){
         compsData.push({ n: c.dataset.num, cargo, manuel, ulds, bulk: { by: c.querySelector(".by")?.value||"", bc: c.querySelector(".bc")?.value||"", mx: c.querySelector(".mx")?.value||"" }, eic: c.querySelector(".eic-input")?.value||"" });
     });
     const data={ ac:document.getElementById('aircraft').value, lt:document.getElementById('loadType').value, p:document.getElementById('pantryInput').value, by:document.getElementById('byAvg').value, bc:document.getElementById('bcAvg').value, n:document.getElementById('note').value, wR:document.getElementById('waterRatio')?.value||"", tG:document.getElementById('tailGroup')?.value||"", tail:document.getElementById('tailInput').value, dest:document.getElementById('destInput').value, compsData };
-    localStorage.setItem("hlc_v33_final_v2", JSON.stringify(data));
+    localStorage.setItem("hlc_v33_final_storage", JSON.stringify(data));
 }
 
 function loadAll(){
-    const raw=localStorage.getItem("hlc_v33_final_v2"); if(!raw) return;
+    const raw=localStorage.getItem("hlc_v33_final_storage"); if(!raw) return;
     const d=JSON.parse(raw);
     document.getElementById('aircraft').value=d.ac; updateWaterUI();
     document.getElementById('loadType').value=d.lt; if(!d.ac||!d.lt) return;
@@ -180,13 +181,12 @@ function updateWaterSummary(){
     document.getElementById('finalWater').textContent = wDisp;
     document.getElementById('finalPantry').textContent = document.getElementById('pantryInput').value || "-";
 }
-function checkLoadType(){ const ac=document.getElementById('aircraft').value, lt=document.getElementById('loadType').value; if(!lt) return; updateCompartments(true); updateSummary(); saveAll(); }
 function updateWaterUI() { const ac = document.getElementById('aircraft').value, ui = document.getElementById('waterUI'); ui.innerHTML = ""; if (!ac) return; if (ac === "A330" || ac === "A350") { let opts = ""; Object.keys(waterData[ac]).forEach(g => opts += `<option value="${g}">${g}</option>`); ui.innerHTML += `<div style="font-size:13px; font-weight:bold;">Tescil Grubu:</div><select id="tailGroup" style="width:100%" onchange="updateWaterRatios(); updateSummary(); saveAll()">${opts}</select>`; } ui.innerHTML += `<div style="font-size:13px; font-weight:bold; margin-top:8px;">Su Oranı:</div><select id="waterRatio" style="width:100%" onchange="updateSummary(); saveAll()"><option value="">Seç...</option></select>`; updateWaterRatios(); }
 function updateWaterRatios() { const ac = document.getElementById('aircraft').value, sel = document.getElementById('waterRatio'); if(!ac || !sel) return; let curr = sel.value; sel.innerHTML = '<option value="">Seç...</option>'; let list = (ac==="B787"||ac==="B777") ? ["1/8","FULL"] : (ac==="A350" ? ["1/10","FULL"] : ["25","50","75","FULL"]); list.forEach(o => { let el=document.createElement("option"); el.value=o; el.textContent=(o==="FULL"?o:"%"+o); sel.appendChild(el); }); if(curr) sel.value = curr; }
 function updateMix(){ const by=+document.getElementById('byAvg').value||0, bc=+document.getElementById('bcAvg').value||0; document.getElementById('mxAvg').value=(by+bc)>0?Math.round((by+bc)/2):""; updateSummary(); saveAll(); }
 function toggleContent(el){ const c=el.nextElementSibling; c.style.display=(c.style.display==='block'?'none':'block'); }
 function fullReset(){ document.getElementById('compartments').innerHTML=""; updateSummary(); }
-function clearStorage() { if(confirm("Tüm veriler silinsin mi?")) { localStorage.removeItem("hlc_v33_final_v2"); location.reload(); } }
+function clearStorage() { if(confirm("Tüm veriler silinsin mi?")) { localStorage.removeItem("hlc_v33_final_storage"); location.reload(); } }
 window.onload=loadAll;
 </script>
 </body>
