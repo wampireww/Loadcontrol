@@ -24,9 +24,11 @@ input[type=number], input[type=text], select{padding:2px 6px; border:1px solid #
 .delete-btn { background: #cc0000; padding: 0 6px; height: 26px; border-radius: 4px; color: white; border:none; font-weight: bold;}
 .weight-display { font-size: 0.92em; color: #004080; font-weight: 900; background: #e6f0ff; padding: 4px 6px; border-radius: 5px; }
 
-#note { width: 100%; height: 95px; margin-top: 15px; border-radius: 8px; padding: 8px; font-size: 14px; font-weight: bold; border: 1px solid #ccc; box-sizing: border-box; }
+#note { width: 100%; height: 80px; margin-top: 15px; border-radius: 8px; padding: 8px; font-size: 14px; font-weight: bold; border: 1px solid #ccc; box-sizing: border-box; }
 .summary{ background:#004080; color: white; padding:15px; border-radius: 12px; border: 2px solid #002b57; margin-top: 10px;}
-.action-btn { flex: 1; height: 45px; border-radius: 8px; border: none; color: white; font-weight: bold; font-size: 15px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px;}
+
+/* Butonlar Küçültüldü */
+.action-btn { flex: 1; height: 36px; border-radius: 6px; border: none; color: white; font-weight: bold; font-size: 13px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px;}
 
 .summary-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 8px; margin-bottom: 15px; }
 .summary-header h3 { color: white !important; margin: 0 !important; font-size: 16px !important; font-weight: 800 !important; }
@@ -118,30 +120,25 @@ function updateSummary(){
         let cptW=0, cptBags=0, cptULDs=0;
         const cptNum = parseInt(c.dataset.num);
         
-        // Yığma Bagaj (Kendi içindeki inputlardan veya Bulk kısmından)
         c.querySelectorAll(".by,.bc,.mx").forEach(i=>{ let v=+i.value||0; cptBags+=v; totalBags+=v; cptW+=v*(i.classList.contains('by')?byA:(i.classList.contains('bc')?bcA:mxA)); });
-        
-        // ULD Bagaj (Konteyner)
         c.querySelectorAll(".konteyner-item").forEach(k=>{
             const count=+k.querySelector("input").value||0;
             const avg=(k.dataset.kind==="By")?byA:(k.dataset.kind==="Bc")?bcA:mxA;
             cptW += 70 + (count * avg); totalBags += count; cptULDs++; totalULDCount++;
         });
 
-        // Kargo & Manuel
         const C = c.querySelectorAll(".local-item[data-kind='C']"); totalCargo += C.length;
         C.forEach(i=>cptW+=+i.querySelector("input").value||0);
         const M = c.querySelectorAll(".local-item[data-kind='Mn']"); totalManuel += M.length;
         M.forEach(i=>cptW+=+i.querySelector("input").value||0);
-        
         const eic=c.querySelector(".eic-input"); if(eic) cptW+=+eic.value||0;
 
-        // Badge MANTIĞI: CPT 5 her zaman B (Bagaj), Diğerleri lt'ye bağlı
+        // Badge: Artık her iki durumda da B yazıyor (Konteyner adedi veya Bagaj adedi)
         let res=[];
         if(cptNum === 5) {
             if(cptBags > 0) res.push("B " + cptBags);
         } else {
-            if(lt === "ULD" && cptULDs > 0) res.push("ULD " + cptULDs);
+            if(lt === "ULD" && cptULDs > 0) res.push("B " + cptULDs); // ULD ise konteyner sayısını B olarak yaz
             else if(lt === "YIGMA" && cptBags > 0) res.push("B " + cptBags);
         }
         
@@ -189,7 +186,6 @@ function updateCompartments(r){
             <div class="items-container manuel-items"></div>
         </div>`;
         const bSec = s.querySelector(".bag-section");
-        // Kural: Yığma modu SEÇİLİYSE veya kompartıman 5 ise Yığma inputları gelsin
         if(lt==="YIGMA" || n===5) {
             bSec.innerHTML=`<div class="flex">By<input type="number" class="by" style="width:60px" oninput="updateSummary();saveAll()"> Bc<input type="number" class="bc" style="width:60px" oninput="updateSummary();saveAll()"> Mix<input type="number" class="mx" style="width:60px" oninput="updateSummary();saveAll()"></div>`;
         } else {
@@ -199,7 +195,6 @@ function updateCompartments(r){
     });
     updateSummary();
 }
-
 function checkLoadType(){ const ac=document.getElementById('aircraft').value, lt=document.getElementById('loadType').value; if(!lt) return; if((ac.includes("B737") && lt==="ULD") || (["A330","A350","B777","B787"].includes(ac) && lt==="YIGMA")){ alert("Konfigürasyon uygun değil!"); document.getElementById('loadType').value=""; return; } updateCompartments(true); }
 function updateWaterUI() { const ac = document.getElementById('aircraft').value, ui = document.getElementById('waterUI'); ui.innerHTML = ""; if (!ac) return; if (ac === "A330" || ac === "A350") { let opts = ""; Object.keys(waterData[ac]).forEach(g => opts += `<option value="${g}">${g}</option>`); ui.innerHTML += `<div style="font-size:13px; font-weight:bold;">Tescil Grubu:</div><select id="tailGroup" style="width:100%" onchange="updateWaterRatios(); updateSummary(); saveAll()">${opts}</select>`; } ui.innerHTML += `<div style="font-size:13px; font-weight:bold; margin-top:8px;">Su Oranı:</div><select id="waterRatio" style="width:100%" onchange="updateSummary(); saveAll()"><option value="">Seç...</option></select>`; updateWaterRatios(); }
 function updateWaterRatios() { const ac = document.getElementById('aircraft').value, sel = document.getElementById('waterRatio'); if(!ac || !sel) return; let curr = sel.value; sel.innerHTML = '<option value="">Seç...</option>'; let list = (ac==="B787"||ac==="B777") ? ["1/8","2/8","3/8","4/8","5/8","6/8","7/8","FULL"] : (ac==="A350" ? ["1/10","2/10","3/10","4/10","5/10","6/10","7/10","8/10","9/10","FULL"] : ["25","50","75","FULL"]); list.forEach(o => { let el=document.createElement("option"); el.value=o; el.textContent=(o==="FULL"?o:"%"+o); sel.appendChild(el); }); if(curr) sel.value = curr; }
