@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<title>Load Control</title>
+<title>HLC - Pro Master V34.6 FINAL</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
 <style>
 html, body { overscroll-behavior-y: contain; }
@@ -15,15 +15,14 @@ input[type=number], input[type=text], select{padding:2px 6px; border:1px solid #
 .add-btn { background:#004080; color:#fff; border:none; border-radius:4px; width: 28px; height: 28px; cursor:pointer; font-weight: bold; font-size: 18px; display: flex; align-items: center; justify-content: center;}
 .midBadge { font-size: 0.82em; color: #d35400; font-weight: 800; flex-grow: 1; text-align: center; }
 .item-wrapper { display: flex; align-items: center; justify-content: space-between; background: #fff; padding: 3px 5px; border-radius: 6px; border: 1.8px solid #004080; width: 48.5%; box-sizing: border-box; margin-bottom: 5px; }
-.item-wrapper span { font-size: 12px; font-weight: 600; color: #444; }
-.eic-wrapper { background: #fff2cc !important; border-color: #f1c232 !important; width: 48.5% !important; margin-bottom: 8px; }
+.item-wrapper span { font-size: 11px; font-weight: 800; color: #004080; }
 .items-container { display: flex; flex-wrap: wrap; gap: 3%; margin-top: 5px; }
-.item-input { width: 65px !important; height: 26px !important; margin: 0 2px; font-weight: 900; border: 1.2px solid #777 !important; text-align: center;}
+.item-input { width: 60px !important; height: 26px !important; margin: 0 2px; font-weight: 900; border: 1.2px solid #777 !important; text-align: center;}
 .delete-btn { background: #cc0000; padding: 0 6px; height: 26px; border-radius: 4px; color: white; border:none; font-weight: bold;}
 .weight-display { font-size: 0.92em; color: #004080; font-weight: 900; background: #e6f0ff; padding: 4px 6px; border-radius: 5px; }
 
-/* Not Alanı Daha Da Yükseltildi (V34.2) */
-#note { width: 100%; height: 200px; margin-top: 15px; border-radius: 8px; padding: 10px; font-size: 14px; font-weight: bold; border: 1.5px solid #ccc; box-sizing: border-box; line-height: 1.4; resize: none;}
+/* Not Alanı 2 Satır Azaltıldı (160px) */
+#note { width: 100%; height: 160px; margin-top: 15px; border-radius: 8px; padding: 10px; font-size: 14px; font-weight: bold; border: 1.5px solid #ccc; box-sizing: border-box; line-height: 1.4; resize: none;}
 
 .summary{ background:#004080; color: white; padding:15px; border-radius: 12px; border: 2px solid #002b57; margin-top: 10px;}
 .action-btn { flex: 1; height: 38px; border-radius: 6px; border: none; color: white; font-weight: bold; font-size: 13px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px;}
@@ -35,14 +34,14 @@ input[type=number], input[type=text], select{padding:2px 6px; border:1px solid #
 .summary-label { color: rgba(255,255,255,0.7); width: 60px; font-weight: 400; font-size: 15px; }
 .summary-val { font-weight: 800; font-size: 17px; }
 .summary-divider { height: 1px; background: rgba(255,255,255,0.15); margin: 15px 0; }
-.total-payload { font-size: 1.05em; color: #ffeb3b; border-top: 1.5px solid rgba(255,255,255,0.2); padding-top: 12px; margin-top: 10px; text-align: center; width: 100%; font-weight: 800; }
+.total-payload { font-size: 1.1em; color: #ffeb3b; border-top: 1.5px solid rgba(255,255,255,0.2); padding-top: 12px; margin-top: 10px; text-align: center; width: 100%; font-weight: 900; }
 .content { display: none; padding: 10px; border-top: 1px solid #eee; }
-.add-row { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+.add-row { display: flex; align-items: center; gap: 8px; margin-top: 10px; font-weight: bold; }
 </style>
 </head>
 <body>
 
-<h1>Harekat Load Control</h1>
+<h1>HLC Pro Master V34.6</h1>
 
 <section class="flex">
     Uçak: <select id="aircraft" onchange="fullReset();checkLoadType();updateWaterUI();updateSummary();saveAll()" style="flex:1;">
@@ -58,11 +57,12 @@ input[type=number], input[type=text], select{padding:2px 6px; border:1px solid #
 
 <section><h3 onclick="toggleContent(this)">Water & Pantry</h3><div class="content"><div id="waterUI"></div><div class="flex" style="margin-top:12px;">Pantry: <input type="text" id="pantryInput" style="flex-grow:1" oninput="saveAll();updateSummary()"></div></div></section>
 <section><h3 onclick="toggleContent(this)">Bagaj Ortalamaları</h3><div class="content" style="display: block;"><div class="flex">By <input type="number" id="byAvg" style="width:70px" oninput="updateMix()"> Bc <input type="number" id="bcAvg" style="width:70px" oninput="updateMix()"> Mix <input type="number" id="mxAvg" style="width:70px" readonly></div></div></section>
+
 <div id="compartments"></div>
 
 <section class="summary">
-    <div class="summary-header"><h3>FINAL KONTROL</h3><div class="header-inputs">TC-<input type="text" id="tailInput" class="header-input" oninput="saveAll()"> / <input type="text" id="destInput" class="header-input" oninput="saveAll()"></div></div>
-    <div id="summary-list"></div><div class="summary-divider"></div><div id="summary-details"></div><div class="summary-divider"></div>
+    <div class="summary-header"><h3>FINAL KONTROL</h3><div class="header-inputs">TC-<input type="text" id="tailInput" class="header-input" placeholder="---" oninput="saveAll()"> / <input type="text" id="destInput" class="header-input" placeholder="---" oninput="saveAll()"></div></div>
+    <div id="summary-list"></div><div class="summary-divider"></div>
     <div class="summary-line"><span class="summary-label">WATER:</span><span class="summary-val" id="finalWater">-</span></div>
     <div class="summary-line"><span class="summary-label">PANTRY:</span><span class="summary-val" id="finalPantry">-</span></div>
     <div class="total-payload">TOTAL PAYLOAD: <span id="totalPayload">0</span> kg</div>
@@ -75,21 +75,21 @@ const waterData = { "A330": { "JNA, JNB (Grup A)": {"25": [-525,-2.6],"50": [-35
 const comps={A319:[1,4,5],A320:[1,3,4,5],A321:[1,2,3,4,5],"B737-800":[1,2,3,4],"B737-900":[1,2,3,4],A330:[1,2,3,4,5],A350:[1,2,3,4,5],B777:[1,2,3,4,5],B787:[1,2,3,4,5]};
 
 function updateSummary(){
-    let outHtml="", totalPayload=0, totalBags=0, totalULDCount=0, totalCargo=0, totalManuel=0;
+    let outHtml="", totalPayload=0;
     const ac=document.getElementById('aircraft').value, lt=document.getElementById('loadType').value;
     const byA=+document.getElementById('byAvg').value||0, bcA=+document.getElementById('bcAvg').value||0, mxA=+document.getElementById('mxAvg').value||0;
 
     document.querySelectorAll(".compartment").forEach(c=>{
         let cptW=0, cptBags=0, cptULDs=0;
         const cptNum = parseInt(c.dataset.num);
-        c.querySelectorAll(".by,.bc,.mx").forEach(i=>{ let v=+i.value||0; cptBags+=v; totalBags+=v; cptW+=v*(i.classList.contains('by')?byA:(i.classList.contains('bc')?bcA:mxA)); });
+        c.querySelectorAll(".by,.bc,.mx").forEach(i=>{ let v=+i.value||0; cptBags+=v; cptW+=v*(i.classList.contains('by')?byA:(i.classList.contains('bc')?bcA:mxA)); });
         c.querySelectorAll(".konteyner-item").forEach(k=>{
             const count=+k.querySelector("input").value||0;
-            cptW += 70 + (count * ((k.dataset.kind==="By")?byA:(k.dataset.kind==="Bc")?bcA:mxA)); totalBags += count; cptULDs++; totalULDCount++;
+            cptW += 70 + (count * ((k.dataset.kind.includes("By"))?byA:(k.dataset.kind.includes("Bc"))?bcA:mxA)); cptULDs++;
         });
-        const C = c.querySelectorAll(".local-item[data-kind='C']"); totalCargo += C.length;
+        const C = c.querySelectorAll(".local-item[data-type='C']");
         C.forEach(i=>cptW+=+i.querySelector("input").value||0);
-        const M = c.querySelectorAll(".local-item[data-kind='Mn']"); totalManuel += M.length;
+        const M = c.querySelectorAll(".local-item[data-type='Mn']");
         M.forEach(i=>cptW+=+i.querySelector("input").value||0);
         const eic=c.querySelector(".eic-input"); if(eic) cptW+=+eic.value||0;
         
@@ -116,11 +116,11 @@ function updateCompartments(r){
         const s=document.createElement("section"); s.className="compartment"; s.dataset.num=n;
         s.innerHTML=`<h3 onclick="toggleContent(this)">CPT ${n} <span class="midBadge"></span> <span class="weight-display">0 kg</span></h3>
         <div class="content">
-            ${n===eicT?`<div class="item-wrapper eic-wrapper"><span>EIC</span><input type="number" class="eic-input item-input" value="${eicV}" oninput="updateSummary();saveAll()"></div>`:''}
+            ${n===eicT?`<div class="item-wrapper eic-wrapper" style="background:#fff2cc; border:1.5px solid #f1c232;"><span>EIC</span><input type="number" class="eic-input item-input" value="${eicV}" oninput="updateSummary();saveAll()"></div>`:''}
             <div class="bag-section"></div>
-            <div class="add-row"><span>Cargo</span><button class="add-btn" onclick="addItem(this,'C')">+</button></div>
+            <div class="add-row">Cargo <button class="add-btn" onclick="addItem(this,'C')">+</button></div>
             <div class="items-container cargo-items"></div>
-            <div class="add-row"><span>Manuel</span><button class="add-btn" onclick="addItem(this,'Mn')">+</button></div>
+            <div class="add-row">Manuel <button class="add-btn" onclick="addItem(this,'Mn')">+</button></div>
             <div class="items-container manuel-items"></div>
         </div>`;
         const bSec = s.querySelector(".bag-section");
@@ -128,6 +128,27 @@ function updateCompartments(r){
         else bSec.innerHTML=`<div class="add-row"><strong>${ac.includes("B737")||ac.includes("A32")?"AKH":"AKE"}</strong> <select class="bagType"><option>By</option><option>Bc</option><option>Mix</option></select> <button class="add-btn" onclick="addBagaj(this)">+</button></div><div class="items-container uld-items"></div>`;
         container.appendChild(s);
     });
+}
+
+function addItem(btn, type, val=null){
+    const container = btn.parentElement.nextElementSibling;
+    const count = container.children.length + 1;
+    const label = type === 'C' ? `Cargo ${count}` : `Mn ${count}`;
+    const div = document.createElement("div"); div.className="local-item item-wrapper"; div.dataset.type = type;
+    div.innerHTML = `<span>${label}</span><input type="number" class="item-input" value="${val||''}" oninput="updateSummary();saveAll()"><button class="delete-btn" onclick="this.parentElement.remove(); updateSummary(); saveAll()">X</button>`;
+    container.appendChild(div);
+    updateSummary(); if(!val) saveAll();
+}
+
+function addBagaj(btn, val=null, kind=null){
+    const type = kind || btn.parentElement.querySelector('.bagType').value;
+    const container = btn.parentElement.nextElementSibling;
+    const count = container.children.length + 1;
+    const label = `${type} ${count}`;
+    const div = document.createElement("div"); div.className="konteyner-item item-wrapper"; div.dataset.kind = type;
+    div.innerHTML = `<span>${label}</span><input type="number" class="item-input" value="${val||''}" oninput="updateSummary();saveAll()"><button class="delete-btn" onclick="this.parentElement.remove(); updateSummary(); saveAll()">X</button>`;
+    container.appendChild(div);
+    updateSummary(); if(!val) saveAll();
 }
 
 function saveAll(){
@@ -148,11 +169,11 @@ function saveAll(){
         n:document.getElementById('note').value, wR:document.getElementById('waterRatio')?.value||"", tG:document.getElementById('tailGroup')?.value||"",
         tail:document.getElementById('tailInput').value, dest:document.getElementById('destInput').value, compsData
     };
-    localStorage.setItem("hlc_v34_final_stable", JSON.stringify(data));
+    localStorage.setItem("hlc_v34_final_stable_v3", JSON.stringify(data));
 }
 
 function loadAll(){
-    const raw=localStorage.getItem("hlc_v34_final_stable"); if(!raw) return;
+    const raw=localStorage.getItem("hlc_v34_final_stable_v3"); if(!raw) return;
     const d=JSON.parse(raw);
     document.getElementById('aircraft').value=d.ac; updateWaterUI();
     document.getElementById('loadType').value=d.lt; if(!d.ac||!d.lt) return;
@@ -173,17 +194,6 @@ function loadAll(){
     updateMix(); updateSummary();
 }
 
-function addItem(b,k,v=null){ 
-    const h=b.parentElement.nextElementSibling; const d=document.createElement("div"); d.className="local-item item-wrapper"; d.dataset.kind=k;
-    d.innerHTML=`<span>${k}</span><input type="number" class="item-input" value="${v||''}" oninput="updateSummary();saveAll()"><button class="delete-btn" onclick="this.parentElement.remove(); updateSummary(); saveAll()">X</button>`;
-    h.appendChild(d); updateSummary(); if(!v) saveAll();
-}
-function addBagaj(b,v=null,kind=null){
-    const t=kind || b.parentElement.querySelector('.bagType').value; const h=b.parentElement.nextElementSibling;
-    const d=document.createElement("div"); d.className="konteyner-item item-wrapper"; d.dataset.kind=t;
-    d.innerHTML=`<span>${t}</span><input type="number" class="item-input" value="${v||''}" oninput="updateSummary();saveAll()"><button class="delete-btn" onclick="this.parentElement.remove(); updateSummary(); saveAll()">X</button>`;
-    h.appendChild(d); updateSummary(); if(!v) saveAll();
-}
 function updateWaterSummary(){
     const ac=document.getElementById('aircraft').value, ratio=document.getElementById('waterRatio')?.value;
     let wDisp = "-";
@@ -200,7 +210,7 @@ function updateWaterRatios() { const ac = document.getElementById('aircraft').va
 function updateMix(){ const by=+document.getElementById('byAvg').value||0, bc=+document.getElementById('bcAvg').value||0; document.getElementById('mxAvg').value=(by+bc)>0?Math.round((by+bc)/2):""; updateSummary(); saveAll(); }
 function toggleContent(el){ const c=el.nextElementSibling; c.style.display=(c.style.display==='block'?'none':'block'); }
 function fullReset(){ document.getElementById('compartments').innerHTML=""; updateSummary(); }
-function clearStorage() { if(confirm("Tüm veriler silinsin mi?")) { localStorage.removeItem("hlc_v34_final_stable"); location.reload(); } }
+function clearStorage() { if(confirm("Tüm veriler silinsin mi?")) { localStorage.removeItem("hlc_v34_final_stable_v3"); location.reload(); } }
 window.onload=loadAll;
 </script>
 </body>
