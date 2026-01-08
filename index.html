@@ -14,25 +14,35 @@ h3{cursor:pointer; margin:4px 0; display:flex; align-items:center; font-size: 1.
 input[type=number], input[type=text], select{padding:2px 6px; border:1px solid #ccc; border-radius:4px; font-size: 15px; font-weight: bold; height: 34px; box-sizing: border-box;}
 .add-btn { background:#004080; color:#fff; border:none; border-radius:4px; width: 28px; height: 28px; cursor:pointer; font-weight: bold; font-size: 18px; display: flex; align-items: center; justify-content: center;}
 .midBadge { font-size: 0.82em; color: #004080; font-weight: 800; flex-grow: 1; text-align: center; }
+
 .item-wrapper { display: flex; align-items: center; justify-content: space-between; background: #fff; padding: 3px 5px; border-radius: 6px; border: 1.8px solid #004080; width: 48.5%; box-sizing: border-box; margin-bottom: 5px; }
 .item-wrapper span { font-size: 13px; font-weight: 600; color: #444; }
+
+/* EIC Kutusu Düzeltildi */
+.eic-wrapper { background: #fff2cc !important; border-color: #f1c232 !important; width: 48.5% !important; margin-bottom: 8px; }
+
 .items-container { display: flex; flex-wrap: wrap; gap: 3%; margin-top: 5px; }
-.item-input { width: 78px !important; height: 26px !important; margin: 0 2px; font-weight: 900; border: 1.2px solid #777 !important; text-align: center;}
+.item-input { width: 70px !important; height: 26px !important; margin: 0 2px; font-weight: 900; border: 1.2px solid #777 !important; text-align: center;}
 .delete-btn { background: #cc0000; padding: 0 6px; height: 26px; border-radius: 4px; color: white; border:none; font-weight: bold;}
 .weight-display { font-size: 0.92em; color: #004080; font-weight: 900; background: #e6f0ff; padding: 4px 6px; border-radius: 5px; }
+
 #note { width: 100%; height: 95px; margin-top: 15px; border-radius: 8px; padding: 8px; font-size: 14px; font-weight: bold; border: 1px solid #ccc; box-sizing: border-box; }
 .summary{ background:#004080; color: white; padding:15px; border-radius: 12px; border: 2px solid #002b57; margin-top: 10px;}
 .action-btn { flex: 1; height: 45px; border-radius: 8px; border: none; color: white; font-weight: bold; font-size: 15px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px;}
+
 .summary-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 8px; margin-bottom: 15px; }
 .summary-header h3 { color: white !important; margin: 0 !important; font-size: 16px !important; font-weight: 800 !important; }
 .header-inputs { display: flex; gap: 4px; align-items: center; font-size: 16px; font-weight: 800; }
-.header-input { width: 45px; background: rgba(255,255,255,0.1); border: none; border-bottom: 1.5px solid white; color: white; font-size: 16px; text-align: center; text-transform: uppercase; font-weight: 800; height: 25px !important; }
+.header-input { width: 55px; background: rgba(255,255,255,0.1); border: none; border-bottom: 1.5px solid white; color: white; font-size: 16px; text-align: center; text-transform: uppercase; font-weight: 800; height: 25px !important; }
+
 .summary-line { margin-bottom: 6px; font-size: 16px; display: flex; align-items: center; }
 .summary-label { color: rgba(255,255,255,0.7); width: 60px; font-weight: 400; font-size: 15px; }
 .summary-val { font-weight: 800; font-size: 17px; }
+
 .summary-divider { height: 1px; background: rgba(255,255,255,0.15); margin: 15px 0; }
 .summary-detail { font-size: 16px; color: #ffffff; margin-bottom: 10px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
 .total-payload { font-size: 1.05em; color: #ffeb3b; border-top: 1.5px solid rgba(255,255,255,0.2); padding-top: 12px; margin-top: 10px; text-align: center; width: 100%; font-weight: 800; }
+
 .content { display: none; padding: 10px; border-top: 1px solid #eee; }
 .add-row { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
 </style>
@@ -58,7 +68,7 @@ input[type=number], input[type=text], select{padding:2px 6px; border:1px solid #
     <div class="content">
         <div id="waterUI" style="display:flex; flex-direction:column; gap:8px;"></div>
         <div class="flex" style="margin-top:12px;">
-            Pantry Code: <input type="text" id="pantryInput" style="flex-grow:1" placeholder="Örn: A" oninput="saveAll();updateSummary()">
+            Pantry Code: <input type="text" id="pantryInput" style="flex-grow:1" oninput="saveAll();updateSummary()">
         </div>
     </div>
 </section>
@@ -80,18 +90,17 @@ input[type=number], input[type=text], select{padding:2px 6px; border:1px solid #
     <div class="summary-header">
         <h3>FINAL KONTROL</h3>
         <div class="header-inputs">
-            <span>TC-</span><input type="text" id="tailInput" placeholder="JRG" class="header-input" style="width:55px;" oninput="saveAll()">
+            <span>TC-</span><input type="text" id="tailInput" class="header-input" style="width:55px;" oninput="saveAll()">
             <span style="color:white; margin-left:5px;">/</span>
-            <input type="text" id="destInput" placeholder="IST" class="header-input" style="width:50px;" oninput="saveAll()">
+            <input type="text" id="destInput" class="header-input" style="width:50px;" oninput="saveAll()">
         </div>
     </div>
     
     <div id="summary-list"></div>
-    
     <div class="summary-divider"></div>
     <div id="summary-details"></div>
-    
     <div class="summary-divider"></div>
+
     <div class="summary-line">
         <span class="summary-label" style="width:80px">WATER:</span>
         <span class="summary-val" id="finalWater">-</span>
@@ -133,7 +142,6 @@ function updateSummary(){
         c.querySelectorAll(".local-item[data-kind='C']").forEach(i=>{ cptW+=+i.querySelector("input").value||0; totalCargo++; });
         c.querySelectorAll(".local-item[data-kind='Mn']").forEach(i=>{ cptW+=+i.querySelector("input").value||0; totalManuel++; });
         const eic=c.querySelector(".eic-input"); if(eic) cptW+=+eic.value||0;
-
         outHtml += `<div class="summary-line"><span class="summary-label">CPT ${c.dataset.num}</span> <span class="summary-val">${Math.round(cptW)} kg</span></div>`;
         totalPayload += cptW;
         if(c.querySelector(".weight-display")) c.querySelector(".weight-display").textContent=Math.round(cptW)+" kg";
@@ -148,26 +156,45 @@ function updateSummary(){
 
     document.getElementById('summary-list').innerHTML = outHtml;
     document.getElementById('summary-details').innerHTML = detailHtml;
-
     let wDisp = "-";
     const ratioSel = document.getElementById('waterRatio'), ratio = ratioSel ? ratioSel.value : "";
     if(ac && ratio && waterData[ac]){
         let v = (ac==="A330"||ac==="A350") ? (waterData[ac][document.getElementById('tailGroup').value]||{})[ratio] : waterData[ac][ratio];
-        if(v) { wDisp = (ratio==="FULL"?ratio:"%"+ratio)+" / "+v[0]+"kg / "+v[1]; }
+        if(v) wDisp = (ratio==="FULL"?ratio:"%"+ratio)+" / "+v[0]+"kg / "+v[1];
     }
-    
-    const pCode = document.getElementById('pantryInput').value || "-";
     document.getElementById('finalWater').textContent = wDisp;
-    document.getElementById('finalPantry').textContent = pCode;
-    // Sadece ambar yüklerinin toplamını (Total Payload) gösterir.
+    document.getElementById('finalPantry').textContent = document.getElementById('pantryInput').value || "-";
     document.getElementById('totalPayload').textContent = Math.round(totalPayload);
     updateCPTBadge();
+}
+
+function updateCompartments(r){
+    const container = document.getElementById('compartments'); if(r) container.innerHTML="";
+    const ac=document.getElementById('aircraft').value, lt=document.getElementById('loadType').value;
+    if(!ac || !lt) return;
+    let eicT=(ac.includes("B737"))?4:5, eicV=(ac.includes("B737")?23:(ac==="A350"?30:35));
+    comps[ac].forEach(n=>{
+        const s=document.createElement("section"); s.className="compartment"; s.dataset.num=n;
+        s.innerHTML=`<h3 onclick="toggleContent(this)">CPT ${n} <span class="midBadge"></span> <span class="weight-display">0 kg</span></h3>
+        <div class="content">
+            ${n===eicT?`<div class="item-wrapper eic-wrapper"><span>EIC</span><input type="number" class="eic-input item-input" value="${eicV}" oninput="updateSummary();saveAll()"></div>`:''}
+            <div class="bag-section"></div>
+            <div class="add-row"><span>Cargo</span><button class="add-btn" onclick="addItem(this,'C')">+</button></div>
+            <div class="items-container cargo-items"></div>
+            <div class="add-row"><span>Manuel</span><button class="add-btn" onclick="addItem(this,'Mn')">+</button></div>
+            <div class="items-container manuel-items"></div>
+        </div>`;
+        const bSec = s.querySelector(".bag-section");
+        if(lt==="YIGMA" || n===5) bSec.innerHTML=`<div class="flex">By<input type="number" class="by" style="width:60px" oninput="updateSummary();saveAll()"> Bc<input type="number" class="bc" style="width:60px" oninput="updateSummary();saveAll()"> Mix<input type="number" class="mx" style="width:60px" oninput="updateSummary();saveAll()"></div>`;
+        else bSec.innerHTML=`<div class="add-row"><strong>${ac.includes("B737")||ac.includes("A32")?"AKH":"AKE"}</strong> <select class="bagType"><option>By</option><option>Bc</option><option>Mix</option></select> <button class="add-btn" onclick="addBagaj(this)">+</button></div><div class="items-container uld-items"></div>`;
+        container.appendChild(s);
+    });
+    updateSummary();
 }
 
 function checkLoadType(){ const ac=document.getElementById('aircraft').value, lt=document.getElementById('loadType').value; if(!lt) return; if((ac.includes("B737") && lt==="ULD") || (["A330","A350","B777","B787"].includes(ac) && lt==="YIGMA")){ alert("Konfigürasyon uygun değil!"); document.getElementById('loadType').value=""; return; } updateCompartments(true); }
 function updateWaterUI() { const ac = document.getElementById('aircraft').value, ui = document.getElementById('waterUI'); ui.innerHTML = ""; if (!ac) return; if (ac === "A330" || ac === "A350") { let opts = ""; Object.keys(waterData[ac]).forEach(g => opts += `<option value="${g}">${g}</option>`); ui.innerHTML += `<div style="font-size:13px; font-weight:bold;">Tescil Grubu:</div><select id="tailGroup" style="width:100%" onchange="updateWaterRatios(); updateSummary(); saveAll()">${opts}</select>`; } ui.innerHTML += `<div style="font-size:13px; font-weight:bold; margin-top:8px;">Su Oranı:</div><select id="waterRatio" style="width:100%" onchange="updateSummary(); saveAll()"><option value="">Seç...</option></select>`; updateWaterRatios(); }
 function updateWaterRatios() { const ac = document.getElementById('aircraft').value, sel = document.getElementById('waterRatio'); if(!ac || !sel) return; let curr = sel.value; sel.innerHTML = '<option value="">Seç...</option>'; let list = (ac==="B787"||ac==="B777") ? ["1/8","2/8","3/8","4/8","5/8","6/8","7/8","FULL"] : (ac==="A350" ? ["1/10","2/10","3/10","4/10","5/10","6/10","7/10","8/10","9/10","FULL"] : ["25","50","75","FULL"]); list.forEach(o => { let el=document.createElement("option"); el.value=o; el.textContent=(o==="FULL"?o:"%"+o); sel.appendChild(el); }); if(curr) sel.value = curr; }
-function updateCompartments(r){ const container = document.getElementById('compartments'); if(r) container.innerHTML=""; const ac=document.getElementById('aircraft').value, lt=document.getElementById('loadType').value; if(!ac || !lt) return; let eicT=(ac.includes("B737"))?4:5, eicV=(ac.includes("B737")?23:(ac==="A350"?30:35)); comps[ac].forEach(n=>{ const s=document.createElement("section"); s.className="compartment"; s.dataset.num=n; s.innerHTML=`<h3 onclick="toggleContent(this)">CPT ${n} <span class="midBadge"></span> <span class="weight-display">0 kg</span></h3><div class="content">${n===eicT?`<div class="item-wrapper eic-wrapper"><span>EIC</span><input type="number" class="eic-input" value="${eicV}" oninput="updateSummary();saveAll()"></div>`:''}<div class="bag-section"></div><div class="add-row"><span>Cargo</span><button class="add-btn" onclick="addItem(this,'C')">+</button></div><div class="items-container cargo-items"></div><div class="add-row"><span>Manuel</span><button class="add-btn" onclick="addItem(this,'Mn')">+</button></div><div class="items-container manuel-items"></div></div>`; const bSec = s.querySelector(".bag-section"); if(lt==="YIGMA" || n===5) bSec.innerHTML=`<div class="flex">By<input type="number" class="by" style="width:60px" oninput="updateSummary();saveAll()"> Bc<input type="number" class="bc" style="width:60px" oninput="updateSummary();saveAll()"> Mix<input type="number" class="mx" style="width:60px" oninput="updateSummary();saveAll()"></div>`; else bSec.innerHTML=`<div class="add-row"><strong>${ac.includes("B737")||ac.includes("A32")?"AKH":"AKE"}</strong> <select class="bagType"><option>By</option><option>Bc</option><option>Mix</option></select> <button class="add-btn" onclick="addBagaj(this)">+</button></div><div class="items-container uld-items"></div>`; container.appendChild(s); }); updateSummary(); }
 function addItem(b,k,v=null){ const h=b.parentElement.nextElementSibling; const d=document.createElement("div"); d.className="local-item item-wrapper"; d.dataset.kind=k; d.innerHTML=`<span>${k} 1</span><input type="number" class="item-input" value="${v||''}" oninput="updateSummary();saveAll()"><button class="delete-btn" onclick="this.parentElement.remove(); renumberLocalItems(); updateSummary(); saveAll()">X</button>`; h.appendChild(d); renumberLocalItems(); updateSummary(); saveAll(); }
 function addBagaj(b,v=null){ const t=b.parentElement.querySelector('.bagType').value, h=b.parentElement.nextElementSibling; const d=document.createElement("div"); d.className="konteyner-item item-wrapper"; d.dataset.kind=t; d.innerHTML=`<span>${t} 1</span><input type="number" class="item-input" value="${v||''}" oninput="updateSummary();saveAll()"><button class="delete-btn" onclick="this.parentElement.remove(); renumberGlobalBags(); updateSummary(); saveAll()">X</button>`; h.appendChild(d); renumberGlobalBags(); updateSummary(); saveAll(); }
 function renumberGlobalBags(){ ['By','Bc','Mix'].forEach(kind => { let count = 1; document.querySelectorAll(`.konteyner-item[data-kind="${kind}"]`).forEach(el => { el.querySelector('span').textContent = `${kind} ${count++}`; }); }); }
