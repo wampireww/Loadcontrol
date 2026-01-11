@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<title>HLC - Pro Master V33.7</title>
+<title>HLC - Pro Master V33.8</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
 <style>
 html, body { overscroll-behavior-y: contain; }
@@ -24,22 +24,24 @@ input[type=number], input[type=text], select{padding:2px 6px; border:1px solid #
 #note { width: 100%; height: 80px; margin-top: 15px; border-radius: 8px; padding: 8px; font-size: 14px; font-weight: bold; border: 1px solid #ccc; box-sizing: border-box; }
 .summary{ background:#004080; color: white; padding:15px; border-radius: 12px; border: 2px solid #002b57; margin-top: 10px;}
 .action-btn { flex: 1; height: 36px; border-radius: 6px; border: none; color: white; font-weight: bold; font-size: 13px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px;}
-.summary-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 8px; margin-bottom: 15px; }
+.summary-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 8px; margin-bottom: 5px; cursor: pointer; }
 .summary-header h3 { color: white !important; margin: 0 !important; font-size: 16px !important; font-weight: 800 !important; }
 .header-inputs { display: flex; gap: 4px; align-items: center; font-size: 16px; font-weight: 800; }
 .header-input { width: 55px; background: rgba(255,255,255,0.1); border: none; border-bottom: 1.5px solid white; color: white; font-size: 16px; text-align: center; text-transform: uppercase; font-weight: 800; height: 25px !important; }
 .summary-line { margin-bottom: 6px; font-size: 16px; display: flex; align-items: center; }
-.summary-label { color: rgba(255,255,255,0.7); width: 60px; font-weight: 400; font-size: 15px; }
+.summary-label { color: rgba(255,255,255,0.7); width: 85px; font-weight: 400; font-size: 15px; }
 .summary-val { font-weight: 800; font-size: 17px; }
 .summary-divider { height: 1px; background: rgba(255,255,255,0.15); margin: 15px 0; }
-.total-payload { font-size: 1.05em; color: #ffeb3b; border-top: 1.5px solid rgba(255,255,255,0.2); padding-top: 12px; margin-top: 10px; text-align: center; width: 100%; font-weight: 800; }
+.total-payload { font-size: 1.1em; color: #ffeb3b; border-top: 1.5px solid rgba(255,255,255,0.2); padding-top: 12px; margin-top: 10px; text-align: center; width: 100%; font-weight: 800; }
 .content { display: none; padding: 10px; border-top: 1px solid #eee; }
 .add-row { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+.summary-detail { margin-bottom: 8px; font-size: 15px; line-height: 1.4; }
+.detail-sub { color: #ffeb3b; font-size: 13.5px; font-weight: 800; display: block; }
 </style>
 </head>
 <body>
 
-<h1>HLC Pro Master V33.7</h1>
+<h1>HLC Pro Master V33.8</h1>
 
 <section class="flex">
     Uçak: <select id="aircraft" onchange="fullReset();checkLoadType();updateWaterUI();updateSummary();saveAll()" style="flex:1;">
@@ -59,13 +61,28 @@ input[type=number], input[type=text], select{padding:2px 6px; border:1px solid #
 <div id="compartments"></div>
 
 <section class="summary">
-    <div class="summary-header"><h3>FINAL KONTROL</h3><div class="header-inputs"><span>TC-</span><input type="text" id="tailInput" class="header-input" style="width:55px;" oninput="saveAll()"><span style="color:white; margin-left:5px;">/</span><input type="text" id="destInput" class="header-input" style="width:50px;" oninput="saveAll()"></div></div>
-    <div id="summary-list"></div><div class="summary-divider"></div><div id="summary-details"></div><div class="summary-divider"></div>
-    <div class="summary-line"><span class="summary-label" style="width:80px">WATER:</span><span class="summary-val" id="finalWater">-</span></div>
-    <div class="summary-line"><span class="summary-label" style="width:80px">PANTRY:</span><span class="summary-val" id="finalPantry">-</span></div>
-    <div class="total-payload">TOTAL PAYLOAD: <span id="totalPayload">0</span> kg</div>
-    <textarea id="note" placeholder="Operasyon Notu Ekle..." oninput="saveAll()"></textarea>
-    <div class="flex" style="justify-content: space-between; margin-top: 15px; gap: 10px;"><button class="action-btn" onclick="saveAll()" style="background: #27ae60;">KAYDET</button><button class="action-btn" onclick="clearStorage()" style="background:#c0392b;">SIFIRLA</button></div>
+    <div class="summary-header" onclick="toggleSummaryContent()">
+        <h3>FINAL KONTROL ▼</h3>
+        <div class="header-inputs">
+            <span>TC-</span><input type="text" id="tailInput" class="header-input" oninput="saveAll()" onclick="event.stopPropagation()">
+            <span style="color:white; margin-left:5px;">/</span><input type="text" id="destInput" class="header-input" oninput="saveAll()" onclick="event.stopPropagation()">
+        </div>
+    </div>
+    
+    <div id="summary-main-content" style="display: none; margin-top:15px;">
+        <div id="summary-list"></div>
+        <div class="summary-divider"></div>
+        <div id="summary-details"></div>
+        <div class="summary-divider"></div>
+        <div class="summary-line"><span class="summary-label">WATER:</span><span class="summary-val" id="finalWater">-</span></div>
+        <div class="summary-line"><span class="summary-label">PANTRY:</span><span class="summary-val" id="finalPantry">-</span></div>
+        <div class="total-payload">TOTAL PAYLOAD: <span id="totalPayload">0</span> kg</div>
+        <textarea id="note" placeholder="Operasyon Notu Ekle..." oninput="saveAll()"></textarea>
+        <div class="flex" style="justify-content: space-between; margin-top: 15px; gap: 10px;">
+            <button class="action-btn" onclick="saveAll()" style="background: #27ae60;">KAYDET</button>
+            <button class="action-btn" onclick="clearStorage()" style="background:#c0392b;">SIFIRLA</button>
+        </div>
+    </div>
 </section>
 
 <script>
@@ -74,21 +91,30 @@ const comps={A319:[1,4,5],A320:[1,3,4,5],A321:[1,2,3,4,5],"B737-800":[1,2,3,4],"
 
 function updateSummary(){
     let outHtml="", totalPayload=0, totalBags=0, totalULDCount=0, totalCargo=0, totalManuel=0;
+    let wCargo=0, wManuel=0, cBy=0, cBc=0, cMx=0;
     const ac=document.getElementById('aircraft').value, lt=document.getElementById('loadType').value;
     const byA=+document.getElementById('byAvg').value||0, bcA=+document.getElementById('bcAvg').value||0, mxA=+document.getElementById('mxAvg').value||0;
 
     document.querySelectorAll(".compartment").forEach(c=>{
         let cptW=0, cptBags=0, cptULDs=0;
         const cptNum = parseInt(c.dataset.num);
-        c.querySelectorAll(".by,.bc,.mx").forEach(i=>{ let v=+i.value||0; cptBags+=v; totalBags+=v; cptW+=v*(i.classList.contains('by')?byA:(i.classList.contains('bc')?bcA:mxA)); });
+        c.querySelectorAll(".by,.bc,.mx").forEach(i=>{ 
+            let v=+i.value||0; cptBags+=v; totalBags+=v; 
+            if(i.classList.contains('by')) { cptW+=v*byA; cBy+=v; }
+            if(i.classList.contains('bc')) { cptW+=v*bcA; cBc+=v; }
+            if(i.classList.contains('mx')) { cptW+=v*mxA; cMx+=v; }
+        });
         c.querySelectorAll(".konteyner-item").forEach(k=>{
             const count=+k.querySelector("input").value||0;
-            cptW += 70 + (count * ((k.dataset.kind==="By")?byA:(k.dataset.kind==="Bc")?bcA:mxA)); totalBags+=count; cptULDs++; totalULDCount++;
+            const kind=k.dataset.kind;
+            cptW += 70 + (count * (kind==="By"?byA:(kind==="Bc"?bcA:mxA))); 
+            totalBags+=count; cptULDs++; totalULDCount++;
+            if(kind==="By") cBy+=count; else if(kind==="Bc") cBc+=count; else if(kind==="Mix") cMx+=count;
         });
         const C = c.querySelectorAll(".local-item[data-kind='C']"); totalCargo += C.length;
-        C.forEach(i=>cptW+=+i.querySelector("input").value||0);
+        C.forEach(i=>{ let val=+i.querySelector("input").value||0; cptW+=val; wCargo+=val; });
         const M = c.querySelectorAll(".local-item[data-kind='Mn']"); totalManuel += M.length;
-        M.forEach(i=>cptW+=+i.querySelector("input").value||0);
+        M.forEach(i=>{ let val=+i.querySelector("input").value||0; cptW+=val; wManuel+=val; });
         const eic=c.querySelector(".eic-input"); if(eic) cptW+=+eic.value||0;
         
         let res=[];
@@ -100,10 +126,20 @@ function updateSummary(){
         totalPayload += cptW;
         if(c.querySelector(".weight-display")) c.querySelector(".weight-display").textContent=Math.round(cptW)+" kg";
     });
-    let uldLabel = (["A330","A350","B777","B787"].includes(ac)) ? "AKE" : "AKH";
+
+    let uLabel = (["A330","A350","B777","B787"].includes(ac)) ? "AKE" : "AKH";
+    let bDet = "";
+    if(lt==="ULD") {
+        bDet = `<div class="summary-detail">📦 TOPLAM ${uLabel} BAGAJ: ${totalULDCount} <span class="detail-sub">(T: ${totalBags} / By: ${cBy} / Bc: ${cBc} / Mx: ${cMx})</span></div>`;
+    } else {
+        bDet = `<div class="summary-detail">📦 TOPLAM BAGAJ: ${totalBags} <span class="detail-sub">(By: ${cBy} / Bc: ${cBc} / Mx: ${cMx})</span></div>`;
+    }
+
     document.getElementById('summary-list').innerHTML = outHtml;
-    document.getElementById('summary-details').innerHTML = lt === "ULD" ? `<div class="summary-detail">📦 Toplam ${uldLabel}: ${totalULDCount} (${totalBags} Bagaj)</div>` : `<div class="summary-detail">📦 Toplam Bagaj: ${totalBags}</div>`;
-    document.getElementById('summary-details').innerHTML += `<div class="summary-detail">🚛 Toplam Kargo (C): ${totalCargo}</div><div class="summary-detail">🛠️ Toplam Manuel (Mn): ${totalManuel}</div>`;
+    document.getElementById('summary-details').innerHTML = bDet + 
+        `<div class="summary-detail">🚛 TOPLAM KARGO (C): ${totalCargo} Parça (${Math.round(wCargo)} kg)</div>` +
+        `<div class="summary-detail">🛠️ TOPLAM MANUEL (Mn): ${totalManuel} Parça (${Math.round(wManuel)} kg)</div>`;
+    
     document.getElementById('totalPayload').textContent = Math.round(totalPayload);
     updateWaterSummary();
 }
@@ -185,6 +221,7 @@ function updateWaterUI() { const ac = document.getElementById('aircraft').value,
 function updateWaterRatios() { const ac = document.getElementById('aircraft').value, sel = document.getElementById('waterRatio'); if(!ac || !sel) return; let curr = sel.value; sel.innerHTML = '<option value="">Seç...</option>'; let list = (ac==="B787"||ac==="B777") ? ["1/8","FULL"] : (ac==="A350" ? ["1/10","FULL"] : ["25","50","75","FULL"]); list.forEach(o => { let el=document.createElement("option"); el.value=o; el.textContent=(o==="FULL"?o:"%"+o); sel.appendChild(el); }); if(curr) sel.value = curr; }
 function updateMix(){ const by=+document.getElementById('byAvg').value||0, bc=+document.getElementById('bcAvg').value||0; document.getElementById('mxAvg').value=(by+bc)>0?Math.round((by+bc)/2):""; updateSummary(); saveAll(); }
 function toggleContent(el){ const c=el.nextElementSibling; c.style.display=(c.style.display==='block'?'none':'block'); }
+function toggleSummaryContent(){ const c=document.getElementById('summary-main-content'); c.style.display=(c.style.display==='block'?'none':'block'); }
 function fullReset(){ document.getElementById('compartments').innerHTML=""; updateSummary(); }
 function clearStorage() { if(confirm("Tüm veriler silinsin mi?")) { localStorage.removeItem("hlc_v33_final_storage"); location.reload(); } }
 window.onload=loadAll;
