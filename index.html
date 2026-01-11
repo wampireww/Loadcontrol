@@ -2,10 +2,9 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<title>HLC - Pro Master V33.8 (Güncel Su Tablosu)</title>
+<title>HLC - Pro Master V33.8</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
 <style>
-/* Stil kısmı aynı kalıyor, dokunulmadı */
 html, body { overscroll-behavior-y: contain; }
 body{font-family: 'Segoe UI', Arial, sans-serif; background:#f0f2f5; margin:5px; padding-bottom:150px; color: #333;}
 section{background:#fff; border:1px solid #ccc; border-radius:8px; padding:8px; margin-bottom:8px;}
@@ -49,6 +48,7 @@ input[type=number], input[type=text], select{padding:2px 6px; border:1px solid #
         <option value="">Seç</option>
         <option value="A319">A319</option><option value="A320">A320</option><option value="A321">A321</option>
         <option value="B737-800">B737-800</option><option value="B737-900">B737-900</option>
+        <option value="A330">A330</option><option value="A350">A350</option>
         <option value="B777">B777</option><option value="B787">B787</option>
     </select>
     Yükleme: <select id="loadType" onchange="checkLoadType();saveAll()" style="flex:1;">
@@ -87,12 +87,12 @@ input[type=number], input[type=text], select{padding:2px 6px; border:1px solid #
 </section>
 
 <script>
-// --- RESME GÖRE GÜNCELLENEN SU VERİLERİ (A330/A350 ŞİMDİLİK HARİÇ) ---
+// --- GÜNCEL SU VERİLERİ (330/350 HARİÇ) ---
 const waterData = {
     "B737-800": {"25": [-177,-2.5], "50": [-118,-1.7], "75": [-59,-0.8], "FULL": [0,0]},
     "B737-900": {"25": [-178,-2.7], "50": [-119,-1.8], "75": [-59,-0.9], "FULL": [0,0]},
     "A319": {"25": [-150,-1.7], "50": [-100,-1.1], "75": [-50,-0.6], "FULL": [0,0]},
-    "A320": {"25": [-150, 0.5], "50": [-100, 0.3], "75": [-50, 0.2], "FULL": [0,0]}, // Pozitif Index
+    "A320": {"25": [-150, 0.5], "50": [-100, 0.3], "75": [-50, 0.2], "FULL": [0,0]},
     "A321": {"25": [-150,-2.3], "50": [-100,-1.6], "75": [-50,-0.8], "FULL": [0,0]},
     "B787": {
         "1/8": [-924,-3.9], "2/8": [-792,-3.3], "3/8": [-660,-2.8], "4/8": [-528,-2.2], 
@@ -104,7 +104,7 @@ const waterData = {
     }
 };
 
-const comps={A319:[1,4,5],A320:[1,3,4,5],A321:[1,2,3,4,5],"B737-800":[1,2,3,4],"B737-900":[1,2,3,4],B777:[1,2,3,4,5],B787:[1,2,3,4,5]};
+const comps={A319:[1,4,5],A320:[1,3,4,5],A321:[1,2,3,4,5],"B737-800":[1,2,3,4],"B737-900":[1,2,3,4],A330:[1,2,3,4,5],A350:[1,2,3,4,5],B777:[1,2,3,4,5],B787:[1,2,3,4,5]};
 
 function updateSummary(){
     let outHtml="", totalPayload=0, totalBags=0, totalULDCount=0, totalCargo=0, totalManuel=0;
@@ -144,8 +144,9 @@ function updateSummary(){
         if(c.querySelector(".weight-display")) c.querySelector(".weight-display").textContent=Math.round(cptW)+" kg";
     });
 
-    let bDet = lt==="ULD" ? 
-        `<div class="summary-detail">📦 TOPLAM ${(["B777","B787"].includes(ac)?"AKE":"AKH")} BAGAJ: ${totalULDCount} <span class="detail-sub">(T: ${totalBags} / By: ${cBy} / Bc: ${cBc} / Mx: ${cMx})</span></div>` :
+    let uLabel = (["A330","A350","B777","B787"].includes(ac)) ? "AKE" : "AKH";
+    let bDet = (lt==="ULD") ? 
+        `<div class="summary-detail">📦 TOPLAM ${uLabel} BAGAJ: ${totalULDCount} <span class="detail-sub">(T: ${totalBags} / By: ${cBy} / Bc: ${cBc} / Mx: ${cMx})</span></div>` :
         `<div class="summary-detail">📦 TOPLAM BAGAJ: ${totalBags} <span class="detail-sub">(By: ${cBy} / Bc: ${cBc} / Mx: ${cMx})</span></div>`;
 
     document.getElementById('summary-list').innerHTML = outHtml;
@@ -161,7 +162,7 @@ function updateCompartments(r){
     const container = document.getElementById('compartments'); if(r) container.innerHTML="";
     const ac=document.getElementById('aircraft').value, lt=document.getElementById('loadType').value;
     if(!ac || !lt) return;
-    let eicT=(ac.includes("B737"))?4:5, eicV=(ac.includes("B737")?23:35);
+    let eicT=(ac.includes("B737"))?4:5, eicV=(ac.includes("B737")?23:(ac==="A350"?30:35));
     comps[ac].forEach(n=>{
         const s=document.createElement("section"); s.className="compartment"; s.dataset.num=n;
         s.innerHTML=`<h3 onclick="toggleContent(this)">CPT ${n} <span class="midBadge"></span> <span class="weight-display">0 kg</span></h3>
@@ -180,7 +181,7 @@ function updateCompartments(r){
     });
 }
 
-function checkLoadType(){ const ac=document.getElementById('aircraft').value, lt=document.getElementById('loadType').value; if(!lt) return; if((ac.includes("B737") && lt==="ULD") || (["B777","B787"].includes(ac) && lt==="YIGMA")){ alert("Konfigürasyon uygun değil!"); document.getElementById('loadType').value=""; return; } updateCompartments(true); updateSummary(); saveAll(); }
+function checkLoadType(){ const ac=document.getElementById('aircraft').value, lt=document.getElementById('loadType').value; if(!lt) return; if((ac.includes("B737") && lt==="ULD") || (["A330","A350","B777","B787"].includes(ac) && lt==="YIGMA")){ alert("Konfigürasyon uygun değil!"); document.getElementById('loadType').value=""; return; } updateCompartments(true); updateSummary(); saveAll(); }
 function addItem(b,k,v=null){ const h=b.parentElement.nextElementSibling; const d=document.createElement("div"); d.className="local-item item-wrapper"; d.dataset.kind=k; d.innerHTML=`<span>${k} 1</span><input type="number" class="item-input" value="${v||''}" oninput="updateSummary();saveAll()"><button class="delete-btn" onclick="this.parentElement.remove(); renumberLocalItems(); updateSummary(); saveAll()">X</button>`; h.appendChild(d); renumberLocalItems(); updateSummary(); saveAll(); }
 function addBagaj(b,v=null,kind=null){ const t=kind||b.parentElement.querySelector('.bagType').value, h=b.parentElement.nextElementSibling; const d=document.createElement("div"); d.className="konteyner-item item-wrapper"; d.dataset.kind=t; d.innerHTML=`<span>${t} 1</span><input type="number" class="item-input" value="${v||''}" oninput="updateSummary();saveAll()"><button class="delete-btn" onclick="this.parentElement.remove(); renumberGlobalBags(); updateSummary(); saveAll()">X</button>`; h.appendChild(d); renumberGlobalBags(); updateSummary(); saveAll(); }
 function renumberGlobalBags(){ ['By','Bc','Mix'].forEach(kind => { let count = 1; document.querySelectorAll(`.konteyner-item[data-kind="${kind}"]`).forEach(el => { el.querySelector('span').textContent = `${kind} ${count++}`; }); }); }
@@ -222,44 +223,32 @@ function loadAll(){
 function updateWaterSummary(){
     const ac=document.getElementById('aircraft').value, ratio=document.getElementById('waterRatio')?.value;
     let wDisp = "-";
-    if(ac && ratio && waterData[ac]){
+    if (ac === "A330" || ac === "A350") {
+        wDisp = "HENÜZ BİLGİ YOK";
+    } else if(ac && ratio && waterData[ac] && waterData[ac][ratio]){
         let v = waterData[ac][ratio];
-        if(v) wDisp = ratio + (ratio==="FULL"?"":" %") + " / " + v[0] + "kg / " + v[1];
+        wDisp = (ratio==="FULL"?ratio:ratio+(ac.includes("/")?"":"%")) + " / " + v[0] + "kg / " + v[1];
     }
     document.getElementById('finalWater').textContent = wDisp;
     document.getElementById('finalPantry').textContent = document.getElementById('pantryInput').value || "-";
 }
-
 function updateWaterUI() { 
     const ac = document.getElementById('aircraft').value, ui = document.getElementById('waterUI'); 
-    ui.innerHTML = ""; 
-    if (!ac) return; 
-    ui.innerHTML += `<div style="font-size:13px; font-weight:bold; margin-top:8px;">Su Oranı:</div><select id="waterRatio" style="width:100%" onchange="updateSummary(); saveAll()"><option value="">Seç...</option></select>`; 
-    updateWaterRatios(); 
+    ui.innerHTML = ""; if (!ac) return; 
+    if (ac === "A330" || ac === "A350") {
+        ui.innerHTML = `<div style="color:#cc0000; font-weight:bold; padding:10px; border:1px solid #cc0000; border-radius:4px; text-align:center;">HENÜZ SU BİLGİSİ YOK</div>`;
+    } else {
+        ui.innerHTML = `<div style="font-size:13px; font-weight:bold; margin-top:8px;">Su Oranı:</div><select id="waterRatio" style="width:100%" onchange="updateSummary(); saveAll()"><option value="">Seç...</option></select>`; 
+        updateWaterRatios(); 
+    }
 }
-
 function updateWaterRatios() { 
     const ac = document.getElementById('aircraft').value, sel = document.getElementById('waterRatio'); 
-    if(!ac || !sel) return; 
-    let curr = sel.value; 
-    sel.innerHTML = '<option value="">Seç...</option>'; 
-    
-    let list = [];
-    if(ac==="B787" || ac==="B777") {
-        list = ["1/8","2/8","3/8","4/8","5/8","6/8","7/8","FULL"];
-    } else {
-        list = ["25","50","75","FULL"];
-    }
-
-    list.forEach(o => { 
-        let el=document.createElement("option"); 
-        el.value=o; 
-        el.textContent=(o==="FULL"?o:"%"+o); 
-        sel.appendChild(el); 
-    }); 
+    if(!ac || !sel) return; let curr = sel.value; sel.innerHTML = '<option value="">Seç...</option>'; 
+    let list = (ac==="B787"||ac==="B777") ? ["1/8","2/8","3/8","4/8","5/8","6/8","7/8","FULL"] : ["25","50","75","FULL"];
+    list.forEach(o => { let el=document.createElement("option"); el.value=o; el.textContent=(o==="FULL"?o:(ac.includes("/")?o:o+"%")); sel.appendChild(el); }); 
     if(curr) sel.value = curr; 
 }
-
 function updateMix(){ const by=+document.getElementById('byAvg').value||0, bc=+document.getElementById('bcAvg').value||0; document.getElementById('mxAvg').value=(by+bc)>0?Math.round((by+bc)/2):""; updateSummary(); saveAll(); }
 function toggleContent(el){ const c=el.nextElementSibling; c.style.display=(c.style.display==='block'?'none':'block'); }
 function toggleSummaryContent(){ const c=document.getElementById('summary-main-content'); c.style.display=(c.style.display==='block'?'none':'block'); }
