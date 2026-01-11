@@ -87,7 +87,7 @@ input[type=number], input[type=text], select{padding:2px 6px; border:1px solid #
 </section>
 
 <script>
-// --- VERİ TABANI ---
+// --- TÜM SU VERİLERİ (GÜNCEL) ---
 const waterData = {
     "A330": {
         "JNA, JNB": {"25": [-525,-2.6], "50": [-350,-1.7], "75": [-175,-0.9], "FULL": [0,0]},
@@ -95,6 +95,14 @@ const waterData = {
         "JNF, JNG, JIL, JIM, JIN": {"25": [-788,-3.5], "50": [-525,-2.4], "75": [-263,-1.2], "FULL": [0,0]},
         "JNH, JNI,JNJ, JNK, JNL, JNM, JNN, JNO, JNP,JNR, JNS, JNT, JNU, JNV, JNY, JNZ, LNC, LND, LNE, LNF, LNG, JOA, JOB, JOC, JOD, JOE, JOF, JOG, JOH, JOJ,JOI, JOK, JOL, JOM, LOA, LOB, LOC, LOD, LOE, LOF, LOG, LOJ, LOK": {"25": [-525,-2.0], "50": [-350,-1.4], "75": [-175,-0.9], "FULL": [0,0]},
         "LON": {"25": [-788,-4.2], "50": [-525,-2.8], "75": [-263,-1.4], "FULL": [0,0]}
+    },
+    "A350": {
+        "LGA, LGB, LGC, LGD, LGE, LGF, LGG, LGH, ŞGM, LGN, LGO, LGP, LGI, LGJ, LGK, LGL": {
+            "1/10": [-954,-4.4], "2/10": [-848,-3.9], "3/10": [-742,-3.4], "4/10": [-636,-2.9], "5/10": [-530,-2.4], "6/10": [-424,-1.9], "7/10": [-318,-1.5], "8/10": [-212,-1.0], "9/10": [-106,-0.5], "FULL": [0,0]
+        },
+        "LGR, LGS, LGT, LGU, LGV, LGY, LGZ, LHA, LHB, LHC": {
+            "1/10": [-1350,-6.0], "2/10": [-1200,-5.4], "3/10": [-1050,-4.7], "4/10": [-900,-4.0], "5/10": [-750,-3.3], "6/10": [-600,-2.7], "7/10": [-450,-2.0], "8/10": [-300,-1.3], "9/10": [-150,-0.7], "FULL": [0,0]
+        }
     },
     "B737-800": {"25": [-177,-2.5], "50": [-118,-1.7], "75": [-59,-0.8], "FULL": [0,0]},
     "B737-900": {"25": [-178,-2.7], "50": [-119,-1.8], "75": [-59,-0.9], "FULL": [0,0]},
@@ -225,10 +233,8 @@ function loadAll(){
 function updateWaterSummary(){
     const ac=document.getElementById('aircraft').value, ratio=document.getElementById('waterRatio')?.value;
     let wDisp = "-";
-    if (ac === "A350") {
-        wDisp = "HENÜZ BİLGİ YOK";
-    } else if(ac && ratio && waterData[ac]){
-        let v = (ac==="A330") ? (waterData[ac][document.getElementById('tailGroup').value]||{})[ratio] : waterData[ac][ratio];
+    if(ac && ratio && waterData[ac]){
+        let v = (ac==="A330" || ac==="A350") ? (waterData[ac][document.getElementById('tailGroup').value]||{})[ratio] : waterData[ac][ratio];
         if(v) wDisp = (ratio==="FULL"?ratio:ratio+(ac.includes("/")?"":"%")) + " / " + v[0] + "kg / " + v[1];
     }
     document.getElementById('finalWater').textContent = wDisp;
@@ -238,15 +244,13 @@ function updateWaterSummary(){
 function updateWaterUI() { 
     const ac = document.getElementById('aircraft').value, ui = document.getElementById('waterUI'); 
     ui.innerHTML = ""; if (!ac) return; 
-    if (ac === "A350") {
-        ui.innerHTML = `<div style="color:#cc0000; font-weight:bold; padding:10px; border:1px solid #cc0000; border-radius:4px; text-align:center;">HENÜZ SU BİLGİSİ YOK</div>`;
-    } else if (ac === "A330") {
-        let opts = ""; Object.keys(waterData["A330"]).forEach(g => opts += `<option value="${g}">${g}</option>`);
+    if (ac === "A330" || ac === "A350") {
+        let opts = ""; Object.keys(waterData[ac]).forEach(g => opts += `<option value="${g}">${g}</option>`);
         ui.innerHTML += `<div style="font-size:13px; font-weight:bold;">Tescil Grubu:</div><select id="tailGroup" style="width:100%" onchange="updateWaterRatios(); updateSummary(); saveAll()">${opts}</select>`;
         ui.innerHTML += `<div style="font-size:13px; font-weight:bold; margin-top:8px;">Su Oranı:</div><select id="waterRatio" style="width:100%" onchange="updateSummary(); saveAll()"><option value="">Seç...</option></select>`;
         updateWaterRatios();
     } else {
-        ui.innerHTML = `<div style="font-size:13px; font-weight:bold; margin-top:8px;">Su Oranı:</div><select id="waterRatio" style="width:100%" onchange="updateSummary(); saveAll()"><option value="">Seç...</option></select>`; 
+        ui.innerHTML += `<div style="font-size:13px; font-weight:bold; margin-top:8px;">Su Oranı:</div><select id="waterRatio" style="width:100%" onchange="updateSummary(); saveAll()"><option value="">Seç...</option></select>`; 
         updateWaterRatios(); 
     }
 }
@@ -254,7 +258,11 @@ function updateWaterUI() {
 function updateWaterRatios() { 
     const ac = document.getElementById('aircraft').value, sel = document.getElementById('waterRatio'); 
     if(!ac || !sel) return; let curr = sel.value; sel.innerHTML = '<option value="">Seç...</option>'; 
-    let list = (ac==="B787"||ac==="B777") ? ["1/8","2/8","3/8","4/8","5/8","6/8","7/8","FULL"] : ["25","50","75","FULL"];
+    let list = [];
+    if(ac==="B787"||ac==="B777") list = ["1/8","2/8","3/8","4/8","5/8","6/8","7/8","FULL"];
+    else if(ac==="A350") list = ["1/10","2/10","3/10","4/10","5/10","6/10","7/10","8/10","9/10","FULL"];
+    else list = ["25","50","75","FULL"];
+    
     list.forEach(o => { let el=document.createElement("option"); el.value=o; el.textContent=(o==="FULL"?o:(ac.includes("/")?o:o+"%")); sel.appendChild(el); }); 
     if(curr) sel.value = curr; 
 }
