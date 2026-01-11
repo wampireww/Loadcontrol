@@ -2,8 +2,9 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<title>HLC - Pro Master V33.8</title>
+<title>Load Control</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
 html, body { overscroll-behavior-y: contain; }
 body{font-family: 'Segoe UI', Arial, sans-serif; background:#f0f2f5; margin:5px; padding-bottom:150px; color: #333;}
@@ -41,7 +42,7 @@ input[type=number], input[type=text], select{padding:2px 6px; border:1px solid #
 </head>
 <body>
 
-<h1>HLC Pro Master V33.8</h1>
+<h1>Harekat Load Control</h1>
 
 <section class="flex">
     Uçak: <select id="aircraft" onchange="fullReset();checkLoadType();updateWaterUI();updateSummary();saveAll()" style="flex:1;">
@@ -61,7 +62,7 @@ input[type=number], input[type=text], select{padding:2px 6px; border:1px solid #
 
 <div id="compartments"></div>
 
-<section class="summary">
+<section id="captureZone" class="summary">
     <div class="summary-header" onclick="toggleSummaryContent()">
         <h3>FINAL KONTROL ▼</h3>
         <div class="header-inputs">
@@ -79,10 +80,12 @@ input[type=number], input[type=text], select{padding:2px 6px; border:1px solid #
         <div class="summary-line"><span class="summary-label">PANTRY:</span><span class="summary-val" id="finalPantry">-</span></div>
         <div class="total-payload">TOTAL PAYLOAD: <span id="totalPayload">0</span> kg</div>
         <textarea id="note" placeholder="Operasyon Notu Ekle..." oninput="saveAll()"></textarea>
+        
         <div class="flex" style="justify-content: space-between; margin-top: 15px; gap: 10px;">
             <button class="action-btn" onclick="saveAll()" style="background: #27ae60;">KAYDET</button>
             <button class="action-btn" onclick="clearStorage()" style="background:#c0392b;">SIFIRLA</button>
         </div>
+        <button id="shotBtn" class="action-btn" onclick="takeSnapshot()" style="background: #f39c12; width: 100%; margin-top: 10px; display: block;">EKRAN GÖRÜNTÜSÜ AL</button>
     </div>
 </section>
 
@@ -122,7 +125,7 @@ function updateSummary(){
     const byA=+document.getElementById('byAvg').value||0, bcA=+document.getElementById('bcAvg').value||0, mxA=+document.getElementById('mxAvg').value||0;
 
     document.querySelectorAll(".compartment").forEach(c=>{
-        let cptW=0, cptBags=0, cptULDs=0;
+        let cptW=0, cptBags=0, cptULDs=0, cptCargoW=0, cptManuelW=0;
         const cptNum = parseInt(c.dataset.num);
         c.querySelectorAll(".by,.bc,.mx").forEach(i=>{ 
             let v=+i.value||0; cptBags+=v; totalBags+=v; 
@@ -138,17 +141,34 @@ function updateSummary(){
             if(kind==="By") cBy+=count; else if(kind==="Bc") cBc+=count; else if(kind==="Mix") cMx+=count;
         });
         const C = c.querySelectorAll(".local-item[data-kind='C']"); totalCargo += C.length;
-        C.forEach(i=>{ let val=+i.querySelector("input").value||0; cptW+=val; wCargo+=val; });
+        C.forEach(i=>{ let val=+i.querySelector("input").value||0; cptW+=val; wCargo+=val; cptCargoW+=val; });
         const M = c.querySelectorAll(".local-item[data-kind='Mn']"); totalManuel += M.length;
-        M.forEach(i=>{ let val=+i.querySelector("input").value||0; cptW+=val; wManuel+=val; });
+        M.forEach(i=>{ let val=+i.querySelector("input").value||0; cptW+=val; wManuel+=val; cptManuelW+=val; });
         const eic=c.querySelector(".eic-input"); if(eic) cptW+=+eic.value||0;
         
+        // Final Kontrol satırındaki parantez içi mantığı
         let res=[];
+        let isBulk = (lt === "YIGMA" || cptNum === 5); // Yığma yükleme veya CPT 5 ise Bulk muamelesi yap
+
+        // Bagaj: Her zaman adet (B 10)
         if(cptNum===5) { if(cptBags>0) res.push("B "+cptBags); } 
         else { if(lt==="ULD" && cptULDs>0) res.push("B "+cptULDs); else if(lt==="YIGMA" && cptBags>0) res.push("B "+cptBags); }
-        if(C.length) res.push("C "+C.length); if(M.length) res.push("Mn "+M.length);
+
+        // Kargo & Manuel: ULD ise adet (C 1), Yığma (Bulk) ise toplam kilo (C 500)
+        if(C.length) {
+            if(isBulk) res.push("C "+Math.round(cptCargoW));
+            else res.push("C "+C.length);
+        }
+        if(M.length) {
+            if(isBulk) res.push("Mn "+Math.round(cptManuelW));
+            else res.push("Mn "+M.length);
+        }
+
         c.querySelector('.midBadge').textContent = res.join(" / ");
-        outHtml += `<div class="summary-line"><span class="summary-label">CPT ${cptNum}</span> <span class="summary-val">${Math.round(cptW)} kg</span></div>`;
+        
+        let detailText = res.length > 0 ? ` <span style="font-size: 0.8em; opacity: 0.9; font-weight: 400;">(${res.join(" / ")})</span>` : "";
+        outHtml += `<div class="summary-line"><span class="summary-label">CPT ${cptNum}</span> <span class="summary-val">${Math.round(cptW)} kg${detailText}</span></div>`;
+        
         totalPayload += cptW;
         if(c.querySelector(".weight-display")) c.querySelector(".weight-display").textContent=Math.round(cptW)+" kg";
     });
@@ -165,6 +185,35 @@ function updateSummary(){
     
     document.getElementById('totalPayload').textContent = Math.round(totalPayload);
     updateWaterSummary();
+}
+
+// --- EKRAN GÖRÜNTÜSÜ ALMA FONKSİYONU ---
+function takeSnapshot() {
+    const element = document.getElementById('captureZone');
+    const noteArea = document.getElementById('note');
+    const buttons = document.querySelectorAll('.summary .flex, #shotBtn');
+    
+    // Görüntüde görünmemesini istediğimiz yerleri geçici gizle
+    noteArea.placeholder = ""; // Cursor'ı gizlemek için
+    buttons.forEach(b => b.style.visibility = 'hidden');
+
+    html2canvas(element, {
+        backgroundColor: '#004080',
+        scale: 2,
+        logging: false,
+        useCORS: true
+    }).then(canvas => {
+        const imageDataURL = canvas.toDataURL('image/png');
+        const link = document.createElement('a');
+        const tail = document.getElementById('tailInput').value || 'RAPOR';
+        link.download = `HLC_${tail}_${new Date().getHours()}${new Date().getMinutes()}.png`;
+        link.href = imageDataURL;
+        link.click();
+
+        // Her şeyi eski haline getir
+        noteArea.placeholder = "Operasyon Notu Ekle...";
+        buttons.forEach(b => b.style.visibility = 'visible');
+    });
 }
 
 function updateCompartments(r){
