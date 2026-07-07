@@ -1,11 +1,7 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-<!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LX9XPDH2EN"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-LX9XPDH2EN"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
@@ -52,6 +48,13 @@ input[type=number], input[type=text], select{padding:2px 6px; border:1px solid #
 .detail-sub { color: #ffeb3b; font-size: 13.5px; font-weight: 800; display: block; }
 .btn-container { display: flex; justify-content: space-between; margin-top: 15px; gap: 10px; }
 .dual-leg-section { display: flex; justify-content: center; align-items: center; background: #fafafa; padding: 6px; font-size: 13.5px; font-weight: 600; color: #555; }
+
+/* İkram Alanı Düzenlenmiş Ortalanmış Satır Yapısı ve Eşitlenmiş Font */
+.catering-wrapper { display: flex; align-items: center; justify-content: space-between; background: #fff; padding: 3px 5px; border-radius: 6px; border: 1.8px solid #004080; width: 48.5%; box-sizing: border-box; margin-bottom: 5px; gap: 4px; }
+.catering-wrapper span { font-size: 13px; font-weight: 600; color: #444; }
+.catering-inputs-combined { display: flex; align-items: center; gap: 2px; justify-content: center; flex-grow: 1; }
+.catering-input-box { width: 45px !important; height: 26px !important; font-weight: 900; border: 1.2px solid #777 !important; text-align: center; font-size: 14px; margin: 0; padding: 0; box-sizing: border-box; }
+.catering-slash { font-weight: bold; color: #004080; font-size: 14px; margin: 0 1px; line-height: 26px; }
 </style>
 </head>
 <body>
@@ -81,7 +84,7 @@ input[type=number], input[type=text], select{padding:2px 6px; border:1px solid #
 <section><h3 onclick="toggleContent(this)">Water & Pantry</h3><div class="content"><div id="waterUI" style="display:flex; flex-direction:column; gap:8px;"></div><div class="flex" style="margin-top:12px;">Pantry Code: <input type="text" id="pantryInput" style="flex-grow:1" oninput="saveAll();updateSummary()"></div></div></section>
 <section>
     <h3 onclick="toggleContent(this)">Bagaj Ortalamaları</h3>
-    <div class="content" style="display: block;">
+    <div class="content">
         <div id="singleLegAvgContainer" class="flex" style="font-weight: bold; justify-content: space-between;">
             <div>By <input type="number" id="byAvg" style="width:78px" oninput="updateMix()"></div>
             <div>Bc <input type="number" id="bcAvg" style="width:78px" oninput="updateMix()"></div>
@@ -164,7 +167,7 @@ const comps={A319:[1,4,5],A320:[1,3,4,5],A321:[1,2,3,4,5],"B737-800":[1,2,3,4],"
 function toggleDualLegMode() {
     const checkbox = document.getElementById('dualLegCheckbox');
     const isChecked = checkbox.checked;
-    
+
     const hasData = document.getElementById('pantryInput').value !== "" || 
                     document.getElementById('tailInput').value !== "" ||
                     document.getElementById('destInput').value !== "" ||
@@ -186,7 +189,7 @@ function toggleDualLegMode() {
         document.getElementById('singleLegAvgContainer').style.display = 'flex';
         document.getElementById('dualLegAvgContainer').style.display = 'none';
     }
-    
+
     document.getElementById('pantryInput').value = "";
     document.getElementById('tailInput').value = "";
     document.getElementById('destInput').value = "";
@@ -200,7 +203,7 @@ function toggleDualLegMode() {
     document.getElementById('byAvgB2').value = "";
     document.getElementById('bcAvgB2').value = "";
     document.getElementById('mxAvgB2').value = "";
-    
+
     updateCompartments(true);
     updateSummary();
     saveAll();
@@ -208,8 +211,8 @@ function toggleDualLegMode() {
 
 function updateSummary(){
     let outHtml="", totalPayload=0, totalCargo=0, totalManuel=0, totalPosta=0, totalIkram=0;
-    let wCargo=0, wManuel=0, wPosta=0, wIkram=0;
-    
+    let wCargo=0, wManuel=0, wPosta=0, wIkram=0, wKuruBuz=0;
+
     let totalBags=0, totalULDCount=0, cBy=0, cBc=0, cMx=0, cX=0, wX=0;
     let b1Bags=0, b1ULDCount=0, b1By=0, b1Bc=0, b1Mx=0;
     let b2Bags=0, b2ULDCount=0, b2By=0, b2Bc=0, b2Mx=0;
@@ -297,11 +300,19 @@ function updateSummary(){
         C.forEach(i=>{ let val=+i.querySelector("input").value||0; cptW+=val; wCargo+=val; cptCargoW+=val; });
         const M = c.querySelectorAll(".local-item[data-kind='Mn']"); totalManuel += M.length;
         M.forEach(i=>{ let val=+i.querySelector("input").value||0; cptW+=val; wManuel+=val; cptManuelW+=val; });
-        
         const P = c.querySelectorAll(".local-item[data-kind='M']"); totalPosta += P.length;
         P.forEach(i=>{ let val=+i.querySelector("input").value||0; cptW+=val; wPosta+=val; cptPostaW+=val; });
+        
         const IK = c.querySelectorAll(".local-item[data-kind='İ']"); totalIkram += IK.length;
-        IK.forEach(i=>{ let val=+i.querySelector("input").value||0; cptW+=val; wIkram+=val; cptIkramW+=val; });
+        IK.forEach(i=>{ 
+            let inputs = i.querySelectorAll(".catering-input-box");
+            let valIkr = +inputs[0].value||0; 
+            let valIce = +inputs[1].value||0;
+            cptW += valIkr; 
+            wIkram += valIkr; 
+            wKuruBuz += valIce; 
+            cptIkramW += valIkr; 
+        });
 
         const eic=c.querySelector(".eic-input"); if(eic) cptW+=+eic.value||0;
 
@@ -346,7 +357,7 @@ function updateSummary(){
         const totalCombinedMx = b1Mx + b2Mx;
 
         if(lt==="ULD") {
-            bDet = `<div class="summary-detail" style="border-bottom: 1px dashed rgba(255,255,255,0.2); padding-bottom: 6px; margin-bottom: 6px;">📦 TOPLAM ${uLabel} BAGAJ (B1+B2): ${totalULDCount} <span class="detail-sub">(T: ${totalCombinedBags} / By: ${totalCombinedBy} / Bc: ${totalCombinedBc} / Mx: ${totalCombinedMx})</span></div>` +
+            bDet = `<div class="summary-detail" style="border-bottom: 1px dashed rgba(255,255,255,0.2); padding-bottom: 6px; margin-bottom: 6px;">📦 TOPLAM ${uLabel} BAGAJ (B1+B2): ${totalULDCount} <span class="detail-sub">(T: ${totalCombinedBags} / By: ${totalCombinedBy} / Bc: ${totalCombinedBc} / Mx: ${totalCombinedBc})</span></div>` +
                    `<div class="summary-detail">📦 TOPLAM ${uLabel} BAGAJ (B1): ${b1ULDCount} <span class="detail-sub">(T: ${b1Bags} / By: ${b1By} / Bc: ${b1Bc} / Mx: ${b1Mx})</span></div>` +
                    `<div class="summary-detail">📦 TOPLAM ${uLabel} BAGAJ (B2): ${b2ULDCount} <span class="detail-sub">(T: ${b2Bags} / By: ${b2By} / Bc: ${b2Bc} / Mx: ${b2Mx})</span></div>`;
         } else {
@@ -356,18 +367,29 @@ function updateSummary(){
         }
     }
 
-    let xDet = "";
-    if (lt === "ULD") {
-        xDet = `<div class="summary-detail">📥 TOPLAM BOŞ ${uLabel} (X): ${cX} Parça (${Math.round(wX)} kg)</div>`;
+    document.getElementById('summary-list').innerHTML = outHtml;
+    
+    // SIFIRDAN BÜYÜKSE GÖSTERME (DİNAMİK RAPOR MANTIĞI)
+    let detailsHtml = bDet; // Bagajlar her zaman kalıyor
+    
+    if (totalCargo > 0) {
+        detailsHtml += `<div class="summary-detail" style="margin-top: 10px;">🚛 TOPLAM KARGO (C): ${totalCargo} Parça (${Math.round(wCargo)} kg)</div>`;
+    }
+    if (totalManuel > 0) {
+        detailsHtml += `<div class="summary-detail">🛠️ TOPLAM MANUEL (Mn): ${totalManuel} Parça (${Math.round(wManuel)} kg)</div>`;
+    }
+    if (totalPosta > 0) {
+        detailsHtml += `<div class="summary-detail">✉️ TOPLAM POSTA (M): ${totalPosta} Parça (${Math.round(wPosta)} kg)</div>`;
+    }
+    if (totalIkram > 0) {
+        let ikramFinalValue = wKuruBuz > 0 ? `${Math.round(wIkram)} / ${wKuruBuz.toFixed(1)}` : `${Math.round(wIkram)}`;
+        detailsHtml += `<div class="summary-detail">🍽️ TOPLAM İKRAM (İ): ${totalIkram} Parça (${ikramFinalValue})</div>`;
+    }
+    if (lt === "ULD" && cX > 0) {
+        detailsHtml += `<div class="summary-detail">📥 TOPLAM BOŞ ${uLabel} (X): ${cX} Parça (${Math.round(wX)} kg)</div>`;
     }
 
-    document.getElementById('summary-list').innerHTML = outHtml;
-    document.getElementById('summary-details').innerHTML = bDet + 
-        `<div class="summary-detail" style="margin-top: 10px;">🚛 TOPLAM KARGO (C): ${totalCargo} Parça (${Math.round(wCargo)} kg)</div>` +
-        `<div class="summary-detail">🛠️ TOPLAM MANUEL (Mn): ${totalManuel} Parça (${Math.round(wManuel)} kg)</div>` +
-        `<div class="summary-detail">✉️ TOPLAM POSTA (M): ${totalPosta} Parça (${Math.round(wPosta)} kg)</div>` +
-        `<div class="summary-detail">🍽️ TOPLAM İKRAM (İ): ${totalIkram} Parça (${Math.round(wIkram)} kg)</div>` + xDet;
-
+    document.getElementById('summary-details').innerHTML = detailsHtml;
     document.getElementById('totalPayload').textContent = Math.round(totalPayload);
     updateWaterSummary();
 }
@@ -394,13 +416,12 @@ function updateCompartments(r){
     const ac=document.getElementById('aircraft').value, lt=document.getElementById('loadType').value;
     if(!ac || !lt) return;
     const isDual = document.getElementById('dualLegCheckbox').checked;
-    
-    // A330 için 58, A350 için 30, B737 için 23, diğerleri için 35
+
     let eicT=(ac.includes("B737"))?4:5, eicV=(ac.includes("B737")?23:(ac==="A350"?30:(ac==="A330"?58:35)));
-    
+
     comps[ac].forEach(n=>{
         const s=document.createElement("section"); s.className="compartment"; s.dataset.num=n;
-        
+
         let showMailAndCatering = (lt === "YIGMA" || n === 5);
 
         s.innerHTML=`<h3 onclick="toggleContent(this)">CPT ${n} <span class="midBadge"></span> <span class="weight-display">0 kg</span></h3>
@@ -414,10 +435,10 @@ function updateCompartments(r){
             ${showMailAndCatering ? `
             <div class="add-row"><span>Posta</span><button class="add-btn" onclick="addItem(this,'M')">+</button></div>
             <div class="items-container posta-items"></div>
-            <div class="add-row"><span>İkram</span><button class="add-btn" onclick="addItem(this,'İ')">+</button></div>
+            <div class="add-row"><span>İkram</span><button class="add-btn" onclick="addCateringItem(this)">+</button></div>
             <div class="items-container ikram-items"></div>` : ''}
         </div>`;
-        
+
         const bSec = s.querySelector(".bag-section");
         let isBulk = (lt==="YIGMA" || n===5);
 
@@ -441,13 +462,33 @@ function updateCompartments(r){
 function checkLoadType(){ const ac=document.getElementById('aircraft').value, lt=document.getElementById('loadType').value; if(!lt) return; if((ac.includes("B737") && lt==="ULD") || (["A330","A350","B777","B787"].includes(ac) && lt==="YIGMA")){ alert("Konfigürasyon uygun değil!"); document.getElementById('loadType').value=""; return; } updateCompartments(true); updateSummary(); saveAll(); }
 function addItem(b,k,v=null){ const h=b.parentElement.nextElementSibling; const d=document.createElement("div"); d.className="local-item item-wrapper"; d.dataset.kind=k; d.innerHTML=`<span>${k} 1</span><input type="number" class="item-input" value="${v||''}" oninput="updateSummary();saveAll()"><button class="delete-btn" onclick="this.parentElement.remove(); renumberLocalItems(); updateSummary(); saveAll()">X</button>`; h.appendChild(d); renumberLocalItems(); updateSummary(); saveAll(); }
 
+function addCateringItem(b, vIkr=null, vIce=null) {
+    const h = b.parentElement.nextElementSibling; 
+    const d = document.createElement("div"); 
+    d.className = "local-item catering-wrapper"; 
+    d.dataset.kind = "İ"; 
+    d.innerHTML = `
+        <span>İ 1</span>
+        <div class="catering-inputs-combined">
+            <input type="number" class="catering-input-box" value="${vIkr||''}" oninput="updateSummary();saveAll()">
+            <span class="catering-slash">/</span>
+            <input type="number" class="catering-input-box" value="${vIce||''}" oninput="updateSummary();saveAll()">
+        </div>
+        <button class="delete-btn" onclick="this.parentElement.remove(); renumberLocalItems(); updateSummary(); saveAll()">X</button>
+    `; 
+    h.appendChild(d); 
+    renumberLocalItems(); 
+    updateSummary(); 
+    saveAll(); 
+}
+
 function addBagaj(b,v=null,kind=null,leg=null){ 
     const isDual = document.getElementById('dualLegCheckbox').checked;
     const t=kind||b.parentElement.querySelector('.bagType').value;
     const selectedLeg = leg || (isDual ? b.parentElement.querySelector('.legSelect').value : "B1");
     const h=b.parentElement.nextElementSibling; const d=document.createElement("div"); d.className="konteyner-item item-wrapper"; d.dataset.kind=t; d.dataset.leg=selectedLeg;
     let labelHtml = isDual ? `<span style="color:#cc0000; font-weight:bold;">${selectedLeg}/</span><span>X 1</span>` : `<span>X 1</span>`;
-    
+
     if (t === "X") {
         d.innerHTML=`<div style="display:flex; align-items:center;">${labelHtml}</div><input type="text" class="item-input" value="Boş" readonly style="background:#eee; cursor:not-allowed; border:1px solid #aaa !important;"><button class="delete-btn" onclick="this.parentElement.remove(); renumberGlobalBags(); updateSummary(); saveAll()">X</button>`;
     } else {
@@ -475,9 +516,14 @@ function saveAll(){
         const cargo = []; c.querySelectorAll(".cargo-items .item-input").forEach(i => cargo.push(i.value));
         const manuel = []; c.querySelectorAll(".manuel-items .item-input").forEach(i => manuel.push(i.value));
         const posta = []; c.querySelectorAll(".posta-items .item-input").forEach(i => posta.push(i.value));
-        const ikram = []; c.querySelectorAll(".ikram-items .item-input").forEach(i => ikram.push(i.value));
-        const ulds = []; c.querySelectorAll(".uld-items .konteyner-item").forEach(k => ulds.push({k: k.dataset.kind, v: k.querySelector("input").value, leg: k.dataset.leg}));
         
+        const ikram = []; c.querySelectorAll(".ikram-items .local-item").forEach(i => {
+            let inputs = i.querySelectorAll(".catering-input-box");
+            ikram.push({ikr: inputs[0].value, ice: inputs[1].value});
+        });
+        
+        const ulds = []; c.querySelectorAll(".uld-items .konteyner-item").forEach(k => ulds.push({k: k.dataset.kind, v: k.querySelector("input").value, leg: k.dataset.leg}));
+
         compsData.push({ 
             n: c.dataset.num, cargo, manuel, posta, ikram, ulds, 
             bulk: { by: c.querySelector(".by")?.value||"", bc: c.querySelector(".bc")?.value||"", mx: c.querySelector(".mx")?.value||"" }, 
@@ -488,7 +534,7 @@ function saveAll(){
             eic: c.querySelector(".eic-input")?.value||"" 
         });
     });
-    
+
     const data={ 
         isDual: document.getElementById('dualLegCheckbox').checked,
         ac:document.getElementById('aircraft').value, lt:document.getElementById('loadType').value, p:document.getElementById('pantryInput').value, 
@@ -504,7 +550,7 @@ function saveAll(){
 function loadAll(){
     const raw=localStorage.getItem("hlc_v34_final_storage"); if(!raw) return;
     const d=JSON.parse(raw);
-    
+
     document.getElementById('dualLegCheckbox').checked = !!d.isDual;
     if (d.isDual) {
         document.getElementById('singleLegAvgContainer').style.display = 'none';
@@ -517,7 +563,7 @@ function loadAll(){
     document.getElementById('aircraft').value=d.ac; updateWaterUI();
     document.getElementById('loadType').value=d.lt; if(!d.ac||!d.lt) return;
     updateCompartments(true);
-    
+
     d.compsData.forEach(cd => {
         const c = document.querySelector(`.compartment[data-num="${cd.n}"]`); if(!c) return;
         cd.cargo.forEach(val => addItem(c.querySelector(".cargo-items").previousElementSibling.querySelector("button"), 'C', val));
@@ -525,8 +571,15 @@ function loadAll(){
         if (cd.posta && c.querySelector(".posta-items")) {
             cd.posta.forEach(val => addItem(c.querySelector(".posta-items").previousElementSibling.querySelector("button"), 'M', val));
         }
+        
         if (cd.ikram && c.querySelector(".ikram-items")) {
-            cd.ikram.forEach(val => addItem(c.querySelector(".ikram-items").previousElementSibling.querySelector("button"), 'İ', val));
+            cd.ikram.forEach(valObj => {
+                if(typeof valObj === 'object' && valObj !== null) {
+                    addCateringItem(c.querySelector(".ikram-items").previousElementSibling.querySelector("button"), valObj.ikr, valObj.ice);
+                } else {
+                    addCateringItem(c.querySelector(".ikram-items").previousElementSibling.querySelector("button"), valObj, '');
+                }
+            });
         }
         cd.ulds.forEach(u => addBagaj(c.querySelector(".uld-items").previousElementSibling.querySelector("button"), u.v, u.k, u.leg));
         if(c.querySelector(".by")) { c.querySelector(".by").value=cd.bulk.by; c.querySelector(".bc").value=cd.bulk.bc; c.querySelector(".mx").value=cd.bulk.mx; }
@@ -536,7 +589,7 @@ function loadAll(){
         }
         if(c.querySelector(".eic-input")) c.querySelector(".eic-input").value=cd.eic;
     });
-    
+
     document.getElementById('pantryInput').value=d.p; 
     document.getElementById('byAvg').value=d.by; document.getElementById('bcAvg').value=d.bc;
     document.getElementById('byAvgB1').value=d.byB1||""; document.getElementById('bcAvgB1').value=d.bcB1||"";
