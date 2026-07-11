@@ -29,6 +29,7 @@ input[type=number], input[type=text], select{padding:2px 6px; border:1px solid #
 .items-container { display: flex; flex-wrap: wrap; gap: 3%; margin-top: 5px; }
 .item-input { width: 70px !important; height: 26px !important; margin: 0 2px; font-weight: 900; border: 1.2px solid #777 !important; text-align: center;}
 .delete-btn { background: #cc0000; padding: 0 6px; height: 26px; border-radius: 4px; color: white; border:none; font-weight: bold;}
+.close-datalist-btn { background: #7f8c8d; color: white; border: none; border-radius: 4px; padding: 0 8px; height: 34px; font-weight: bold; cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center; }
 .weight-display { font-size: 0.92em; color: #004080; font-weight: 900; background: #e6f0ff; padding: 4px 6px; border-radius: 5px; }
 #note { width: 100%; height: 115px; margin-top: 15px; border-radius: 8px; padding: 8px; font-size: 14px; font-weight: bold; border: 1px solid #ccc; box-sizing: border-box; resize: none; }
 .summary{ background:#004080; color: white; padding:15px; border-radius: 12px; border: 2px solid #002b57; margin-top: 10px;}
@@ -36,7 +37,7 @@ input[type=number], input[type=text], select{padding:2px 6px; border:1px solid #
 .summary-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 8px; margin-bottom: 5px; cursor: pointer; }
 .summary-header h3 { color: white !important; margin: 0 !important; font-size: 16px !important; font-weight: 800 !important; }
 .header-inputs { display: flex; gap: 4px; align-items: center; font-size: 16px; font-weight: 800; }
-.header-input { width: 55px; background: rgba(255,255,255,0.1); border: none; border-bottom: 1.5px solid white; color: white; font-size: 16px; text-align: center; text-transform: uppercase; font-weight: 800; height: 25px !important; }
+.header-input { width: 65px; background: rgba(255,255,255,0.1); border: none; border-bottom: 1.5px solid white; color: white; font-size: 16px; text-align: center; text-transform: uppercase; font-weight: 800; height: 25px !important; }
 .summary-line { margin-bottom: 6px; font-size: 16px; display: flex; align-items: center; }
 .summary-label { color: rgba(255,255,255,0.7); width: 85px; font-weight: 400; font-size: 15px; }
 .summary-val { font-weight: 800; font-size: 17px; }
@@ -49,12 +50,15 @@ input[type=number], input[type=text], select{padding:2px 6px; border:1px solid #
 .btn-container { display: flex; justify-content: space-between; margin-top: 15px; gap: 10px; }
 .dual-leg-section { display: flex; justify-content: center; align-items: center; background: #fafafa; padding: 6px; font-size: 13.5px; font-weight: 600; color: #555; }
 
-/* İkram Alanı Düzenlenmiş Ortalanmış Satır Yapısı ve Eşitlenmiş Font */
 .catering-wrapper { display: flex; align-items: center; justify-content: space-between; background: #fff; padding: 3px 5px; border-radius: 6px; border: 1.8px solid #004080; width: 48.5%; box-sizing: border-box; margin-bottom: 5px; gap: 4px; }
 .catering-wrapper span { font-size: 13px; font-weight: 600; color: #444; }
 .catering-inputs-combined { display: flex; align-items: center; gap: 2px; justify-content: center; flex-grow: 1; }
 .catering-input-box { width: 45px !important; height: 26px !important; font-weight: 900; border: 1.2px solid #777 !important; text-align: center; font-size: 14px; margin: 0; padding: 0; box-sizing: border-box; }
 .catering-slash { font-weight: bold; color: #004080; font-size: 14px; margin: 0 1px; line-height: 26px; }
+
+/* Ekran görüntüsü esnasında harf bozulmalarını önleyen klon katmanlar */
+.snapshot-text-span { color: white; font-size: 16px; font-weight: 800; display: none; text-transform: uppercase; }
+#note-snapshot-view { width: 100%; min-height: 115px; margin-top: 15px; padding: 8px; font-size: 14px; font-weight: bold; background: rgba(255,255,255,0.1); border: 1px dashed rgba(255,255,255,0.3); border-radius: 8px; color: white; white-space: pre-wrap; word-break: break-all; box-sizing: border-box; display: none; }
 </style>
 </head>
 <body>
@@ -81,7 +85,275 @@ input[type=number], input[type=text], select{padding:2px 6px; border:1px solid #
     </label>
 </section>
 
-<section><h3 onclick="toggleContent(this)">Water & Pantry</h3><div class="content"><div id="waterUI" style="display:flex; flex-direction:column; gap:8px;"></div><div class="flex" style="margin-top:12px;">Pantry Code: <input type="text" id="pantryInput" style="flex-grow:1" oninput="saveAll();updateSummary()"></div></div></section>
+<section>
+    <h3 onclick="toggleContent(this)">Water & Pantry</h3>
+    <div class="content">
+        <div id="waterUI" style="display:flex; flex-direction:column; gap:8px;"></div>
+        <div class="flex" style="margin-top:12px;">
+            Pantry Code: 
+            <input type="text" id="pantryInput" list="pantryList" style="flex-grow:1" oninput="handlePantryInput(this);" placeholder="İstasyon girin...">
+            <button class="close-datalist-btn" onclick="document.getElementById('pantryInput').value=''; saveAll(); updateSummary();">X</button>
+            <datalist id="pantryList">
+                <option value="JFK">JFK / New York / ABD / A</option>
+                <option value="ORD">ORD / Chicago / ABD / A</option>
+                <option value="IAD">IAD / Washington D.C. / ABD / A</option>
+                <option value="LAX">LAX / Los Angeles / ABD / A</option>
+                <option value="GRU">GRU / São Paulo / BREZİLYA / A</option>
+                <option value="YYZ">YYZ / Toronto / KANADA / A</option>
+                <option value="TPE">TPE / Taipei / TAYVAN / A</option>
+                <option value="PVG">PVG / Şanghay / ÇİN / A</option>
+                <option value="EWR">EWR / Newark / ABD / A</option>
+                <option value="ATL">ATL / Atlanta / ABD / A</option>
+                <option value="IAH">IAH / Houston / ABD / A</option>
+                <option value="YUL">YUL / Montréal / KANADA / A</option>
+                <option value="JNB">JNB / Johannesburg / GÜNEY AFRİKA / A</option>
+                <option value="CPT">CPT / Cape Town / GÜNEY AFRİKA / A</option>
+                <option value="SIN">SIN / Singapur / SİNGAPUR / A</option>
+                <option value="CGK">CGK / Cakarta / ENDONEZYA / A</option>
+                <option value="KUL">KUL / Kuala Lumpur / MALEZYA / A</option>
+                <option value="DPS">DPS / Denpasar (Bali) / ENDONEZYA / A</option>
+                <option value="BKK">BKK / Bangkok / TAYLAND / A</option>
+                <option value="HKG">HKG / Hong Kong / HONG KONG / A</option>
+                <option value="CAN">CAN / Guangzhou / ÇİN / A</option>
+                <option value="YVR">YVR / Vancouver / KANADA / A</option>
+                <option value="MIA">MIA / Miami / ABD / A</option>
+                <option value="SFO">SFO / San Francisco / ABD / A</option>
+                <option value="BOS">BOS / Boston / ABD / A</option>
+                <option value="MNL">MNL / Manila / FİLİPİNLER / A</option>
+                <option value="PEK">PEK / Pekin / ÇİN / A</option>
+                <option value="ICN">ICN / Seul (Incheon) / GÜNEY KORE / A</option>
+                <option value="HKT">HKT / Phuket / TAYLAND / A</option>
+                <option value="MRU">MRU / Port Louis / MAURİTİUS / A</option>
+                <option value="MEX">MEX / Meksiko / MEKSİKA / A</option>
+                <option value="XIY">XIY / Xi'an / ÇİN / A</option>
+                <option value="HND">HND / Tokyo (Haneda) / JAPONYA / A</option>
+                <option value="CCS">CCS / Caracas / VENEZUELA / A</option>
+                <option value="HAV">HAV / Havana / KÜBA / A</option>
+                <option value="BOG">BOG / Bogota / KOLOMBİYA / A</option>
+                <option value="NRT">NRT / Tokyo (Narita) / JAPONYA / A</option>
+                <option value="DFW">DFW / Dallas / ABD / A</option>
+                <option value="SGN">SGN / Ho Chi Minh City / VİETNAM / A</option>
+                <option value="HAN">HAN / Hanoi / VİETNAM / A</option>
+                <option value="SEA">SEA / Seattle / ABD / A</option>
+                <option value="DTW">DTW / Detroit / ABD / A</option>
+                <option value="PTY">PTY / Panama City / PANAMA / A</option>
+                <option value="KIX">KIX / Osaka (Kansai) / JAPONYA / A</option>
+                <option value="DEN">DEN / Denver / ABD / A</option>
+                <option value="ULN">ULN / Ulan Batur / MOĞOLİSTAN / L</option>
+                <option value="DYU">DYU / Duşanbe / TACİKİSTAN / L</option>
+                <option value="FEG">FEG / Fergana / ÖZBEKİSTAN / L</option>
+                <option value="FRU">FRU / Bişkek / KIRGIZİSTAN / L</option>
+                <option value="ALA">ALA / Almatı / KAZAKİSTAN / L</option>
+                <option value="NQZ">NQZ / Astana / KAZAKİSTAN / L</option>
+                <option value="TAS">TAS / Taşkent / ÖZBEKİSTAN / L</option>
+                <option value="SKD">SKD / Semerkant / ÖZBEKİSTAN / L</option>
+                <option value="SKT">SKT / Sialkot / PAKİSTAN / L</option>
+                <option value="OUA">OUA / Ouagadougou / BURKİNA FASO / L</option>
+                <option value="NIM">NIM / Niamey / NİJER / L</option>
+                <option value="BKO">BKO / Bamako / MALİ / L</option>
+                <option value="COO">COO / Cotonou / BENİN / L</option>
+                <option value="ABJ">ABJ / Abidjan / FİLDİŞİ SAHİLİ / L</option>
+                <option value="ZNZ">ZNZ / Zanzibar / TANZANYA / L</option>
+                <option value="DAR">DAR / Darüsselam / TANZANYA / L</option>
+                <option value="KGL">KGL / Kigali / RUANDA / L</option>
+                <option value="EBB">EBB / Entebbe / UGANDA / L</option>
+                <option value="MBA">MBA / Mombasa / KENYA / L</option>
+                <option value="NKC">NKC / Nouakchott / MORİTANYA / L</option>
+                <option value="DSS">DSS / Dakar / SENEGAL / L</option>
+                <option value="LBV">LBV / Libreville / GABON / L</option>
+                <option value="FIH">FIH / Kinşasa / DEMOKRATİK KONGO CUMHURİYETİ / L</option>
+                <option value="NDJ">NDJ / N'Djamena / ÇAD / L</option>
+                <option value="BJL">BJL / Banjul / GAMBİYA / L</option>
+                <option value="LUN">LUN / Lusaka / ZAMBİYA / L</option>
+                <option value="NBO">NBO / Nairobi / KENYA / L</option>
+                <option value="RAK">RAK / Marakeş / FAS / L</option>
+                <option value="ABV">ABV / Abuja / NİJERYA / L</option>
+                <option value="LOS">LOS / Lagos / NİJERYA / L</option>
+                <option value="ACC">ACC / Akra / GANA / L</option>
+                <option value="PHC">PHC / Port Harcourt / NİJERYA / L</option>
+                <option value="DLA">DLA / Douala / KAMERUN / L</option>
+                <option value="NSI">NSI / Yaoundé / KAMERUN / L</option>
+                <option value="JIB">JIB / Cibuti / CİBUTİ / L</option>
+                <option value="HGA">HGA / Hargeisa / SOMALİLAND / L</option>
+                <option value="MGQ">MGQ / Mogadişu / SOMALİ / L</option>
+                <option value="KHI">KHI / Karaçi / PAKİSTAN / L</option>
+                <option value="KBL">KBL / Kabil / AFGANİSTAN / L</option>
+                <option value="ISB">ISB / İslamabad / PAKİSTAN / L</option>
+                <option value="DAC">DAC / Dakka / BANGLADEŞ / L</option>
+                <option value="LHE">LHE / Lahor / PAKİSTAN / L</option>
+                <option value="DEL">DEL / Delhi / HİNDİSTAN / L</option>
+                <option value="BOM">BOM / Mumbai / HİNDİSTAN / L</option>
+                <option value="MZR">MZR / Mezar-ı Şerif / AFGANİSTAN / L</option>
+                <option value="MCT">MCT / Maskat / UMAN / L</option>
+                <option value="MLE">MLE / Male / MALDİVLER / L</option>
+                <option value="SEZ">SEZ / Mahé / SEYŞELLER / L</option>
+                <option value="KTM">KTM / Katmandu / NEPAL / L</option>
+                <option value="HSA">HSA / Hail / SUUDİ ARABİSTAN / L</option>
+                <option value="ADD">ADD / Addis Ababa / ETİYOPYA / L</option>
+                <option value="UBN">UBN / Ulan Batur / MOĞOLİSTAN / L</option>
+                <option value="LAD">LAD / Luanda / ANGOLA / L</option>
+                <option value="PNR">PNR / Brazzaville / KONGO / L</option>
+                <option value="JUB">JUB / Juba / GÜNEY SUDAN / L</option>
+                <option value="JRO">JRO / Kilimanjaro / TANZANYA / L</option>
+                <option value="ASM">ASM / Asmara / ERİTRE / L</option>
+                <option value="CMB">CMB / Kolombo / SRİ LANKA / L</option>
+                <option value="VAR">VAR / Varna / BULGARİSTAN / S</option>
+                <option value="CND">CND / Köstence / ROMANYA / S</option>
+                <option value="SOF">SOF / Sofya / BULGARİSTAN / S</option>
+                <option value="OTP">OTP / Bükreş / ROMANYA / S</option>
+                <option value="KHE">KHE / Herson / UKRAYNA / S</option>
+                <option value="ODS">ODS / Odessa / UKRAYNA / S</option>
+                <option value="SKP">SKP / Üsküp / MAKEDONYA / S</option>
+                <option value="PRN">PRN / Priştine / KOSOVA / S</option>
+                <option value="BEG">BEG / Belgrad / SIRBİSTAN / S</option>
+                <option value="ATH">ATH / Atina / YUNANİSTAN / S</option>
+                <option value="CLJ">CLJ / Cluj-Napoca / ROMANYA / S</option>
+                <option value="SKG">SKG / Selanik / YUNANİSTAN / S</option>
+                <option value="RMO">RMO / Kişinev / MOLDOVA / S</option>
+                <option value="TGD">TGD / Podgorica / KARADAĞ / S</option>
+                <option value="SJJ">SJJ / Saraybosna / BOSNA HERSEK / S</option>
+                <option value="OZH">OZH / Zaporijya / UKRAYNA / S</option>
+                <option value="LWO">LWO / Lviv / UKRAYNA / S</option>
+                <option value="KBP">KBP / Kiev (Boryspil) / UKRAYNA / S</option>
+                <option value="BUD">BUD / Budapeşte / MACARİSTAN / S</option>
+                <option value="AER">AER / Soçi / RUSYA / S</option>
+                <option value="BEY">BEY / Beyrut / LÜBNAN / S</option>
+                <option value="DBV">DBV / Dubrovnik / HIRVATİSTAN / S</option>
+                <option value="KRR">KRR / Krasnodar / RUSYA / S</option>
+                <option value="TLV">TLV / Tel Aviv / İSRAİL / S</option>
+                <option value="BUS">BUS / Batum / GÜRCİSTAN / S</option>
+                <option value="NLV">NLV / Mıkolayiv / UKRAYNA / S</option>
+                <option value="TIV">TIV / Tivat / KARADAĞ / S</option>
+                <option value="DAM">DAM / Şam / SURİYE / S</option>
+                <option value="OHD">OHD / Ohri / MAKEDONYA / S</option>
+                <option value="HBE">HBE / İskenderiye / MISIR / M</option>
+                <option value="TBS">TBS / Tiflis / GÜRCİSTAN / M</option>
+                <option value="ROV">ROV / Rostov / RUSYA / M</option>
+                <option value="WAW">WAW / Varşova / POLONYA / M</option>
+                <option value="ZAG">ZAG / Zagreb / HIRVATİSTAN / M</option>
+                <option value="LJU">LJU / Ljubljana / SLOVENYA / M</option>
+                <option value="MLA">MLA / Valletta / MALTA / M</option>
+                <option value="HRK">HRK / Harkiv / UKRAYNA / M</option>
+                <option value="PRG">PRG / Prag / ÇEK CUMHURİYETİ / M</option>
+                <option value="CAI">CAI / Kahire / MISIR / M</option>
+                <option value="GRZ">GRZ / Graz / AVUSTURYA / M</option>
+                <option value="MSQ">MSQ / Minsk / BEYAZ RUSYA / M</option>
+                <option value="BRI">BRI / Bari / İTALYA / M</option>
+                <option value="AMM">AMM / Amman / ÜRDÜN / M</option>
+                <option value="AQJ">AQJ / Akabe / ÜRDÜN / M</option>
+                <option value="CTA">CTA / Katanya / İTALYA / M</option>
+                <option value="NAP">NAP / Napoli / İTALYA / M</option>
+                <option value="JED">JED / Cidde / SUUDİ ARABİSTAN / M</option>
+                <option value="MED">MED / Medine / SUUDİ ARABİSTAN / M</option>
+                <option value="RUH">RUH / Riyad / SUUDİ ARABİSTAN / M</option>
+                <option value="DMM">DMM / Dammam / SUUDİ ARABİSTAN / M</option>
+                <option value="UGC">UGC / Ürgenç / ÖZBEKİSTAN / M</option>
+                <option value="BGW">BGW / Bağdat / IRAK / M</option>
+                <option value="NAJ">NAJ / Nahçıvan / AZERBAYCAN / M</option>
+                <option value="EBL">EBL / Erbil / IRAK / M</option>
+                <option value="ASB">ASB / Aşkabat / TÜRKMENİSTAN / M</option>
+                <option value="KVD">KVD / Gence / AZERBAYCAN / M</option>
+                <option value="GYD">GYD / Bakü / AZERBAYCAN / M</option>
+                <option value="LED">LED / St. Petersburg / RUSYA / M</option>
+                <option value="VKO">VKO / Moskova (Vnukovo) / RUSYA / M</option>
+                <option value="KZN">KZN / Kazan / RUSYA / M</option>
+                <option value="UFA">UFA / Ufa / RUSYA / M</option>
+                <option value="SVX">SVX / Yekaterinburg / RUSYA / M</option>
+                <option value="VOZ">VOZ / Voronej / RUSYA / M</option>
+                <option value="KUF">KUF / Samara / RUSYA / M</option>
+                <option value="ORN">ORN / Oran / CEZAYİR / M</option>
+                <option value="CMN">CMN / Kazablanka / FAS / M</option>
+                <option value="ALG">ALG / Cezayir / CEZAYİR / M</option>
+                <option value="TUN">TUN / Tunus / TUNUS / M</option>
+                <option value="KRT">KRT / Hartum / SUDAN / M</option>
+                <option value="SSH">SSH / Şarm El-Şeyh / MISIR / M</option>
+                <option value="HRG">HRG / Hurgada / MISIR / M</option>
+                <option value="SHJ">SHJ / Sharjah / BAE / M</option>
+                <option value="DXB">DXB / Dubai / BAE / M</option>
+                <option value="KWI">KWI / Kuveyt / KUVEYT / M</option>
+                <option value="BAH">BAH / Manama / BAHREYN / M</option>
+                <option value="DOH">DOH / Doha / KATAR / M</option>
+                <option value="NJF">NJF / Necef / IRAK / M</option>
+                <option value="BSR">BSR / Basra / IRAK / M</option>
+                <option value="AUH">AUH / Abu Dabi / BAE / M</option>
+                <option value="IKA">IKA / Tahran / İRAN / M</option>
+                <option value="TBZ">TBZ / Tebriz / İRAN / M</option>
+                <option value="SYZ">SYZ / Şiraz / İRAN / M</option>
+                <option value="MHD">MHD / Meşhed / İRAN / M</option>
+                <option value="IFN">IFN / İsfahan / İRAN / M</option>
+                <option value="VLC">VLC / Valensiya / İSPANYA / M</option>
+                <option value="AGP">AGP / Malaga / İSPANYA / M</option>
+                <option value="BIO">BIO / Bilbao / İSPANYA / M</option>
+                <option value="BLQ">BLQ / Bologna / İTALYA / M</option>
+                <option value="GVA">GVA / Cenevre / İSVİÇRE / M</option>
+                <option value="BRE">BRE / Bremen / ALMANYA / M</option>
+                <option value="LEJ">LEJ / Leipzig / ALMANYA / M</option>
+                <option value="EDI">EDI / Edinburgh / BİRLEŞİK KRALLIK / M</option>
+                <option value="LUX">LUX / Lüksemburg / LÜKSEMBURG / M</option>
+                <option value="MAD">MAD / Madrid / İSPANYA / M</option>
+                <option value="FCO">FCO / Roma / İTALYA / M</option>
+                <option value="MRS">MRS / Marsilya / FRANSA / M</option>
+                <option value="SZG">SZG / Salzburg / AVUSTURYA / M</option>
+                <option value="FDH">FDH / Friedrichshafen / ALMANYA / M</option>
+                <option value="BOD">BOD / Bordeaux / FRANSA / M</option>
+                <option value="PSA">PSA / Pisa / İTALYA / M</option>
+                <option value="VNO">VNO / Vilnius / LİTVANYA / M</option>
+                <option value="CZL">CZL / Konstantin / CEZAYİR / M</option>
+                <option value="TLL">TLL / Tallinn / ESTONYA / M</option>
+                <option value="OPO">OPO / Porto / PORTEKİZ / M</option>
+                <option value="SXB">SXB / Strazburg / FRANSA / M</option>
+                <option value="BLL">BLL / Billund / DANİMARKA / M</option>
+                <option value="NUE">NUE / Nürnberg / ALMANYA / M</option>
+                <option value="DUS">DUS / Düsseldorf / ALMANYA / M</option>
+                <option value="LIS">LIS / Lizbon / PORTEKİZ / M</option>
+                <option value="BCN">BCN / Barselona / İSPANYA / M</option>
+                <option value="HAJ">HAJ / Hannover / ALMANYA / M</option>
+                <option value="FRA">FRA / Frankfurt / ALMANYA / M</option>
+                <option value="MUC">MUC / Münih / ALMANYA / M</option>
+                <option value="MXP">MXP / Milano / İTALYA / M</option>
+                <option value="ZRH">ZRH / Zürih / İSVİÇRE / M</option>
+                <option value="BRU">BRU / Brüksel / BELÇİKA / M</option>
+                <option value="HAM">HAM / Hamburg / ALMANYA / M</option>
+                <option value="CGN">CGN / Köln / ALMANYA / M</option>
+                <option value="STR">STR / Stuttgart / ALMANYA / M</option>
+                <option value="BER">BER / Berlin / ALMANYA / M</option>
+                <option value="OSL">OSL / Oslo / NORSVEÇ / M</option>
+                <option value="RIX">RIX / Riga / LETONYA / M</option>
+                <option value="HEL">HEL / Helsinki / FİNLANDİYA / M</option>
+                <option value="CPH">CPH / Kopenhag / DANİMARKA / M</option>
+                <option value="ARN">ARN / Stockholm / İSVEÇ / M</option>
+                <option value="GOT">GOT / Göteborg / İSVEÇ / M</option>
+                <option value="TLS">TLS / Toulouse / FRANSA / M</option>
+                <option value="LYS">LYS / Lyon / FRANSA / M</option>
+                <option value="NCE">NCE / Nice / FRANSA / M</option>
+                <option value="CDG">CDG / Paris / FRANSA / M</option>
+                <option value="VCE">VCE / Venedik / İTALYA / M</option>
+                <option value="VIE">VIE / Viyana / AVUSTURYA / M</option>
+                <option value="BSL">BSL / Basel / İSVİÇRE / M</option>
+                <option value="AMS">AMS / Amsterdam / HOLLANDA / M</option>
+                <option value="BHX">BHX / Birmingham / BİRLEŞİK KRALLIK / M</option>
+                <option value="LHR">LHR / Londra Heathrow / BİRLEŞİK KRALLIK / M</option>
+                <option value="DUB">DUB / Dublin / İRLANDA / M</option>
+                <option value="LGW">LGW / Londra Gatwick / BİRLEŞİK KRALLIK / M</option>
+                <option value="MAN">MAN / Manchester / BİRLEŞİK KRALLIK / M</option>
+                <option value="SCO">SCO / Aktau / KAZAKHSTAN / M</option>
+                <option value="ISU">ISU / Süleymaniye / IRAK / M</option>
+                <option value="GNJ">GNJ / Gence / AZERBAYCAN / M</option>
+                <option value="BHK">BHK / Buhara / ÖZBEKİSTAN / M</option>
+                <option value="KRW">KRW / Türkmenbaşı / TÜRKMENİSTAN / M</option>
+                <option value="KIK">KIK / Kerkük / IRAK / M</option>
+                <option value="RVN">RVN / Rovaniemi / FİNLANDİYA / M</option>
+                <option value="KTW">KTW / Katowice / POLONYA / M</option>
+                <option value="TIF">TIF / Taif / SUUDİ ARABİSTAN / M</option>
+                <option value="KRK">KRK / Kraków / POLONYA / M</option>
+                <option value="PMO">PMO / Palermo / İTALYA / M</option>
+                <option value="MJI">MJI / Trablus / LİBYA / M</option>
+                <option value="TRN">TRN / Torino / İTALYA / M</option>
+                <option value="BEN">BEN / Bingazi / LİBYA / M</option>
+            </datalist>
+        </div>
+    </div>
+</section>
 <section>
     <h3 onclick="toggleContent(this)">Bagaj Ortalamaları</h3>
     <div class="content">
@@ -113,8 +385,14 @@ input[type=number], input[type=text], select{padding:2px 6px; border:1px solid #
     <div class="summary-header" onclick="toggleSummaryContent()">
         <h3>FINAL KONTROL ▼</h3>
         <div class="header-inputs">
-            <span>TC-</span><input type="text" id="tailInput" class="header-input" oninput="saveAll()" onclick="event.stopPropagation()">
-            <span style="color:white; margin-left:5px;">/</span><input type="text" id="destInput" class="header-input" oninput="saveAll()" onclick="event.stopPropagation()">
+            <span>TC-</span>
+            <input type="text" id="tailInput" class="header-input" oninput="saveAll()" onclick="event.stopPropagation()">
+            <span id="tailInput-snap" class="snapshot-text-span"></span>
+            
+            <span style="color:white; margin-left:5px;">/</span>
+            
+            <input type="text" id="destInput" class="header-input" oninput="saveAll()" onclick="event.stopPropagation()">
+            <span id="destInput-snap" class="snapshot-text-span"></span>
         </div>
     </div>
 
@@ -123,10 +401,13 @@ input[type=number], input[type=text], select{padding:2px 6px; border:1px solid #
         <div class="summary-divider"></div>
         <div id="summary-details"></div>
         <div class="summary-divider"></div>
+        <div class="summary-line" id="finalCateringRow" style="display:none;"><span class="summary-label">İKRAM:</span><span class="summary-val" id="finalCatering">-</span></div>
         <div class="summary-line"><span class="summary-label">WATER:</span><span class="summary-val" id="finalWater">-</span></div>
         <div class="summary-line"><span class="summary-label">PANTRY:</span><span class="summary-val" id="finalPantry">-</span></div>
         <div class="total-payload">TOTAL PAYLOAD: <span id="totalPayload">0</span> kg</div>
+        
         <textarea id="note" placeholder="Operasyon Notu Ekle..." oninput="saveAll()"></textarea>
+        <div id="note-snapshot-view"></div>
 
         <div class="btn-container" id="actionButtonsRow">
             <button class="action-btn" onclick="saveAll()" style="background: #27ae60;">KAYDET</button>
@@ -164,10 +445,33 @@ const waterData = {
 
 const comps={A319:[1,4,5],A320:[1,3,4,5],A321:[1,2,3,4,5],"B737-800":[1,2,3,4],"B737-900":[1,2,3,4],A330:[1,2,3,4,5],A350:[1,2,3,4,5],B777:[1,2,3,4,5],B787:[1,2,3,4,5]};
 
+function handlePantryInput(inputEl) {
+    let val = inputEl.value.trim().toUpperCase();
+    let options = document.getElementById('pantryList').options;
+    
+    // Sadece tam bir 3 harfli istasyon kodu yazıldığında datalist eşleşmesi yapsın
+    if (val.length === 3) {
+        for(let i=0; i<options.length; i++) {
+            let optVal = options[i].value.toUpperCase();
+            if(optVal === val) {
+                let parts = options[i].textContent.split(" / ");
+                if (parts.length >= 4) {
+                    inputEl.value = `${parts[0].trim()} / ${parts[1].trim()} / ${parts[3].trim()}`;
+                } else {
+                    inputEl.value = options[i].textContent;
+                }
+                break;
+            }
+        }
+    }
+    
+    updateSummary(); 
+    saveAll();
+}
+
 function toggleDualLegMode() {
     const checkbox = document.getElementById('dualLegCheckbox');
     const isChecked = checkbox.checked;
-
     const hasData = document.getElementById('pantryInput').value !== "" || 
                     document.getElementById('tailInput').value !== "" ||
                     document.getElementById('destInput').value !== "" ||
@@ -212,7 +516,6 @@ function toggleDualLegMode() {
 function updateSummary(){
     let outHtml="", totalPayload=0, totalCargo=0, totalManuel=0, totalPosta=0, totalIkram=0;
     let wCargo=0, wManuel=0, wPosta=0, wIkram=0, wKuruBuz=0;
-
     let totalBags=0, totalULDCount=0, cBy=0, cBc=0, cMx=0, cX=0, wX=0;
     let b1Bags=0, b1ULDCount=0, b1By=0, b1Bc=0, b1Mx=0;
     let b2Bags=0, b2ULDCount=0, b2By=0, b2Bc=0, b2Mx=0;
@@ -247,9 +550,7 @@ function updateSummary(){
             c.querySelectorAll(".konteyner-item").forEach(k=>{
                 const kind=k.dataset.kind;
                 if(kind === "X") {
-                    cptW += 70; 
-                    wX += 70;
-                    cptX++; cX++;
+                    cptW += 70; wX += 70; cptX++; cX++;
                 } else {
                     const count=+k.querySelector("input").value||0;
                     cptW += 70 + (count * (kind==="By"?byA:(kind==="Bc"?bcA:mxA))); 
@@ -276,9 +577,7 @@ function updateSummary(){
                     const kind=k.dataset.kind;
                     const leg=k.dataset.leg;
                     if(kind === "X") {
-                        cptW += 70;
-                        wX += 70;
-                        cptX++; cX++;
+                        cptW += 70; wX += 70; cptX++; cX++;
                     } else {
                         const count=+k.querySelector("input").value||0;
                         cptBags+=count; cptActiveULD++; totalULDCount++;
@@ -302,16 +601,11 @@ function updateSummary(){
         M.forEach(i=>{ let val=+i.querySelector("input").value||0; cptW+=val; wManuel+=val; cptManuelW+=val; });
         const P = c.querySelectorAll(".local-item[data-kind='M']"); totalPosta += P.length;
         P.forEach(i=>{ let val=+i.querySelector("input").value||0; cptW+=val; wPosta+=val; cptPostaW+=val; });
-        
         const IK = c.querySelectorAll(".local-item[data-kind='İ']"); totalIkram += IK.length;
         IK.forEach(i=>{ 
             let inputs = i.querySelectorAll(".catering-input-box");
-            let valIkr = +inputs[0].value||0; 
-            let valIce = +inputs[1].value||0;
-            cptW += valIkr; 
-            wIkram += valIkr; 
-            wKuruBuz += valIce; 
-            cptIkramW += valIkr; 
+            let valIkr = +inputs[0].value||0; let valIce = +inputs[1].value||0;
+            cptW += valIkr; wIkram += valIkr; wKuruBuz += valIce; cptIkramW += valIkr; 
         });
 
         const eic=c.querySelector(".eic-input"); if(eic) cptW+=+eic.value||0;
@@ -327,16 +621,14 @@ function updateSummary(){
             } 
         }
 
-        if(C.length) { if(isBulk) res.push("C "+Math.round(cptCargoW)); else res.push("C "+C.length); }
-        if(M.length) { if(isBulk) res.push("Mn "+Math.round(cptManuelW)); else res.push("Mn "+M.length); }
-        if(P.length) { res.push("M "+Math.round(cptPostaW)); }
-        if(IK.length) { res.push("İ "+Math.round(cptIkramW)); }
+        if(C.length) res.push("C "+(isBulk?Math.round(cptCargoW):C.length));
+        if(M.length) res.push("Mn "+(isBulk?Math.round(cptManuelW):M.length));
+        if(P.length) res.push("M "+Math.round(cptPostaW));
+        if(IK.length) res.push("İ "+Math.round(cptIkramW));
 
         c.querySelector('.midBadge').textContent = res.join(" / ");
-
         let detailText = res.length > 0 ? ` <span style="font-size: 0.8em; opacity: 0.9; font-weight: 400;">(${res.join(" / ")})</span>` : "";
         outHtml += `<div class="summary-line"><span class="summary-label">CPT ${cptNum}</span> <span class="summary-val">${Math.round(cptW)} kg${detailText}</span></div>`;
-
         totalPayload += cptW;
         if(c.querySelector(".weight-display")) c.querySelector(".weight-display").textContent=Math.round(cptW)+" kg";
     });
@@ -345,19 +637,13 @@ function updateSummary(){
     let bDet = "";
 
     if (!isDual) {
-        if(lt==="ULD") {
-            bDet = `<div class="summary-detail">📦 TOPLAM ${uLabel} BAGAJ: ${totalULDCount} <span class="detail-sub">(T: ${totalBags} / By: ${cBy} / Bc: ${cBc} / Mx: ${cMx})</span></div>`;
-        } else {
-            bDet = `<div class="summary-detail">📦 TOPLAM BAGAJ: ${totalBags} <span class="detail-sub">(By: ${cBy} / Bc: ${cBc} / Mx: ${cMx})</span></div>`;
-        }
+        if(lt==="ULD") bDet = `<div class="summary-detail">📦 TOPLAM ${uLabel} BAGAJ: ${totalULDCount} <span class="detail-sub">(T: ${totalBags} / By: ${cBy} / Bc: ${cBc} / Mx: ${cMx})</span></div>`;
+        else bDet = `<div class="summary-detail">📦 TOPLAM BAGAJ: ${totalBags} <span class="detail-sub">(By: ${cBy} / Bc: ${cBc} / Mx: ${cMx})</span></div>`;
     } else {
         const totalCombinedBags = b1Bags + b2Bags;
-        const totalCombinedBy = b1By + b2By;
-        const totalCombinedBc = b1Bc + b2Bc;
-        const totalCombinedMx = b1Mx + b2Mx;
-
+        const totalCombinedBy = b1By + b2By; const totalCombinedBc = b1Bc + b2Bc; const totalCombinedMx = b1Mx + b2Mx;
         if(lt==="ULD") {
-            bDet = `<div class="summary-detail" style="border-bottom: 1px dashed rgba(255,255,255,0.2); padding-bottom: 6px; margin-bottom: 6px;">📦 TOPLAM ${uLabel} BAGAJ (B1+B2): ${totalULDCount} <span class="detail-sub">(T: ${totalCombinedBags} / By: ${totalCombinedBy} / Bc: ${totalCombinedBc} / Mx: ${totalCombinedBc})</span></div>` +
+            bDet = `<div class="summary-detail" style="border-bottom: 1px dashed rgba(255,255,255,0.2); padding-bottom: 6px; margin-bottom: 6px;">📦 TOPLAM ${uLabel} BAGAJ (B1+B2): ${totalULDCount} <span class="detail-sub">(T: ${totalCombinedBags} / By: ${totalCombinedBy} / Bc: ${totalCombinedBc} / Mx: ${totalCombinedMx})</span></div>` +
                    `<div class="summary-detail">📦 TOPLAM ${uLabel} BAGAJ (B1): ${b1ULDCount} <span class="detail-sub">(T: ${b1Bags} / By: ${b1By} / Bc: ${b1Bc} / Mx: ${b1Mx})</span></div>` +
                    `<div class="summary-detail">📦 TOPLAM ${uLabel} BAGAJ (B2): ${b2ULDCount} <span class="detail-sub">(T: ${b2Bags} / By: ${b2By} / Bc: ${b2Bc} / Mx: ${b2Mx})</span></div>`;
         } else {
@@ -368,29 +654,22 @@ function updateSummary(){
     }
 
     document.getElementById('summary-list').innerHTML = outHtml;
-    
-    // SIFIRDAN BÜYÜKSE GÖSTERME (DİNAMİK RAPOR MANTIĞI)
-    let detailsHtml = bDet; // Bagajlar her zaman kalıyor
-    
-    if (totalCargo > 0) {
-        detailsHtml += `<div class="summary-detail" style="margin-top: 10px;">🚛 TOPLAM KARGO (C): ${totalCargo} Parça (${Math.round(wCargo)} kg)</div>`;
-    }
-    if (totalManuel > 0) {
-        detailsHtml += `<div class="summary-detail">🛠️ TOPLAM MANUEL (Mn): ${totalManuel} Parça (${Math.round(wManuel)} kg)</div>`;
-    }
-    if (totalPosta > 0) {
-        detailsHtml += `<div class="summary-detail">✉️ TOPLAM POSTA (M): ${totalPosta} Parça (${Math.round(wPosta)} kg)</div>`;
-    }
-    if (totalIkram > 0) {
-        let ikramFinalValue = wKuruBuz > 0 ? `${Math.round(wIkram)} / ${wKuruBuz.toFixed(1)}` : `${Math.round(wIkram)}`;
-        detailsHtml += `<div class="summary-detail">🍽️ TOPLAM İKRAM (İ): ${totalIkram} Parça (${ikramFinalValue})</div>`;
-    }
-    if (lt === "ULD" && cX > 0) {
-        detailsHtml += `<div class="summary-detail">📥 TOPLAM BOŞ ${uLabel} (X): ${cX} Parça (${Math.round(wX)} kg)</div>`;
-    }
+    let detailsHtml = bDet;
+    if (totalCargo > 0) detailsHtml += `<div class="summary-detail" style="margin-top: 10px;">🚛 TOPLAM KARGO (C): ${totalCargo} Parça (${Math.round(wCargo)} kg)</div>`;
+    if (totalManuel > 0) detailsHtml += `<div class="summary-detail">🛠️ TOPLAM MANUEL (Mn): ${totalManuel} Parça (${Math.round(wManuel)} kg)</div>`;
+    if (totalPosta > 0) detailsHtml += `<div class="summary-detail">✉️ TOPLAM POSTA (M): ${totalPosta} Parça (${Math.round(wPosta)} kg)</div>`;
+    if (lt === "ULD" && cX > 0) detailsHtml += `<div class="summary-detail">📥 TOPLAM BOŞ ${uLabel} (X): ${cX} Parça (${Math.round(wX)} kg)</div>`;
 
     document.getElementById('summary-details').innerHTML = detailsHtml;
     document.getElementById('totalPayload').textContent = Math.round(totalPayload);
+    
+    const cateringRow = document.getElementById('finalCateringRow');
+    if (totalIkram > 0) {
+        cateringRow.style.display = 'flex';
+        document.getElementById('finalCatering').textContent = wKuruBuz > 0 ? `${Math.round(wIkram)} / ${wKuruBuz.toFixed(1)}` : `${Math.round(wIkram)}`;
+    } else {
+        cateringRow.style.display = 'none';
+    }
     updateWaterSummary();
 }
 
@@ -398,17 +677,42 @@ function takeSnapshot() {
     const element = document.getElementById('captureZone');
     const actionRow = document.getElementById('actionButtonsRow');
     const shotBtn = document.getElementById('shotBtn');
+
+    const tailInput = document.getElementById('tailInput');
+    const destInput = document.getElementById('destInput');
+    const noteTextarea = document.getElementById('note');
+
+    const tailSnap = document.getElementById('tailInput-snap');
+    const destSnap = document.getElementById('destInput-snap');
+    const noteSnap = document.getElementById('note-snapshot-view');
+
+    tailSnap.textContent = tailInput.value.toUpperCase();
+    destSnap.textContent = destInput.value.toUpperCase();
+    noteSnap.textContent = noteTextarea.value;
+
+    tailInput.style.display = 'none'; destInput.style.display = 'none'; noteTextarea.style.display = 'none';
+    tailSnap.style.display = 'inline-block'; destSnap.style.display = 'inline-block';
+    if(noteTextarea.value.trim() !== "") noteSnap.style.display = 'block';
+
     actionRow.style.display = 'none'; shotBtn.style.display = 'none';
 
     html2canvas(element, { backgroundColor: '#004080', scale: 2, logging: false, useCORS: true }).then(canvas => {
         const imageDataURL = canvas.toDataURL('image/png');
         const link = document.createElement('a');
-        const tail = document.getElementById('tailInput').value || 'RAPOR';
+        const tail = tailInput.value || 'RAPOR';
         const now = new Date();
         const timeStr = String(now.getHours()).padStart(2, '0') + String(now.getMinutes()).padStart(2, '0');
         link.download = `HLC_${tail.toUpperCase()}_${timeStr}.png`; link.href = imageDataURL; link.click();
-        actionRow.style.display = 'flex'; shotBtn.style.display = 'block';
-    }).catch(err => { console.error("Snapshot hatası:", err); actionRow.style.display = 'flex'; shotBtn.style.display = 'block'; });
+        
+        tailInput.style.display = 'inline-block'; destInput.style.display = 'inline-block'; noteTextarea.style.display = 'block';
+        tailSnap.style.display = 'none'; destSnap.style.display = 'none'; noteSnap.style.display = 'none';
+        actionRow.style.display = 'flex'; shotBtn.style.block = 'block';
+    }).catch(err => { 
+        console.error("Snapshot hatası:", err); 
+        tailInput.style.display = 'inline-block'; destInput.style.display = 'inline-block'; noteTextarea.style.display = 'block';
+        tailSnap.style.display = 'none'; destSnap.style.display = 'none'; noteSnap.style.display = 'none';
+        actionRow.style.display = 'flex'; shotBtn.style.display = 'block'; 
+    });
 }
 
 function updateCompartments(r){
@@ -416,12 +720,10 @@ function updateCompartments(r){
     const ac=document.getElementById('aircraft').value, lt=document.getElementById('loadType').value;
     if(!ac || !lt) return;
     const isDual = document.getElementById('dualLegCheckbox').checked;
-
     let eicT=(ac.includes("B737"))?4:5, eicV=(ac.includes("B737")?23:(ac==="A350"?30:(ac==="A330"?58:35)));
 
     comps[ac].forEach(n=>{
         const s=document.createElement("section"); s.className="compartment"; s.dataset.num=n;
-
         let showMailAndCatering = (lt === "YIGMA" || n === 5);
 
         s.innerHTML=`<h3 onclick="toggleContent(this)">CPT ${n} <span class="midBadge"></span> <span class="weight-display">0 kg</span></h3>
@@ -463,23 +765,9 @@ function checkLoadType(){ const ac=document.getElementById('aircraft').value, lt
 function addItem(b,k,v=null){ const h=b.parentElement.nextElementSibling; const d=document.createElement("div"); d.className="local-item item-wrapper"; d.dataset.kind=k; d.innerHTML=`<span>${k} 1</span><input type="number" class="item-input" value="${v||''}" oninput="updateSummary();saveAll()"><button class="delete-btn" onclick="this.parentElement.remove(); renumberLocalItems(); updateSummary(); saveAll()">X</button>`; h.appendChild(d); renumberLocalItems(); updateSummary(); saveAll(); }
 
 function addCateringItem(b, vIkr=null, vIce=null) {
-    const h = b.parentElement.nextElementSibling; 
-    const d = document.createElement("div"); 
-    d.className = "local-item catering-wrapper"; 
-    d.dataset.kind = "İ"; 
-    d.innerHTML = `
-        <span>İ 1</span>
-        <div class="catering-inputs-combined">
-            <input type="number" class="catering-input-box" value="${vIkr||''}" oninput="updateSummary();saveAll()">
-            <span class="catering-slash">/</span>
-            <input type="number" class="catering-input-box" value="${vIce||''}" oninput="updateSummary();saveAll()">
-        </div>
-        <button class="delete-btn" onclick="this.parentElement.remove(); renumberLocalItems(); updateSummary(); saveAll()">X</button>
-    `; 
-    h.appendChild(d); 
-    renumberLocalItems(); 
-    updateSummary(); 
-    saveAll(); 
+    const h = b.parentElement.nextElementSibling; const d = document.createElement("div"); d.className = "local-item catering-wrapper"; d.dataset.kind = "İ"; 
+    d.innerHTML = `<span>İ 1</span><div class="catering-inputs-combined"><input type="number" class="catering-input-box" value="${vIkr||''}" oninput="updateSummary();saveAll()"><span class="catering-slash">/</span><input type="number" class="catering-input-box" value="${vIce||''}" oninput="updateSummary();saveAll()"></div><button class="delete-btn" onclick="this.parentElement.remove(); renumberLocalItems(); updateSummary(); saveAll()">X</button>`; 
+    h.appendChild(d); renumberLocalItems(); updateSummary(); saveAll(); 
 }
 
 function addBagaj(b,v=null,kind=null,leg=null){ 
@@ -507,7 +795,6 @@ function renumberGlobalBags(){
         });
     }
 }
-
 function renumberLocalItems(){ document.querySelectorAll('.compartment').forEach(c => { ['C','Mn','M','İ'].forEach(kind => { let count = 1; c.querySelectorAll(`.local-item[data-kind="${kind}"]`).forEach(el => { el.querySelector('span').textContent = `${kind} ${count++}`; }); }); }); }
 
 function saveAll(){
@@ -516,12 +803,10 @@ function saveAll(){
         const cargo = []; c.querySelectorAll(".cargo-items .item-input").forEach(i => cargo.push(i.value));
         const manuel = []; c.querySelectorAll(".manuel-items .item-input").forEach(i => manuel.push(i.value));
         const posta = []; c.querySelectorAll(".posta-items .item-input").forEach(i => posta.push(i.value));
-        
         const ikram = []; c.querySelectorAll(".ikram-items .local-item").forEach(i => {
             let inputs = i.querySelectorAll(".catering-input-box");
             ikram.push({ikr: inputs[0].value, ice: inputs[1].value});
         });
-        
         const ulds = []; c.querySelectorAll(".uld-items .konteyner-item").forEach(k => ulds.push({k: k.dataset.kind, v: k.querySelector("input").value, leg: k.dataset.leg}));
 
         compsData.push({ 
@@ -544,11 +829,11 @@ function saveAll(){
         n:document.getElementById('note').value, wR:document.getElementById('waterRatio')?.value||"", tG:document.getElementById('tailGroup')?.value||"", 
         tail:document.getElementById('tailInput').value, dest:document.getElementById('destInput').value, compsData 
     };
-    localStorage.setItem("hlc_v34_final_storage", JSON.stringify(data));
+    localStorage.setItem("hlc_v35_final_storage", JSON.stringify(data));
 }
 
 function loadAll(){
-    const raw=localStorage.getItem("hlc_v34_final_storage"); if(!raw) return;
+    const raw=localStorage.getItem("hlc_v35_final_storage"); if(!raw) return;
     const d=JSON.parse(raw);
 
     document.getElementById('dualLegCheckbox').checked = !!d.isDual;
@@ -568,17 +853,11 @@ function loadAll(){
         const c = document.querySelector(`.compartment[data-num="${cd.n}"]`); if(!c) return;
         cd.cargo.forEach(val => addItem(c.querySelector(".cargo-items").previousElementSibling.querySelector("button"), 'C', val));
         cd.manuel.forEach(val => addItem(c.querySelector(".manuel-items").previousElementSibling.querySelector("button"), 'Mn', val));
-        if (cd.posta && c.querySelector(".posta-items")) {
-            cd.posta.forEach(val => addItem(c.querySelector(".posta-items").previousElementSibling.querySelector("button"), 'M', val));
-        }
-        
+        if (cd.posta && c.querySelector(".posta-items")) cd.posta.forEach(val => addItem(c.querySelector(".posta-items").previousElementSibling.querySelector("button"), 'M', val));
         if (cd.ikram && c.querySelector(".ikram-items")) {
             cd.ikram.forEach(valObj => {
-                if(typeof valObj === 'object' && valObj !== null) {
-                    addCateringItem(c.querySelector(".ikram-items").previousElementSibling.querySelector("button"), valObj.ikr, valObj.ice);
-                } else {
-                    addCateringItem(c.querySelector(".ikram-items").previousElementSibling.querySelector("button"), valObj, '');
-                }
+                if(typeof valObj === 'object' && valObj !== null) addCateringItem(c.querySelector(".ikram-items").previousElementSibling.querySelector("button"), valObj.ikr, valObj.ice);
+                else addCateringItem(c.querySelector(".ikram-items").previousElementSibling.querySelector("button"), valObj, '');
             });
         }
         cd.ulds.forEach(u => addBagaj(c.querySelector(".uld-items").previousElementSibling.querySelector("button"), u.v, u.k, u.leg));
@@ -590,7 +869,7 @@ function loadAll(){
         if(c.querySelector(".eic-input")) c.querySelector(".eic-input").value=cd.eic;
     });
 
-    document.getElementById('pantryInput').value=d.p; 
+    document.getElementById('pantryInput').value=d.p || ""; 
     document.getElementById('byAvg').value=d.by; document.getElementById('bcAvg').value=d.bc;
     document.getElementById('byAvgB1').value=d.byB1||""; document.getElementById('bcAvgB1').value=d.bcB1||"";
     document.getElementById('byAvgB2').value=d.byB2||""; document.getElementById('bcAvgB2').value=d.bcB2||"";
@@ -608,7 +887,38 @@ function updateWaterSummary(){
         if(v) wDisp = (ratio==="FULL"?ratio:ratio+"%") + " / " + v[0] + "kg / " + v[1];
     }
     document.getElementById('finalWater').textContent = wDisp;
-    document.getElementById('finalPantry').textContent = document.getElementById('pantryInput').value || "-";
+
+    let pInp = document.getElementById('pantryInput').value.trim();
+    let finalPantryField = document.getElementById('finalPantry');
+    
+    if(!pInp) { finalPantryField.textContent = "-"; return; }
+
+    let matchedOptText = null;
+    let options = document.getElementById('pantryList').options;
+    let inputUpper = pInp.toUpperCase();
+    
+    // Final kontrolün pantry alanında da sadece tam bir eşleşme varsa uzun isim yazsın
+    for(let i=0; i<options.length; i++) {
+        let optVal = options[i].value.toUpperCase();
+        if(optVal === inputUpper) {
+            matchedOptText = options[i].textContent;
+            break;
+        }
+    }
+
+    if(matchedOptText) {
+        let parts = matchedOptText.split(" / ");
+        if(parts.length >= 4) {
+            finalPantryField.textContent = `${parts[0].trim()} / ${parts[1].trim()} / ${parts[3].trim()}`;
+        } else if (parts.length === 3) {
+            finalPantryField.textContent = `${parts[0].trim()} / ${parts[1].trim()} / ${parts[2].trim()}`;
+        } else {
+            finalPantryField.textContent = matchedOptText;
+        }
+    } else {
+        // Liste dışı serbest metin veya tek harf girildiyse direkt ne yazdıysan o gözükecek
+        finalPantryField.textContent = inputUpper;
+    }
 }
 
 function updateWaterUI() { 
@@ -648,23 +958,14 @@ function updateMixDual(){
 function toggleContent(el){ const c=el.nextElementSibling; c.style.display=(c.style.display==='block'?'none':'block'); }
 function toggleSummaryContent(){ const c=document.getElementById('summary-main-content'); c.style.display=(c.style.display==='block'?'none':'block'); }
 function fullReset() {
-    document.getElementById('compartments').innerHTML=""; 
-    document.getElementById('pantryInput').value = "";
-    document.getElementById('tailInput').value = "";
-    document.getElementById('destInput').value = "";
-    document.getElementById('note').value = "";
-    document.getElementById('byAvg').value = "";
-    document.getElementById('bcAvg').value = "";
-    document.getElementById('mxAvg').value = "";
-    document.getElementById('byAvgB1').value = "";
-    document.getElementById('bcAvgB1').value = "";
-    document.getElementById('mxAvgB1').value = "";
-    document.getElementById('byAvgB2').value = "";
-    document.getElementById('bcAvgB2').value = "";
-    document.getElementById('mxAvgB2').value = "";
+    document.getElementById('compartments').innerHTML=""; document.getElementById('pantryInput').value = "";
+    document.getElementById('tailInput').value = ""; document.getElementById('destInput').value = ""; document.getElementById('note').value = "";
+    document.getElementById('byAvg').value = ""; document.getElementById('bcAvg').value = ""; document.getElementById('mxAvg').value = "";
+    document.getElementById('byAvgB1').value = ""; document.getElementById('bcAvgB1').value = ""; document.getElementById('mxAvgB1').value = "";
+    document.getElementById('byAvgB2').value = ""; document.getElementById('bcAvgB2').value = ""; document.getElementById('mxAvgB2').value = "";
     updateSummary(); 
 }
-function clearStorage() { if(confirm("Tüm veriler silinsin mi?")) { localStorage.removeItem("hlc_v34_final_storage"); location.reload(); } }
+function clearStorage() { if(confirm("Tüm veriler silinsin mi?")) { localStorage.removeItem("hlc_v35_final_storage"); location.reload(); } }
 window.onload=loadAll;
 </script>
 </body>
