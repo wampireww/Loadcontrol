@@ -449,7 +449,6 @@ function handlePantryInput(inputEl) {
     let val = inputEl.value.trim().toUpperCase();
     let options = document.getElementById('pantryList').options;
     
-    // Sadece tam bir 3 harfli istasyon kodu yazıldığında datalist eşleşmesi yapsın
     if (val.length === 3) {
         for(let i=0; i<options.length; i++) {
             let optVal = options[i].value.toUpperCase();
@@ -648,8 +647,8 @@ function updateSummary(){
                    `<div class="summary-detail">📦 TOPLAM ${uLabel} BAGAJ (B2): ${b2ULDCount} <span class="detail-sub">(T: ${b2Bags} / By: ${b2By} / Bc: ${b2Bc} / Mx: ${b2Mx})</span></div>`;
         } else {
             bDet = `<div class="summary-detail" style="border-bottom: 1px dashed rgba(255,255,255,0.2); padding-bottom: 6px; margin-bottom: 6px;">📦 TOPLAM BAGAJ (B1+B2): ${totalCombinedBags} <span class="detail-sub">(By: ${totalCombinedBy} / Bc: ${totalCombinedBc} / Mx: ${totalCombinedMx})</span></div>` +
-                   `<div class="summary-detail">📦 TOPLAM BAGAJ (B1): ${b1Bags} <span class="detail-sub">(By: ${b1By} / Bc: ${b1Bc} / Mx: ${b1Mx})</span></div>` +
-                   `<div class="summary-detail">📦 TOPLAM BAGAJ (B2): ${b2Bags} <span class="detail-sub">(By: ${b2By} / Bc: ${b2Bc} / Mx: ${b2Mx})</span></div>`;
+                   `<div class="summary-detail">📦 TOPLAM BAGAJ (B1): ${b1Bags} <span class="detail-sub">(By: ${b1Bags} / By: ${b1By} / Bc: ${b1Bc} / Mx: ${b1Mx})</span></div>` +
+                   `<div class="summary-detail">📦 TOPLAM BAGAJ (B2): ${b2Bags} <span class="detail-sub">(By: ${b2Bags} / By: ${b2By} / Bc: ${b2Bc} / Mx: ${b2Mx})</span></div>`;
         }
     }
 
@@ -706,12 +705,14 @@ function takeSnapshot() {
         
         tailInput.style.display = 'inline-block'; destInput.style.display = 'inline-block'; noteTextarea.style.display = 'block';
         tailSnap.style.display = 'none'; destSnap.style.display = 'none'; noteSnap.style.display = 'none';
-        actionRow.style.display = 'flex'; shotBtn.style.block = 'block';
+        actionRow.style.display = 'flex'; 
+        shotBtn.style.display = 'block';
     }).catch(err => { 
         console.error("Snapshot hatası:", err); 
         tailInput.style.display = 'inline-block'; destInput.style.display = 'inline-block'; noteTextarea.style.display = 'block';
         tailSnap.style.display = 'none'; destSnap.style.display = 'none'; noteSnap.style.display = 'none';
-        actionRow.style.display = 'flex'; shotBtn.style.display = 'block'; 
+        actionRow.style.display = 'flex'; 
+        shotBtn.style.display = 'block'; 
     });
 }
 
@@ -897,7 +898,6 @@ function updateWaterSummary(){
     let options = document.getElementById('pantryList').options;
     let inputUpper = pInp.toUpperCase();
     
-    // Final kontrolün pantry alanında da sadece tam bir eşleşme varsa uzun isim yazsın
     for(let i=0; i<options.length; i++) {
         let optVal = options[i].value.toUpperCase();
         if(optVal === inputUpper) {
@@ -916,7 +916,6 @@ function updateWaterSummary(){
             finalPantryField.textContent = matchedOptText;
         }
     } else {
-        // Liste dışı serbest metin veya tek harf girildiyse direkt ne yazdıysan o gözükecek
         finalPantryField.textContent = inputUpper;
     }
 }
