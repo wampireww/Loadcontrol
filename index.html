@@ -56,9 +56,15 @@ input[type=number], input[type=text], select{padding:2px 6px; border:1px solid #
 .catering-input-box { width: 45px !important; height: 26px !important; font-weight: 900; border: 1.2px solid #777 !important; text-align: center; font-size: 14px; margin: 0; padding: 0; box-sizing: border-box; }
 .catering-slash { font-weight: bold; color: #004080; font-size: 14px; margin: 0 1px; line-height: 26px; }
 
-/* Ekran görüntüsü esnasında harf bozulmalarını önleyen klon katmanlar */
 .snapshot-text-span { color: white; font-size: 16px; font-weight: 800; display: none; text-transform: uppercase; }
 #note-snapshot-view { width: 100%; min-height: 115px; margin-top: 15px; padding: 8px; font-size: 14px; font-weight: bold; background: rgba(255,255,255,0.1); border: 1px dashed rgba(255,255,255,0.3); border-radius: 8px; color: white; white-space: pre-wrap; word-break: break-all; box-sizing: border-box; display: none; }
+
+.cg-section { margin-top: 12px; margin-bottom: 6px; background: rgba(255, 255, 255, 0.05); padding: 6px 10px; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.12); }
+.cg-labels { display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; color: rgba(255, 255, 255, 0.7); margin-bottom: 4px; letter-spacing: 0.5px; }
+.cg-track { position: relative; width: 100%; height: 14px; background: rgba(0, 0, 0, 0.25); border-radius: 7px; border: 1px solid rgba(255, 255, 255, 0.15); box-sizing: border-box; }
+.cg-center-line { position: absolute; left: 50%; top: 0; bottom: 0; width: 2px; background: rgba(255, 255, 255, 0.8); transform: translateX(-50%); z-index: 1; }
+.cg-indicator { position: absolute; top: -2px; left: 50%; transform: translateX(-50%); transition: left 0.25s ease-out; z-index: 2; display: flex; flex-direction: column; align-items: center; }
+.cg-pointer { width: 4px; height: 16px; background: #e0d130; box-shadow: 0 0 2px rgba(224, 209, 48, 0.5); border-radius: 2px; }
 </style>
 </head>
 <body>
@@ -317,7 +323,7 @@ input[type=number], input[type=text], select{padding:2px 6px; border:1px solid #
                 <option value="CGN">CGN / Köln / ALMANYA / M</option>
                 <option value="STR">STR / Stuttgart / ALMANYA / M</option>
                 <option value="BER">BER / Berlin / ALMANYA / M</option>
-                <option value="OSL">OSL / Oslo / NORSVEÇ / M</option>
+                <option value="OSL">OSL / Oslo / NORVEÇ / M</option>
                 <option value="RIX">RIX / Riga / LETONYA / M</option>
                 <option value="HEL">HEL / Helsinki / FİNLANDİYA / M</option>
                 <option value="CPH">CPH / Kopenhag / DANİMARKA / M</option>
@@ -404,6 +410,21 @@ input[type=number], input[type=text], select{padding:2px 6px; border:1px solid #
         <div class="summary-line" id="finalCateringRow" style="display:none;"><span class="summary-label">İKRAM:</span><span class="summary-val" id="finalCatering">-</span></div>
         <div class="summary-line"><span class="summary-label">WATER:</span><span class="summary-val" id="finalWater">-</span></div>
         <div class="summary-line"><span class="summary-label">PANTRY:</span><span class="summary-val" id="finalPantry">-</span></div>
+        
+        <!-- YALIN SARI İBRELİ MİNİMALİST CG GÖSTERGESİ -->
+        <div class="cg-section">
+            <div class="cg-labels">
+                <span>◄ AFT</span>
+                <span>FWD ►</span>
+            </div>
+            <div class="cg-track">
+                <div class="cg-center-line"></div>
+                <div id="cgIndicator" class="cg-indicator">
+                    <div class="cg-pointer"></div>
+                </div>
+            </div>
+        </div>
+
         <div class="total-payload">TOTAL PAYLOAD: <span id="totalPayload">0</span> kg</div>
 
         <textarea id="note" placeholder="Operasyon Notu Ekle..." oninput="saveAll()"></textarea>
@@ -518,6 +539,8 @@ function updateSummary(){
     let totalBags=0, totalULDCount=0, cBy=0, cBc=0, cMx=0, cX=0, wX=0;
     let b1Bags=0, b1ULDCount=0, b1By=0, b1Bc=0, b1Mx=0;
     let b2Bags=0, b2ULDCount=0, b2By=0, b2Bc=0, b2Mx=0;
+    let cptWeights = {};
+    let cptPayloadWeights = {};
 
     const ac=document.getElementById('aircraft').value, lt=document.getElementById('loadType').value;
     const isDual = document.getElementById('dualLegCheckbox').checked;
@@ -535,24 +558,30 @@ function updateSummary(){
     const mxA_b2 = +document.getElementById('mxAvgB2').value||0;
 
     document.querySelectorAll(".compartment").forEach(c=>{
-        let cptW=0, cptBags=0, cptActiveULD=0, cptCargoW=0, cptManuelW=0, cptX=0, cptPostaW=0, cptIkramW=0;
+        let cptW=0, cptPayloadW=0, cptBags=0, cptActiveULD=0, cptCargoW=0, cptManuelW=0, cptX=0, cptPostaW=0, cptIkramW=0;
         const cptNum = parseInt(c.dataset.num);
         let isBulk = (lt === "YIGMA" || cptNum === 5);
 
         if (!isDual) {
             c.querySelectorAll(".by,.bc,.mx").forEach(i=>{ 
                 let v=+i.value||0; cptBags+=v; totalBags+=v; 
-                if(i.classList.contains('by')) { cptW+=v*byA; cBy+=v; }
-                if(i.classList.contains('bc')) { cptW+=v*bcA; cBc+=v; }
-                if(i.classList.contains('mx')) { cptW+=v*mxA; cMx+=v; }
+                let addW = 0;
+                if(i.classList.contains('by')) addW = v*byA;
+                if(i.classList.contains('bc')) addW = v*bcA;
+                if(i.classList.contains('mx')) addW = v*mxA;
+                cptW += addW; cptPayloadW += addW;
+                if(i.classList.contains('by')) cBy+=v;
+                if(i.classList.contains('bc')) cBc+=v;
+                if(i.classList.contains('mx')) cMx+=v;
             });
             c.querySelectorAll(".konteyner-item").forEach(k=>{
                 const kind=k.dataset.kind;
                 if(kind === "X") {
-                    cptW += 70; wX += 70; cptX++; cX++;
+                    cptW += 70; cptPayloadW += 70; wX += 70; cptX++; cX++;
                 } else {
                     const count=+k.querySelector("input").value||0;
-                    cptW += 70 + (count * (kind==="By"?byA:(kind==="Bc"?bcA:mxA))); 
+                    let uldW = 70 + (count * (kind==="By"?byA:(kind==="Bc"?bcA:mxA)));
+                    cptW += uldW; cptPayloadW += uldW;
                     totalBags+=count; cptActiveULD++; totalULDCount++;
                     if(kind==="By") cBy+=count; else if(kind==="Bc") cBc+=count; else if(kind==="Mix") cMx+=count;
                 }
@@ -561,53 +590,72 @@ function updateSummary(){
             if (isBulk) {
                 c.querySelectorAll(".by-b1, .bc-b1, .mx-b1").forEach(i=>{
                     let v=+i.value||0; cptBags+=v; b1Bags+=v;
-                    if(i.classList.contains('by-b1')) { cptW+=v*byA_b1; b1By+=v; }
-                    if(i.classList.contains('bc-b1')) { cptW+=v*bcA_b1; b1Bc+=v; }
-                    if(i.classList.contains('mx-b1')) { cptW+=v*mxA_b1; b1Mx+=v; }
+                    let addW = 0;
+                    if(i.classList.contains('by-b1')) addW = v*byA_b1;
+                    if(i.classList.contains('bc-b1')) addW = v*bcA_b1;
+                    if(i.classList.contains('mx-b1')) addW = v*mxA_b1;
+                    cptW += addW; cptPayloadW += addW;
+                    if(i.classList.contains('by-b1')) b1By+=v;
+                    if(i.classList.contains('bc-b1')) b1Bc+=v;
+                    if(i.classList.contains('mx-b1')) b1Mx+=v;
                 });
                 c.querySelectorAll(".by-b2, .bc-b2, .mx-b2").forEach(i=>{
                     let v=+i.value||0; cptBags+=v; b2Bags+=v;
-                    if(i.classList.contains('by-b2')) { cptW+=v*byA_b2; b2By+=v; }
-                    if(i.classList.contains('bc-b2')) { cptW+=v*bcA_b2; b2Bc+=v; }
-                    if(i.classList.contains('mx-b2')) { cptW+=v*mxA_b2; b2Mx+=v; }
+                    let addW = 0;
+                    if(i.classList.contains('by-b2')) addW = v*byA_b2;
+                    if(i.classList.contains('bc-b2')) addW = v*bcA_b2;
+                    if(i.classList.contains('mx-b2')) addW = v*mxA_b2;
+                    cptW += addW; cptPayloadW += addW;
+                    if(i.classList.contains('by-b2')) b2By+=v;
+                    if(i.classList.contains('bc-b2')) b2Bc+=v;
+                    if(i.classList.contains('mx-b2')) b2Mx+=v;
                 });
             } else {
                 c.querySelectorAll(".konteyner-item").forEach(k=>{
                     const kind=k.dataset.kind;
                     const leg=k.dataset.leg;
                     if(kind === "X") {
-                        cptW += 70; wX += 70; cptX++; cX++;
+                        cptW += 70; cptPayloadW += 70; wX += 70; cptX++; cX++;
                     } else {
                         const count=+k.querySelector("input").value||0;
                         cptBags+=count; cptActiveULD++; totalULDCount++;
+                        let uldW = 0;
                         if (leg === "B1") {
-                            cptW += 70 + (count * (kind==="By"?byA_b1:(kind==="Bc"?bcA_b1:mxA_b1)));
+                            uldW = 70 + (count * (kind==="By"?byA_b1:(kind==="Bc"?bcA_b1:mxA_b1)));
                             b1Bags+=count; b1ULDCount++;
                             if(kind==="By") b1By+=count; else if(kind==="Bc") b1Bc+=count; else if(kind==="Mix") b1Mx+=count;
                         } else {
-                            cptW += 70 + (count * (kind==="By"?byA_b2:(kind==="Bc"?bcA_b2:mxA_b2)));
+                            uldW = 70 + (count * (kind==="By"?byA_b2:(kind==="Bc"?bcA_b2:mxA_b2)));
                             b2Bags+=count; b2ULDCount++;
-                            if(kind==="By") b2By+=count; else if(kind==="Bc") b2Bc+=count; else if(kind==="Mix") b2Mx+=count;
+                            if(kind==="By") b2By+=count; else if(kind==="Bc") b2By+=count; else if(kind==="Mix") b2Mx+=count;
                         }
+                        cptW += uldW; cptPayloadW += uldW;
                     }
                 });
             }
         }
 
         const C = c.querySelectorAll(".local-item[data-kind='C']"); totalCargo += C.length;
-        C.forEach(i=>{ let val=+i.querySelector("input").value||0; cptW+=val; wCargo+=val; cptCargoW+=val; });
+        C.forEach(i=>{ let val=+i.querySelector("input").value||0; cptW+=val; cptPayloadW+=val; wCargo+=val; cptCargoW+=val; });
         const M = c.querySelectorAll(".local-item[data-kind='Mn']"); totalManuel += M.length;
-        M.forEach(i=>{ let val=+i.querySelector("input").value||0; cptW+=val; wManuel+=val; cptManuelW+=val; });
+        M.forEach(i=>{ let val=+i.querySelector("input").value||0; cptW+=val; cptPayloadW+=val; wManuel+=val; cptManuelW+=val; });
         const P = c.querySelectorAll(".local-item[data-kind='M']"); totalPosta += P.length;
-        P.forEach(i=>{ let val=+i.querySelector("input").value||0; cptW+=val; wPosta+=val; cptPostaW+=val; });
+        P.forEach(i=>{ let val=+i.querySelector("input").value||0; cptW+=val; cptPayloadW+=val; wPosta+=val; cptPostaW+=val; });
         const IK = c.querySelectorAll(".local-item[data-kind='İ']"); totalIkram += IK.length;
         IK.forEach(i=>{ 
             let inputs = i.querySelectorAll(".catering-input-box");
             let valIkr = +inputs[0].value||0; let valIce = +inputs[1].value||0;
-            cptW += valIkr; wIkram += valIkr; wKuruBuz += valIce; cptIkramW += valIkr; 
+            cptW += valIkr; cptPayloadW += valIkr; wIkram += valIkr; wKuruBuz += valIce; cptIkramW += valIkr; 
         });
 
-        const eic=c.querySelector(".eic-input"); if(eic) cptW+=+eic.value||0;
+        const eic=c.querySelector(".eic-input"); 
+        if(eic) {
+            let eicVal = +eic.value||0;
+            cptW += eicVal; 
+        }
+
+        cptWeights[cptNum] = cptW;
+        cptPayloadWeights[cptNum] = cptPayloadW;
 
         let res=[];
         if(cptNum===5) { if(cptBags>0) res.push("B "+cptBags); } 
@@ -644,11 +692,11 @@ function updateSummary(){
         if(lt==="ULD") {
             bDet = `<div class="summary-detail" style="border-bottom: 1px dashed rgba(255,255,255,0.2); padding-bottom: 6px; margin-bottom: 6px;">📦 TOPLAM ${uLabel} BAGAJ (B1+B2): ${totalULDCount} <span class="detail-sub">(T: ${totalCombinedBags} / By: ${totalCombinedBy} / Bc: ${totalCombinedBc} / Mx: ${totalCombinedMx})</span></div>` +
                    `<div class="summary-detail">📦 TOPLAM ${uLabel} BAGAJ (B1): ${b1ULDCount} <span class="detail-sub">(By: ${b1By} / Bc: ${b1Bc} / Mx: ${b1Mx})</span></div>` +
-                   `<div class="summary-detail">📦 TOPLAM ${uLabel} BAGAJ (B2): ${b2ULDCount} <span class="detail-sub">(By: ${b2By} / Bc: ${b2Bc} / Mx: ${b2Mx})</span></div>`;
+                   `<div class="summary-detail">📦 TOPLAM ${uLabel} BAGAJ (B2): ${b2ULDCount} <span class="detail-sub">(By: ${b2By} / Bc: ${b2By} / Mx: ${b2By})</span></div>`;
         } else {
-            bDet = `<div class="summary-detail" style="border-bottom: 1px dashed rgba(255,255,255,0.2); padding-bottom: 6px; margin-bottom: 6px;">📦 TOPLAM BAGAJ (B1+B2): ${totalCombinedBags} <span class="detail-sub">(By: ${totalCombinedBy} / Bc: ${totalCombinedBc} / Mx: ${totalCombinedMx})</span></div>` +
-                   `<div class="summary-detail">📦 TOPLAM BAGAJ (B1): ${b1Bags} <span class="detail-sub">(By: ${b1By} / Bc: ${b1Bc} / Mx: ${b1Mx})</span></div>` +
-                   `<div class="summary-detail">📦 TOPLAM BAGAJ (B2): ${b2Bags} <span class="detail-sub">(By: ${b2By} / Bc: ${b2Bc} / Mx: ${b2Mx})</span></div>`;
+            bDet = `<div class="summary-detail" style="border-bottom: 1px dashed rgba(255,255,255,0.2); padding-bottom: 6px; margin-bottom: 6px;">📦 TOPLAM BAGAJ (B1+B2): ${totalCombinedBags} <span class="detail-sub">(T: ${totalCombinedBags} / By: ${totalCombinedBy} / Bc: ${totalCombinedBc} / Mx: ${totalCombinedMx})</span></div>` +
+                   `<div class="summary-detail">📦 TOPLAM BAGAJ (B1): ${b1Bags} <span class="detail-sub">(By: ${b1By} / Bc: ${b1By} / Mx: ${b1By})</span></div>` +
+                   `<div class="summary-detail">📦 TOPLAM BAGAJ (B2): ${b2Bags} <span class="detail-sub">(By: ${b2By} / Bc: ${b2By} / Mx: ${b2By})</span></div>`;
         }
     }
 
@@ -670,6 +718,53 @@ function updateSummary(){
         cateringRow.style.display = 'none';
     }
     updateWaterSummary();
+    
+    calculateCG(ac, cptPayloadWeights);
+}
+
+// BÖLGESEL BİÇAK SIRTI KUSURSUZ SİMETRİK CG HESABI
+function calculateCG(ac, cptPayloadWeights) {
+    const indicator = document.getElementById('cgIndicator');
+    if (!ac) {
+        indicator.style.left = '50%';
+        return;
+    }
+
+    let fwdWeight = 0;
+    let aftWeight = 0;
+
+    // Her uçak için ÖN ve ARKA ambar gruplaması
+    Object.keys(cptPayloadWeights).forEach(cptNumStr => {
+        let cptNum = parseInt(cptNumStr);
+        let w = cptPayloadWeights[cptNum] || 0;
+
+        if (cptNum === 1 || cptNum === 2) {
+            fwdWeight += w; // ÖN
+        } else {
+            aftWeight += w; // ARKA (CPT 3, 4, 5)
+        }
+    });
+
+    let totalWeight = fwdWeight + aftWeight;
+
+    if (totalWeight <= 0) {
+        indicator.style.left = '50%';
+        return;
+    }
+
+    // Göreceli Denge Oranı: (AFT - FWD) / Toplam
+    // Tam eşitse (AFT = FWD) -> ratio = 0
+    let ratio = (aftWeight - fwdWeight) / totalWeight;
+
+    // 50% tam orta nokta. ratio -1 ile +1 arasındadır.
+    // ratio = -1 ise (Sadece FWD) -> %92 (FWD yönü sağda)
+    // ratio = +1 ise (Sadece AFT) -> %8 (AFT yönü solda)
+    let finalLeftPercent = 50 - (ratio * 42);
+
+    if (finalLeftPercent < 8) finalLeftPercent = 8;
+    if (finalLeftPercent > 92) finalLeftPercent = 92;
+
+    indicator.style.left = finalLeftPercent.toFixed(1) + '%';
 }
 
 function takeSnapshot() {
