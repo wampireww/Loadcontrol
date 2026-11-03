@@ -22,6 +22,7 @@ h3{cursor:pointer; margin:4px 0; display:flex; align-items:center; font-size: 1.
 .flex{display:flex; flex-wrap:wrap; align-items:center; gap:6px;}
 input[type=number], input[type=text], select{padding:2px 6px; border:1px solid #ccc; border-radius:4px; font-size: 15px; font-weight: bold; height: 34px; box-sizing: border-box;}
 .add-btn { background:#004080; color:#fff; border:none; border-radius:4px; width: 28px; height: 28px; cursor:pointer; font-weight: bold; font-size: 18px; display: flex; align-items: center; justify-content: center;}
+.slash-btn { background:#004080; color:#fff; border:none; border-radius:4px; width: 28px; height: 28px; cursor:pointer; font-weight: bold; font-size: 15px; display: flex; align-items: center; justify-content: center; }
 .midBadge { font-size: 0.82em; color: #d35400; font-weight: 800; flex-grow: 1; text-align: center; }
 .item-wrapper { display: flex; align-items: center; justify-content: space-between; background: #fff; padding: 3px 5px; border-radius: 6px; border: 1.8px solid #004080; width: 48.5%; box-sizing: border-box; margin-bottom: 5px; }
 .item-wrapper span { font-size: 13px; font-weight: 600; color: #444; }
@@ -410,7 +411,7 @@ input[type=number], input[type=text], select{padding:2px 6px; border:1px solid #
         <div class="summary-line" id="finalCateringRow" style="display:none;"><span class="summary-label">İKRAM:</span><span class="summary-val" id="finalCatering">-</span></div>
         <div class="summary-line"><span class="summary-label">WATER:</span><span class="summary-val" id="finalWater">-</span></div>
         <div class="summary-line"><span class="summary-label">PANTRY:</span><span class="summary-val" id="finalPantry">-</span></div>
-        
+
         <!-- YALIN SARI İBRELİ MİNİMALİST CG GÖSTERGESİ -->
         <div class="cg-section">
             <div class="cg-labels">
@@ -578,6 +579,8 @@ function updateSummary(){
                 const kind=k.dataset.kind;
                 if(kind === "X") {
                     cptW += 70; cptPayloadW += 70; wX += 70; cptX++; cX++;
+                } else if(kind === "SLASH") {
+                    // Slash (/) ağırlık eklemez
                 } else {
                     const count=+k.querySelector("input").value||0;
                     let uldW = 70 + (count * (kind==="By"?byA:(kind==="Bc"?bcA:mxA)));
@@ -616,6 +619,8 @@ function updateSummary(){
                     const leg=k.dataset.leg;
                     if(kind === "X") {
                         cptW += 70; cptPayloadW += 70; wX += 70; cptX++; cX++;
+                    } else if(kind === "SLASH") {
+                        // Slash (/) ağırlık eklemez
                     } else {
                         const count=+k.querySelector("input").value||0;
                         cptBags+=count; cptActiveULD++; totalULDCount++;
@@ -718,7 +723,7 @@ function updateSummary(){
         cateringRow.style.display = 'none';
     }
     updateWaterSummary();
-    
+
     calculateCG(ac, cptPayloadWeights);
 }
 
@@ -733,7 +738,6 @@ function calculateCG(ac, cptPayloadWeights) {
     let fwdWeight = 0;
     let aftWeight = 0;
 
-    // Her uçak için ÖN ve ARKA ambar gruplaması
     Object.keys(cptPayloadWeights).forEach(cptNumStr => {
         let cptNum = parseInt(cptNumStr);
         let w = cptPayloadWeights[cptNum] || 0;
@@ -752,13 +756,7 @@ function calculateCG(ac, cptPayloadWeights) {
         return;
     }
 
-    // Göreceli Denge Oranı: (AFT - FWD) / Toplam
-    // Tam eşitse (AFT = FWD) -> ratio = 0
     let ratio = (aftWeight - fwdWeight) / totalWeight;
-
-    // 50% tam orta nokta. ratio -1 ile +1 arasındadır.
-    // ratio = -1 ise (Sadece FWD) -> %92 (FWD yönü sağda)
-    // ratio = +1 ise (Sadece AFT) -> %8 (AFT yönü solda)
     let finalLeftPercent = 50 - (ratio * 42);
 
     if (finalLeftPercent < 8) finalLeftPercent = 8;
@@ -841,8 +839,11 @@ function updateCompartments(r){
         let isBulk = (lt==="YIGMA" || n===5);
 
         if (!isDual) {
-            if(isBulk) bSec.innerHTML=`<div class="flex">By<input type="number" class="by" style="width:60px" oninput="updateSummary();saveAll()"> Bc<input type="number" class="bc" style="width:60px" oninput="updateSummary();saveAll()"> Mix<input type="number" class="mx" style="width:60px" oninput="updateSummary();saveAll()"></div>`;
-            else bSec.innerHTML=`<div class="add-row"><strong>${ac.includes("B737")||ac.includes("A32")?"AKH":"AKE"}</strong> <select class="bagType"><option value="By">By</option><option value="Bc">Bc</option><option value="Mix">Mix</option><option value="X">Boş</option></select> <button class="add-btn" onclick="addBagaj(this)">+</button></div><div class="items-container uld-items"></div>`;
+            if(isBulk) {
+                bSec.innerHTML=`<div class="flex">By<input type="number" class="by" style="width:60px" oninput="updateSummary();saveAll()"> Bc<input type="number" class="bc" style="width:60px" oninput="updateSummary();saveAll()"> Mix<input type="number" class="mx" style="width:60px" oninput="updateSummary();saveAll()"></div>`;
+            } else {
+                bSec.innerHTML=`<div class="add-row"><strong>${ac.includes("B737")||ac.includes("A32")?"AKH":"AKE"}</strong> <select class="bagType"><option value="By">By</option><option value="Bc">Bc</option><option value="Mix">Mix</option><option value="X">Boş</option></select> <button class="add-btn" onclick="addBagaj(this)">+</button> <button class="slash-btn" onclick="addSlashBagaj(this)" title="Slash Ekle">/</button></div><div class="items-container uld-items"></div>`;
+            }
         } else {
             if(isBulk) {
                 bSec.innerHTML=`<div style="display:flex; flex-direction:column; gap:6px;">
@@ -850,7 +851,7 @@ function updateCompartments(r){
                     <div class="flex"><span style="color:#cc0000; font-weight:bold; width:20px;">B2</span> By<input type="number" class="by-b2" style="width:50px" oninput="updateSummary();saveAll()"> Bc<input type="number" class="bc-b2" style="width:50px" oninput="updateSummary();saveAll()"> Mix<input type="number" class="mx-b2" style="width:50px" oninput="updateSummary();saveAll()"></div>
                 </div>`;
             } else {
-                bSec.innerHTML=`<div class="add-row"><select class="legSelect"><option>B1</option><option>B2</option></select><strong>${ac.includes("B737")||ac.includes("A32")?"AKH":"AKE"}</strong> <select class="bagType"><option value="By">By</option><option value="Bc">Bc</option><option value="Mix">Mix</option><option value="X">Boş</option></select> <button class="add-btn" onclick="addBagaj(this)">+</button></div><div class="items-container uld-items"></div>`;
+                bSec.innerHTML=`<div class="add-row"><select class="legSelect"><option>B1</option><option>B2</option></select><strong>${ac.includes("B737")||ac.includes("A32")?"AKH":"AKE"}</strong> <select class="bagType"><option value="By">By</option><option value="Bc">Bc</option><option value="Mix">Mix</option><option value="X">Boş</option></select> <button class="add-btn" onclick="addBagaj(this)">+</button> <button class="slash-btn" onclick="addSlashBagaj(this)" title="Slash Ekle">/</button></div><div class="items-container uld-items"></div>`;
             }
         }
         container.appendChild(s);
@@ -881,6 +882,23 @@ function addBagaj(b,v=null,kind=null,leg=null){
     h.appendChild(d); renumberGlobalBags(); updateSummary(); saveAll(); 
 }
 
+function addSlashBagaj(b, leg=null) {
+    const isDual = document.getElementById('dualLegCheckbox').checked;
+    const selectedLeg = leg || (isDual ? b.parentElement.querySelector('.legSelect').value : "B1");
+    const h = b.parentElement.nextElementSibling; 
+    const d = document.createElement("div"); 
+    d.className = "konteyner-item item-wrapper"; 
+    d.dataset.kind = "SLASH"; 
+    d.dataset.leg = selectedLeg;
+
+    let labelHtml = isDual ? `<span style="color:#cc0000; font-weight:bold;">${selectedLeg}/</span><span></span>` : `<span></span>`;
+    d.innerHTML = `<div style="display:flex; align-items:center;">${labelHtml}</div><span style="font-weight:900; color:#333; font-size:18px; margin: 0 auto; text-align:center;">/</span><button class="delete-btn" onclick="this.parentElement.remove(); updateSummary(); saveAll()">X</button>`;
+    
+    h.appendChild(d); 
+    updateSummary(); 
+    saveAll();
+}
+
 function renumberGlobalBags(){ 
     const isDual = document.getElementById('dualLegCheckbox').checked;
     if (!isDual) {
@@ -903,7 +921,10 @@ function saveAll(){
             let inputs = i.querySelectorAll(".catering-input-box");
             ikram.push({ikr: inputs[0].value, ice: inputs[1].value});
         });
-        const ulds = []; c.querySelectorAll(".uld-items .konteyner-item").forEach(k => ulds.push({k: k.dataset.kind, v: k.querySelector("input").value, leg: k.dataset.leg}));
+        const ulds = []; c.querySelectorAll(".uld-items .konteyner-item").forEach(k => {
+            let val = k.dataset.kind === "SLASH" ? "" : k.querySelector("input").value;
+            ulds.push({k: k.dataset.kind, v: val, leg: k.dataset.leg});
+        });
 
         compsData.push({ 
             n: c.dataset.num, cargo, manuel, posta, ikram, ulds, 
@@ -956,7 +977,13 @@ function loadAll(){
                 else addCateringItem(c.querySelector(".ikram-items").previousElementSibling.querySelector("button"), valObj, '');
             });
         }
-        cd.ulds.forEach(u => addBagaj(c.querySelector(".uld-items").previousElementSibling.querySelector("button"), u.v, u.k, u.leg));
+        cd.ulds.forEach(u => {
+            if (u.k === "SLASH") {
+                addSlashBagaj(c.querySelector(".uld-items").previousElementSibling.querySelector("button"), u.leg);
+            } else {
+                addBagaj(c.querySelector(".uld-items").previousElementSibling.querySelector("button"), u.v, u.k, u.leg);
+            }
+        });
         if(c.querySelector(".by")) { c.querySelector(".by").value=cd.bulk.by; c.querySelector(".bc").value=cd.bulk.bc; c.querySelector(".mx").value=cd.bulk.mx; }
         if(c.querySelector(".by-b1")) {
             c.querySelector(".by-b1").value=cd.bulkDual.by_b1; c.querySelector(".bc-b1").value=cd.bulkDual.bc_b1; c.querySelector(".mx-b1").value=cd.bulkDual.mx_b1;
